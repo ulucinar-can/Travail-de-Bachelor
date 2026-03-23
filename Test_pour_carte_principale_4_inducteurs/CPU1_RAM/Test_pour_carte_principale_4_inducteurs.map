@@ -1,7 +1,7 @@
 ******************************************************************************
-             TMS320C2000 Linker PC v22.6.1                     
+             TMS320C2000 Linker Unix v22.6.1                   
 ******************************************************************************
->> Linked Mon Feb 23 14:59:35 2026
+>> Linked Wed Mar 18 14:27:33 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -20,7 +20,7 @@ MEMORY CONFIGURATION
   RAMLS2                00009000   00000800  00000800  00000000  RWIX
   RAMLS3                00009800   00000800  0000064e  000001b2  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
-  RAMLS5                0000a800   00000800  000005ce  00000232  RWIX
+  RAMLS5                0000a800   00000800  000005d0  00000230  RWIX
   RAMLS6_7              0000b000   00001000  000009cb  00000635  RWIX
   RAMGS0                0000c000   00001000  00000000  00001000  RWIX
   RAMGS1                0000d000   00001000  00000000  00001000  RWIX
@@ -137,7 +137,7 @@ codestart
                   0000a98e    00000001     SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib : SFO_v8_fpu_lib_build_c28_driverlib.obj (.data)
                   0000a98f    00000001     rts2800_fpu32_eabi.lib : errno.c.obj (.data)
 
-.const     0    0000aa28    000003a6     
+.const     0    0000aa28    000003a8     
                   0000aa28    0000009a     driverlib.lib : sysctl.obj (.const:.string)
                   0000aac2    00000098                   : epwm.obj (.const:.string)
                   0000ab5a    00000098                   : gpio.obj (.const:.string)
@@ -146,13 +146,13 @@ codestart
                   0000ac8a    00000050                   : cputimer.obj (.const:.string)
                   0000acda    0000004b                   : adc.obj (.const:.string)
                   0000ad25    00000001     --HOLE-- [fill = 0]
-                  0000ad26    00000045     hrpwm_ex1_duty_sfo.obj (.const:.string)
-                  0000ad6b    00000001     --HOLE-- [fill = 0]
-                  0000ad6c    00000044     board.obj (.const:.string)
-                  0000adb0    00000012     hrpwm_ex1_duty_sfo.obj (.const:SAVITZKY)
-                  0000adc2    00000004     rts2800_fpu32_eabi.lib : e_powf.c.obj (.const:bp)
-                  0000adc6    00000004                            : e_powf.c.obj (.const:dp_h)
-                  0000adca    00000004                            : e_powf.c.obj (.const:dp_l)
+                  0000ad26    00000046     hrpwm_ex1_duty_sfo.obj (.const:.string)
+                  0000ad6c    00000045     board.obj (.const:.string)
+                  0000adb1    00000001     --HOLE-- [fill = 0]
+                  0000adb2    00000012     hrpwm_ex1_duty_sfo.obj (.const:SAVITZKY)
+                  0000adc4    00000004     rts2800_fpu32_eabi.lib : e_powf.c.obj (.const:bp)
+                  0000adc8    00000004                            : e_powf.c.obj (.const:dp_h)
+                  0000adcc    00000004                            : e_powf.c.obj (.const:dp_l)
 
 .text.1    0    00008000    00000800     
                   00008000    0000038c     rts2800_fpu32_eabi.lib : e_powf.c.obj (.text)
@@ -275,23 +275,23 @@ MODULE SUMMARY
 
        Module                                   code    ro data   rw data
        ------                                   ----    -------   -------
-    .\
-       hrpwm_ex1_duty_sfo.obj                   3447    87        526    
+    ./
+       hrpwm_ex1_duty_sfo.obj                   3447    88        526    
     +--+----------------------------------------+-------+---------+---------+
-       Total:                                   3447    87        526    
+       Total:                                   3447    88        526    
                                                                          
-    .\device\
+    ./device/
        device.obj                               305     0         0      
        f28003x_codestartbranch.obj              10      0         0      
     +--+----------------------------------------+-------+---------+---------+
        Total:                                   315     0         0      
                                                                          
-    .\syscfg\
-       board.obj                                1924    68        0      
+    ./syscfg/
+       board.obj                                1924    69        0      
     +--+----------------------------------------+-------+---------+---------+
-       Total:                                   1924    68        0      
+       Total:                                   1924    69        0      
                                                                          
-    C:/ti/c2000/C2000Ware_5_02_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib
+    /home/can/ti/C2000Ware_5_02_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib
        sysctl.obj                               1348    154       0      
        gpio.obj                                 546     152       0      
        sci.obj                                  354     151       0      
@@ -302,12 +302,12 @@ MODULE SUMMARY
     +--+----------------------------------------+-------+---------+---------+
        Total:                                   2671    764       0      
                                                                          
-    C:\ti\c2000\C2000Ware_5_02_00_00\libraries\calibration\hrpwm\f28003x\lib\SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib
+    /home/can/ti/C2000Ware_5_02_00_00/libraries/calibration/hrpwm/f28003x/lib/SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib
        SFO_v8_fpu_lib_build_c28_driverlib.obj   497     0         15     
     +--+----------------------------------------+-------+---------+---------+
        Total:                                   497     0         15     
                                                                          
-    C:\ti\ccs1260\ccs\tools\compiler\ti-cgt-c2000_22.6.1.LTS\lib\rts2800_fpu32_eabi.lib
+    /home/can/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib/rts2800_fpu32_eabi.lib
        e_powf.c.obj                             908     12        0      
        fs_div28.asm.obj                         136     0         0      
        s_scalbnf.c.obj                          88      0         0      
@@ -331,7 +331,7 @@ MODULE SUMMARY
        Stack:                                   0       0         512    
        Linker Generated:                        0       114       0      
     +--+----------------------------------------+-------+---------+---------+
-       Grand Total:                             10271   1045      1064   
+       Grand Total:                             10271   1047      1064   
 
 
 LINKER GENERATED COPY TABLES
@@ -530,7 +530,7 @@ address     data page           name
 0000aa1a     2a8 (0000aa00)     MEP_SF
 0000aa23     2a8 (0000aa00)     SFO_CAL
 
-0000adb0     2b6 (0000ad80)     SAVITZKY
+0000adb2     2b6 (0000ad80)     SAVITZKY
 
 
 GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
@@ -634,7 +634,7 @@ page  address   name
 0     0000a868  Position_c2_dec                  
 0     0000a86a  Position_c3_dec                  
 0     00009daa  Push_Button_Start_XINT_init      
-0     0000adb0  SAVITZKY                         
+0     0000adb2  SAVITZKY                         
 0     00009557  SCI_clearInterruptStatus         
 0     0000959c  SCI_disableInterrupt             
 0     00009626  SCI_enableInterrupt              
@@ -1068,7 +1068,7 @@ page  address   name
 0     0000aa19  MEP_ScaleFactor                  
 0     0000aa1a  MEP_SF                           
 0     0000aa23  SFO_CAL                          
-0     0000adb0  SAVITZKY                         
+0     0000adb2  SAVITZKY                         
 0     0000b000  adcA1ISR                         
 abs   00000200  __TI_STACK_SIZE                  
 abs   ffffffff  __TI_pprof_out_hndl              

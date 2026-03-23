@@ -2,9 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-SHELL = cmd.exe
-
-CG_TOOL_ROOT := C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS
+CG_TOOL_ROOT := /home/can/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS
 
 GEN_OPTS__FLAG := --cmd_file="syscfg/board.opt" --cmd_file="syscfg/c2000ware_libraries.opt" 
 GEN_CMDS__FLAG := 
@@ -16,16 +14,16 @@ ORDERED_OBJS += \
 "./device/device.obj" \
 "./device/f28003x_codestartbranch.obj" \
 "../28003x_generic_ram_lnk.cmd" \
-"C:/ti/c2000/C2000Ware_5_02_00_00/libraries/calibration/hrpwm/f28003x/lib/SFO_v8_fpu_lib_build_c28_driverlib.lib" \
-"C:/ti/c2000/C2000Ware_5_02_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib" \
+"/home/can/ti/C2000Ware_5_02_00_00/libraries/calibration/hrpwm/f28003x/lib/SFO_v8_fpu_lib_build_c28_driverlib.lib" \
+"/home/can/ti/C2000Ware_5_02_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib" \
 $(GEN_CMDS__FLAG) \
 -lc2000ware_libraries.cmd.genlibs \
 -llibc.a \
 
 -include ../makefile.init
 
-RM := DEL /F
-RMDIR := RMDIR /S/Q
+RM := rm -rf
+RMDIR := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -143,7 +141,7 @@ all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 Test_pour_carte_principale_4_inducteurs.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
-	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -O3 --opt_for_speed=5 --fp_mode=relaxed --fp_reassoc=on --advice:performance=all --define=DEBUG --define=RAM --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"Test_pour_carte_principale_4_inducteurs.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/c2000/C2000Ware_5_02_00_00" -i"C:/Users/CanUl/Documents/TB/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --define=RAM --diag_wrap=off --display_error_number --xml_link_info="Test_pour_carte_principale_4_inducteurs_linkInfo.xml" --entry_point=code_start --rom_model -o "Test_pour_carte_principale_4_inducteurs.out" $(ORDERED_OBJS)
+	"/home/can/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -O3 --opt_for_speed=5 --fp_mode=relaxed --fp_reassoc=on --advice:performance=all --define=DEBUG --define=RAM --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"Test_pour_carte_principale_4_inducteurs.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"/home/can/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"/home/can/ti/C2000Ware_5_02_00_00" -i"/home/can/TB/Travail-de-Bachelor/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg" -i"/home/can/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --define=RAM --diag_wrap=off --display_error_number --xml_link_info="Test_pour_carte_principale_4_inducteurs_linkInfo.xml" --entry_point=code_start --rom_model -o "Test_pour_carte_principale_4_inducteurs.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -151,18 +149,18 @@ Test_pour_carte_principale_4_inducteurs.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(G
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "hrpwm_ex1_duty_sfo.obj" "syscfg\board.obj" "syscfg\c2000ware_libraries.obj" "device\device.obj" "device\f28003x_codestartbranch.obj" 
-	-$(RM) "hrpwm_ex1_duty_sfo.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "device\device.d" 
-	-$(RM) "device\f28003x_codestartbranch.d" 
+	-$(RM) "hrpwm_ex1_duty_sfo.obj" "syscfg/board.obj" "syscfg/c2000ware_libraries.obj" "device/device.obj" "device/f28003x_codestartbranch.obj" 
+	-$(RM) "hrpwm_ex1_duty_sfo.d" "syscfg/board.d" "syscfg/c2000ware_libraries.d" "device/device.d" 
+	-$(RM) "device/f28003x_codestartbranch.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
 	-@echo ' '
 
 post-build:
 	-echo "========= Build of the CLB simulation has moved to the CLB Tool. Click the '?' icon by the _Generate CLB Simulation File_ enable for more details (located in the Global Parameters of the Tile Design SysConfig module) ============="
-	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_02_00_00/utilities/clb_tool/clb_syscfg/dot_file_libraries/clbDotUtility.js"  "C:/ti/c2000/C2000Ware_5_02_00_00/utilities/clb_tool/clb_syscfg/" "C:/Users/CanUl/Documents/TB/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg" "C:/Users/CanUl/Documents/TB/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg/clb.dot"
-	-if 0 == 1  mkdir "C:/Users/CanUl/Documents/TB/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/diagrams"
-	-if 0 == 1  C:/ti/ccs1260/ccs/tools/node/node.exe "C:/ti/c2000/C2000Ware_5_02_00_00/driverlib/.meta/generate_diagrams.js" "C:/ti/c2000/C2000Ware_5_02_00_00" "C:/Users/CanUl/Documents/TB/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/diagrams" "C:/Users/CanUl/Documents/TB/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg"
+	-if 0 == 1  /home/can/ti/ccs1260/ccs/tools/node/node "/home/can/ti/C2000Ware_5_02_00_00/utilities/clb_tool/clb_syscfg/dot_file_libraries/clbDotUtility.js"  "/home/can/ti/C2000Ware_5_02_00_00/utilities/clb_tool/clb_syscfg/" "/home/can/TB/Travail-de-Bachelor/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg" "/home/can/TB/Travail-de-Bachelor/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg/clb.dot"
+	-if 0 == 1  mkdir "/home/can/TB/Travail-de-Bachelor/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/diagrams"
+	-if 0 == 1  /home/can/ti/ccs1260/ccs/tools/node/node "/home/can/ti/C2000Ware_5_02_00_00/driverlib/.meta/generate_diagrams.js" "/home/can/ti/C2000Ware_5_02_00_00" "/home/can/TB/Travail-de-Bachelor/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/diagrams" "/home/can/TB/Travail-de-Bachelor/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg"
 	-@echo ' '
 
 .PHONY: all clean dependents

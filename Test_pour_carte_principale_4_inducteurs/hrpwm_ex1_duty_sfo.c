@@ -12,9 +12,9 @@
 //###########################################################################
 // Description :
 //
-// Algorithme de régulation repris de M. Franck Yersin et M.Isoz.
-// Le code à été réaliser pour correspondre au mieux aux besoin de
-// la maquette dans sa dernière version.
+// Algorithme de rï¿½gulation repris de M. Franck Yersin et M.Isoz.
+// Le code ï¿½ ï¿½tï¿½ rï¿½aliser pour correspondre au mieux aux besoin de
+// la maquette dans sa derniï¿½re version.
 //
 // Optimisation du compilateur (2025) :
 // - Level : 3 - Interprocedure Optimization
@@ -22,11 +22,11 @@
 // - Floating point mode : relaxed
 // - Allow Reassociation of FP arithmetic : on
 //
-// Code réalisé :
+// Code rï¿½alisï¿½ :
 //
 //      - Optimisation du code pour s'approcher des 40us de temps
-//        d'exécution souhaité
-//      - Modification de calcul de conversion optimisé
+//        d'exï¿½cution souhaitï¿½
+//      - Modification de calcul de conversion optimisï¿½
 //      - Correction de lignes PWM pour faire fonctionner la sustentation
 //###########################################################################
 
@@ -67,7 +67,7 @@
 #define COUNT_TO_REACH              10000 //POUR ANTI REBOND   10'000 X 40 us = 400ms
 
 // Rapport cyclique de base a 50% -> courant theorique de 0A dans les inducteurs
-// (Forcer les PWMs à 50%, sinon de base à 0% et PWMA = 0 et PWMB = 1 (fort courant car 1 transistor toujours enclenché))
+// (Forcer les PWMs ï¿½ 50%, sinon de base ï¿½ 0% et PWMA = 0 et PWMB = 1 (fort courant car 1 transistor toujours enclenchï¿½))
 #define DUTY_CYCLE_1 50
 #define DUTY_CYCLE_2 50
 #define DUTY_CYCLE_3 50
@@ -227,7 +227,7 @@ float fc4f = 0.0;                   //buffers for inductor 4
 float IN4[Nb] ={[0 ... 2] = 0};
 float OUT4[Na] = {[0 ... 1] = 0};
 
-//float i01 = 0,i02 = 0,i03 = 0,i04 = 0; // Pas utilisé
+//float i01 = 0,i02 = 0,i03 = 0,i04 = 0; // Pas utilisï¿½
 
 // Variable pour le rapport cyclique
 float dutyFine = MIN_HRPWM_DUTY_PERCENT;
@@ -424,7 +424,7 @@ void SendFloatAsText(float f0, float f1, float f2, float f3)
     char str[TX_BUF_LEN];
     int i = 0, j = 0;
 
-// Mise en forme de la trame envoyée
+// Mise en forme de la trame envoyï¿½e
     str[i++] = '\x02'; // start bit
 
     i += ftoa(f0, &str[i], 3);
@@ -544,7 +544,7 @@ void error (void)
     ESTOP0;         // Stop here and handle error
 }
 
-// Interruption contenant les conversions, l'algorithme de régulation, les PWM et
+// Interruption contenant les conversions, l'algorithme de rï¿½gulation, les PWM et
 // la lecture du bouton poussoir
 __interrupt void adcA1ISR(void)
 {
@@ -566,7 +566,7 @@ __interrupt void adcA1ISR(void)
         ADC_cur_3 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER2);
         ADC_cur_4 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER3);
 
-     // Lecture de l'offset du conditionnement par rapport a la valeur theorique 0A au début de l'interruption (1 fois)
+     // Lecture de l'offset du conditionnement par rapport a la valeur theorique 0A au dï¿½but de l'interruption (1 fois)
      // Adaptation de l'offset : 1.5 / 3.3 * 4095 = 1861.36 (1.5V correspond a un courant de 0A = point de reference)
     if(Offset_count <= 999 && Offset_stop == 0)
          {
@@ -586,7 +586,7 @@ __interrupt void adcA1ISR(void)
 
                  Offset_stop = 1; // Arret de l'echantillonnage
 
-                 Position_c1_dec = Position1 * POS_DETECT; // Mesure de position une fois stabilisée
+                 Position_c1_dec = Position1 * POS_DETECT; // Mesure de position une fois stabilisï¿½e
                  Position_c3_dec = Position3 * POS_DETECT;
 
                  // Test pour 1 inducteur
@@ -614,19 +614,19 @@ __interrupt void adcA1ISR(void)
       Current3     = (((float)(ADC_cur_3) - ADC_ZERO_CURRENT - Offset_ADC3) / (ADC_ZERO_CURRENT + Offset_ADC3)) * I_MAX;
       Current4     = (((float)(ADC_cur_4) - ADC_ZERO_CURRENT - Offset_ADC4) / (ADC_ZERO_CURRENT + Offset_ADC4)) * I_MAX;
 
-      // Envoi des données UART toute les 40*10e-6 * 25000 = 1 s
+      // Envoi des donnï¿½es UART toute les 40*10e-6 * 25000 = 1 s
       UartCounter++;
 
       if (UartCounter >= 25000) {
           UartCounter = 0; // Reset du compteur
           SendFloatAsText(Position1*1000.0f,Position2*1000.0f,Position3*1000.0f,Position4*1000.0f);
 
-//          SendFloatAsText(1.234f,2.567f,3.891,4.234f); // Trame de test envoyée : "\x02float1,float2,float3float4\x03" avec les float sous cette forme x.xxx
+//          SendFloatAsText(1.234f,2.567f,3.891,4.234f); // Trame de test envoyï¿½e : "\x02float1,float2,float3float4\x03" avec les float sous cette forme x.xxx
 //          sendString("\x02Hello World!\r\x03");
       }
 
 //--------------------------------------------------------------------------------------------------------------------------
-     if(start_ISOZ == 1 || state_PIN == 1) // SI bouton poussoir pressé physique ou sur page web -> debut de la sustentation
+     if(start_ISOZ == 1 || state_PIN == 1) // SI bouton poussoir pressï¿½ physique ou sur page web -> debut de la sustentation
      {
          // allumage lors de la sustentation, led2 d'indication sur DSP
          GPIO_writePin(myLED_D2,0);
@@ -729,11 +729,11 @@ __interrupt void adcA1ISR(void)
          {
 
          //SET POINT GENERATOR FOR INDUCTOR 1 & 2                                       //
-         // Ce bloc permet de baisser petit à petit la consigne de position pour que    //
+         // Ce bloc permet de baisser petit ï¿½ petit la consigne de position pour que    //
          // la regulation puisse suivre et s'adapter                                    //
              if(Position_c1 > Pos1_to_regul)
              {
-                 Position_c1 -= 2.5 * 4e-7; // ramp from 3mm to 2mm (4e-7 [s]) par 0.25 mm
+                 Position_c1 -= 2.5 * 4e-7; // ramp from 3mm to 2mm with a 0.25 mm step
              }
              else
              {
@@ -742,7 +742,7 @@ __interrupt void adcA1ISR(void)
 
              if(Position_c2 > Pos2_to_regul)
              {
-                 Position_c2 -= 2.5 * 4e-7; // ramp from 3mm to 2mm (4e-7 [s])
+                 Position_c2 -= 2.5 * 4e-7; // ramp from 3mm to 2mm
              }
              else
              {
@@ -834,7 +834,7 @@ __interrupt void adcA1ISR(void)
          // end takeoff 1 & 2//
 
          /////////////////// CHANGEMENT POLES PLACEMENT ///////////////////////////////////
-         if(i_store >= i_store_change_poles_placement) // sert pour le passage de regulation de 2 à 4 inducteurs (stabilité)
+         if(i_store >= i_store_change_poles_placement) // sert pour le passage de regulation de 2 ï¿½ 4 inducteurs (stabilitï¿½)
          {
              Kr = Kr_change;
              Kw = Kw_change;
@@ -990,7 +990,7 @@ __interrupt void adcA1ISR(void)
         //                           CALCUL DES PWMs                                //
         //////////////////////////////////////////////////////////////////////////////
 
-    // Travail avec DC en pourcent, de 0 à 100 [%]
+    // Travail avec DC en pourcent, de 0 ï¿½ 100 [%]
         duty1 = dutyCycle1 * 100;
         duty2 = dutyCycle2 * 100;
         duty3 = dutyCycle3 * 100;
@@ -1176,11 +1176,11 @@ __interrupt void INT_mySCI0_RX_ISR(void) // .xxx
              rxBuffer[rxIndex++] = c;
          }
          if(c == '\x02'){
-            // Marque le début de trame
-            dataIndex = rxIndex; // Sauvegarde la position pour les données
+            // Marque le dï¿½but de trame
+            dataIndex = rxIndex; // Sauvegarde la position pour les donnï¿½es
          }
          if(c == '\x03'){
-            // Fin de trame - traite les données
+            // Fin de trame - traite les donnï¿½es
             if(dataIndex > 0 && dataIndex < rxIndex-1) {
                 state_PIN = (rxBuffer[dataIndex] == '1') ? 1 : 0;
             }
@@ -1205,7 +1205,7 @@ __interrupt void INT_mySCI0_TX_ISR(void)
     }
 
     if (txIndex >= txLength) {
-        SCI_disableInterrupt(mySCI0_BASE, SCI_INT_TXFF); // Fin d’envoi
+        SCI_disableInterrupt(mySCI0_BASE, SCI_INT_TXFF); // Fin dï¿½envoi
     }
 
     // Acquitter l'interruption
