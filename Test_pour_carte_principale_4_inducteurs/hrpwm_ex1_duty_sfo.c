@@ -548,7 +548,7 @@ void error (void)
 // la lecture du bouton poussoir
 __interrupt void adcA1ISR(void)
 {
-    GPIO_writePin(myLED_D1,0); // Allumer LED pendant sustentation
+    GPIO_writePin(LED_D5_carte_principale,0); // Allumer LED pendant sustentation
 
     //////////////////////////////////////////////////////////////////////////////
     //                          Lecture ADC                                     //
@@ -1157,7 +1157,7 @@ __interrupt void adcA1ISR(void)
 //************************************//
 
     // Led de debug
-    GPIO_writePin(myLED_D1,1); // Led de debug pour mesurer la frequence de l interruption
+    GPIO_writePin(LED_D5_carte_principale,1); // Led de debug pour mesurer la frequence de l interruption
 }
 
 __interrupt void INT_Push_Button_Start_XINT_ISR(void)

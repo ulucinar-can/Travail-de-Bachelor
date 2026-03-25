@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker Unix v22.6.1                   
 ******************************************************************************
->> Linked Wed Mar 18 14:27:33 2026
+>> Linked Wed Mar 25 11:09:21 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -21,7 +21,7 @@ MEMORY CONFIGURATION
   RAMLS3                00009800   00000800  0000064e  000001b2  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
   RAMLS5                0000a800   00000800  000005d0  00000230  RWIX
-  RAMLS6_7              0000b000   00001000  000009cb  00000635  RWIX
+  RAMLS6_7              0000b000   00001000  000009c9  00000637  RWIX
   RAMGS0                0000c000   00001000  00000000  00001000  RWIX
   RAMGS1                0000d000   00001000  00000000  00001000  RWIX
   RAMGS2                0000e000   00001000  00000000  00001000  RWIX
@@ -268,17 +268,17 @@ codestart
                   00009e49    00000003     hrpwm_ex1_duty_sfo.obj (.text:error)
                   00009e4c    00000002     rts2800_fpu32_eabi.lib : pre_init.c.obj (.text)
 
-.text.5    0    0000b000    000009cb     
-                  0000b000    000009cb     hrpwm_ex1_duty_sfo.obj (.text:adcA1ISR)
+.text.5    0    0000b000    000009c9     
+                  0000b000    000009c9     hrpwm_ex1_duty_sfo.obj (.text:adcA1ISR)
 
 MODULE SUMMARY
 
        Module                                   code    ro data   rw data
        ------                                   ----    -------   -------
     ./
-       hrpwm_ex1_duty_sfo.obj                   3447    88        526    
+       hrpwm_ex1_duty_sfo.obj                   3445    88        526    
     +--+----------------------------------------+-------+---------+---------+
-       Total:                                   3447    88        526    
+       Total:                                   3445    88        526    
                                                                          
     ./device/
        device.obj                               305     0         0      
@@ -331,7 +331,7 @@ MODULE SUMMARY
        Stack:                                   0       0         512    
        Linker Generated:                        0       114       0      
     +--+----------------------------------------+-------+---------+---------+
-       Grand Total:                             10271   1047      1064   
+       Grand Total:                             10269   1047      1064   
 
 
 LINKER GENERATED COPY TABLES
