@@ -8,7 +8,8 @@ GEN_OPTS__FLAG := --cmd_file="syscfg/board.opt" --cmd_file="syscfg/c2000ware_lib
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
-"./hrpwm_ex1_duty_sfo.obj" \
+"./FunctionHeader2.obj" \
+"./Sustentation_Main.obj" \
 "./syscfg/board.obj" \
 "./syscfg/c2000ware_libraries.obj" \
 "./device/device.obj" \
@@ -149,8 +150,8 @@ Test_pour_carte_principale_4_inducteurs.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(G
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "hrpwm_ex1_duty_sfo.obj" "syscfg/board.obj" "syscfg/c2000ware_libraries.obj" "device/device.obj" "device/f28003x_codestartbranch.obj" 
-	-$(RM) "hrpwm_ex1_duty_sfo.d" "syscfg/board.d" "syscfg/c2000ware_libraries.d" "device/device.d" 
+	-$(RM) "FunctionHeader2.obj" "Sustentation_Main.obj" "syscfg/board.obj" "syscfg/c2000ware_libraries.obj" "device/device.obj" "device/f28003x_codestartbranch.obj" 
+	-$(RM) "FunctionHeader2.d" "Sustentation_Main.d" "syscfg/board.d" "syscfg/c2000ware_libraries.d" "device/device.d" 
 	-$(RM) "device/f28003x_codestartbranch.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'

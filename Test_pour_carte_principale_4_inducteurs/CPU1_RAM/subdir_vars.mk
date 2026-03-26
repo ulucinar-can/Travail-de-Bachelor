@@ -14,7 +14,8 @@ LIB_SRCS += \
 /home/can/ti/C2000Ware_5_02_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib 
 
 C_SRCS += \
-../hrpwm_ex1_duty_sfo.c \
+../FunctionHeader2.c \
+../Sustentation_Main.c \
 ./syscfg/board.c \
 ./syscfg/c2000ware_libraries.c 
 
@@ -28,7 +29,8 @@ GEN_MISC_DIRS += \
 ./syscfg 
 
 C_DEPS += \
-./hrpwm_ex1_duty_sfo.d \
+./FunctionHeader2.d \
+./Sustentation_Main.d \
 ./syscfg/board.d \
 ./syscfg/c2000ware_libraries.d 
 
@@ -37,7 +39,8 @@ GEN_OPTS += \
 ./syscfg/c2000ware_libraries.opt 
 
 OBJS += \
-./hrpwm_ex1_duty_sfo.obj \
+./FunctionHeader2.obj \
+./Sustentation_Main.obj \
 ./syscfg/board.obj \
 ./syscfg/c2000ware_libraries.obj 
 
@@ -56,7 +59,8 @@ GEN_MISC_DIRS__QUOTED += \
 "syscfg" 
 
 OBJS__QUOTED += \
-"hrpwm_ex1_duty_sfo.obj" \
+"FunctionHeader2.obj" \
+"Sustentation_Main.obj" \
 "syscfg/board.obj" \
 "syscfg/c2000ware_libraries.obj" 
 
@@ -72,7 +76,8 @@ GEN_MISC_FILES__QUOTED += \
 "syscfg/clocktree.h" 
 
 C_DEPS__QUOTED += \
-"hrpwm_ex1_duty_sfo.d" \
+"FunctionHeader2.d" \
+"Sustentation_Main.d" \
 "syscfg/board.d" \
 "syscfg/c2000ware_libraries.d" 
 
@@ -83,7 +88,8 @@ GEN_FILES__QUOTED += \
 "syscfg/c2000ware_libraries.c" 
 
 C_SRCS__QUOTED += \
-"../hrpwm_ex1_duty_sfo.c" \
+"../FunctionHeader2.c" \
+"../Sustentation_Main.c" \
 "./syscfg/board.c" \
 "./syscfg/c2000ware_libraries.c" 
 
