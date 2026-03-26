@@ -14,13 +14,14 @@
 #include "sfo_v8.h"
 #include <math.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "FunctionHeader2.h"
 
 /* ========================================================================= *
  * CONFIGURATION DEFINES
  * ========================================================================= */
-#define LIMITE_MAX_DUTY_FINE 80
-#define LIMITE_MIN_DUTY_FINE 30
+#define LIMITE_MAX_DUTY_FINE        80
+#define LIMITE_MIN_DUTY_FINE        30
 #define NUM_OF_PWM_CHANNEL          4
 #define EPWM_TIMER_TBPRD            100UL
 #define MIN_HRPWM_DUTY_PERCENT      4.0f/((float)EPWM_TIMER_TBPRD)*100.0f
@@ -36,10 +37,14 @@
 
 #define COUNT_TO_REACH              10000
 
-#define DUTY_CYCLE_1 50
-#define DUTY_CYCLE_2 50
-#define DUTY_CYCLE_3 50
-#define DUTY_CYCLE_4 50
+#define DUTY_CYCLE_1                50
+#define DUTY_CYCLE_2                50
+#define DUTY_CYCLE_3                50
+#define DUTY_CYCLE_4                50
+
+#define ADC_ZERO_CURRENT            1861.36f
+
+#define RX_BUF_LEN                  64
 
 /* ========================================================================= *
  * GLOBAL VARIABLES
@@ -48,11 +53,10 @@
 int MEP_ScaleFactor;
 
 // --- ADC & Offset ---
-const float ADC_ZERO_CURRENT = 1861.36f;
-bool Offset_stop = 0;
+bool Offset_stop = false;
 float Offset_count = 0;
 float Offset_ADC1 = 0, Offset_ADC2 = 0, Offset_ADC3 = 0, Offset_ADC4 = 0;
-uint16_t ADC_pos_1,ADC_pos_2,ADC_pos_3,ADC_pos_4,ADC_cur_1,ADC_cur_2,ADC_cur_3,ADC_cur_4;
+uint16_t ADC_pos_1, ADC_pos_2, ADC_pos_3, ADC_pos_4, ADC_cur_1, ADC_cur_2, ADC_cur_3, ADC_cur_4;
 
 // --- System States ---
 float Position1 = DELTA_0, Position2 = DELTA_0, Position3 = DELTA_0, Position4 = DELTA_0;
@@ -63,17 +67,13 @@ float mean1 = 0, mean2 = 0, mean3 = 0, mean4 = 0;
 unsigned int dt_mean = 0;
 
 // --- Shared Control Variables ---
-float I = 1;
-float Kw = KW, Kd = KD, Kddot = KDDOT, Kr = KR, K_antiwindup = K_ANTIWINDUP;
-float Kw_change = KW_CHANGE, Kd_change = KD_CHANGE, Kddot_change = KDDOT_CHANGE, Kr_change = KR_CHANGE;
-float Kw_sans_int = KW_SANS_INT, Kd_sans_int = KD_SANS_INT, Kddot_sans_int = KDDOT_SANS_INT, Kr_sans_int = KR_SANS_INT;
-float antiwindup_pos = ANTIWINDUP_EN;
-float Pos1_to_regul = DELTA_N, Pos2_to_regul = DELTA_N, Pos3_to_regul = DELTA_N, Pos4_to_regul = DELTA_N;
-uint32_t i_store_change_poles_placement = I_STORE_CHANGE_POLES_PLACEMENT, i_store_2e_decollage = I_STORE_2E_DECOLLAGE;
+float I = 1; // Conservée en variable pour pouvoir couper l'intégrateur en direct via debugger
+float Kw = KW, Kd = KD, Kddot = KDDOT, Kr = KR;
+float Kr_sans_int = KR_SANS_INT; // Conservée car modifiée dynamiquement plus tard
 
-bool takeOff = 1;
-bool takeOff2 = 1;
-bool phase1 = 1;
+bool takeOff = true;
+bool takeOff2 = true;
+bool phase1 = true;
 uint32_t i_store = 0;
 
 // --- Inductor 1 Control ---
@@ -82,7 +82,6 @@ float fc1 = 0;
 float pos1Buff[FILTWINDOW] = {[0 ... 8] = 0};
 float v1 = 0, ep1 = 0, xr1 = 0, fce1 = 0, sum_vp1 = 0, fc1_prim = 0;
 float Position_c1 = DELTA_0, Position_c1_dec = 0;
-float dpos1 = 0, kep1 = 0;
 
 // --- Inductor 2 Control ---
 float ic2 = 0, ue2 = 0, integral_i2 = 0;
@@ -90,7 +89,6 @@ float fc2 = 0;
 float pos2Buff[FILTWINDOW] = {[0 ... 8] = 0};
 float v2 = 0, ep2 = 0, xr2 = 0, fce2 = 0, sum_vp2 = 0, fc2_prim = 0;
 float Position_c2 = DELTA_0, Position_c2_dec = 0;
-float dpos2 = 0, kep2 = 0;
 
 // --- Inductor 3 Control ---
 float ic3 = 0, ue3 = 0, integral_i3 = 0;
@@ -106,11 +104,13 @@ float pos4Buff[FILTWINDOW] = {[0 ... 8] = 0};
 float v4 = 0, ep4 = 0, xr4 = 0, fce4 = 0, sum_vp4 = 0, fc4_prim = 0;
 float Position2_c4 = DELTA_0;
 
-// --- PID ---
-float Kp_pid = 2050;
-float Ki_pid = 100;
-float Kd_pid = -75e1;
-float K_antiwindupPID = 1;
+// --- PID Variables (Archive for future tests) ---
+//float Kp_pid = 2050;
+//float Ki_pid = 100;
+//float Kd_pid = -75e1;
+//float K_antiwindupPID = 1;
+//float dpos1 = 0, kep1 = 0;
+//float dpos2 = 0, kep2 = 0;
 
 // --- Filter Buffers ---
 float fc1f = 0.0, IN1[Nb] ={[0 ... 2] = 0}, OUT1[Na] = {[0 ... 1] = 0};
@@ -122,14 +122,14 @@ float fc4f = 0.0, IN4[Nb] ={[0 ... 2] = 0}, OUT4[Na] = {[0 ... 1] = 0};
 float dutyFine = MIN_HRPWM_DUTY_PERCENT;
 float duty1 = 50, duty2 = 50, duty3 = 50, duty4 = 50;
 float duty_table[] = {0, DUTY_CYCLE_1, DUTY_CYCLE_2, DUTY_CYCLE_3, DUTY_CYCLE_4};
-float duty_int = 50, count = 0;
+float count = 0;
 uint32_t compCount = 0;
 uint16_t i = 1, status;
 volatile uint32_t ePWM[] = {0, myEPWM1_BASE, myEPWM2_BASE, myEPWM3_BASE, myEPWM4_BASE};
 
 // --- User Interface & Buttons ---
-uint16_t start_ISOZ = 0, stop_ISOZ = 0, count_ext_int = 0, Ext_Int_Flag = 0;
-bool state_PIN = 0;
+bool ButtonS2 = false, Ext_Int_Flag = false, state_PIN = false;
+uint16_t count_ext_int = 0;
 
 // --- Communication (UART) ---
 volatile uint16_t UartCounter = 0;
@@ -137,10 +137,8 @@ volatile char txBuffer[TX_BUF_LEN];
 volatile uint16_t txIndex = 0;
 volatile uint16_t txLength = 0;
 
-#define RX_BUF_LEN 64
 volatile char rxBuffer[RX_BUF_LEN];
 volatile uint16_t rxIndex = 0;
-volatile bool frameReady = false;
 static uint16_t dataIndex = 0;
 
 /* ========================================================================= *
@@ -168,56 +166,56 @@ void main(void)
 void init(void)
 {
     // Initialize device clock and peripherals
-        Device_init();
+    Device_init();
 
-        // Disable pin locks and enable internal pull ups.
-        Device_initGPIO();
+    // Disable pin locks and enable internal pull ups.
+    Device_initGPIO();
 
-        // Initialize PIE and clear PIE registers. Disables CPU interrupts.
-        Interrupt_initModule();
+    // Initialize PIE and clear PIE registers. Disables CPU interrupts.
+    Interrupt_initModule();
 
-        // Initialize the PIE vector table
-        Interrupt_initVectorTable();
+    // Initialize the PIE vector table
+    Interrupt_initVectorTable();
 
-        // SFO Initialization
-        while(status == SFO_INCOMPLETE)
+    // SFO Initialization
+    while(status == SFO_INCOMPLETE)
+    {
+        status = SFO();
+        if(status == SFO_ERROR)
         {
-            status = SFO();
-            if(status == SFO_ERROR)
-            {
-                error();
-            }
+            error();
         }
+    }
 
-        // Disable sync
-        SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
+    // Disable sync
+    SysCtl_disablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
 
-        // Initialize the EPWM GPIO Pins, SCI and XBAR
-        Board_init();
-        SCI_enableInterrupt(mySCI0_BASE, SCI_INT_RXFF);
+    // Initialize the EPWM GPIO Pins, SCI and XBAR
+    Board_init();
+    SCI_enableInterrupt(mySCI0_BASE, SCI_INT_RXFF);
 
-        // Enable sync and clock to PWM
-        SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
+    // Enable sync and clock to PWM
+    SysCtl_enablePeripheral(SYSCTL_PERIPH_CLK_TBCLKSYNC);
 
-        // Enable Global Interrupt (INTM) and realtime interrupt (DBGM)
-        EINT;
-        ERTM;
+    // Enable Global Interrupt (INTM) and realtime interrupt (DBGM)
+    EINT;
+    ERTM;
 
-        // Affection des PWMs
-        for(i = 1;i<1+NUM_OF_PWM_CHANNEL;i++)
-        {
-            dutyFine = ((float)(duty_table[i]*TIME_BASE_PERIOD) * INV_FACTOR);
-            count = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-            compCount = (count);
-            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
-            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
-        }
+    // Affection des PWMs
+    for(i = 1;i<1+NUM_OF_PWM_CHANNEL;i++)
+    {
+        dutyFine = ((float)(duty_table[i]*TIME_BASE_PERIOD) * INV_FACTOR);
+        count = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
+        compCount = (count);
+        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
+        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+    }
 
-        // Extinctions LEDs
-        GPIO_writePin(myLED_D1,1);
-        GPIO_writePin(myLED_D2,1);
-        GPIO_writePin(LED_D5_carte_principale,0);
-        GPIO_writePin(LED_D6_carte_principale,0);
+    // Extinctions LEDs
+    GPIO_writePin(myLED_D1,1);
+    GPIO_writePin(myLED_D2,1);
+    GPIO_writePin(LED_D5_carte_principale,0);
+    GPIO_writePin(LED_D6_carte_principale,0);
 }
 
 void error (void)
@@ -250,7 +248,7 @@ __interrupt void adcA1ISR(void)
     ADC_cur_4 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER3);
 
     // --- Calibration de l'offset initial (0A = 1.5V = ~1861.36) ---
-    if(Offset_count <= 999 && Offset_stop == 0)
+    if(Offset_count <= 999 && !Offset_stop)
     {
         Offset_ADC1 += ((float)ADC_cur_1) - ADC_ZERO_CURRENT;
         Offset_ADC2 += ((float)ADC_cur_2) - ADC_ZERO_CURRENT;
@@ -266,7 +264,7 @@ __interrupt void adcA1ISR(void)
             Offset_ADC3 = Offset_ADC3 * OFFSET_COUNT_INV;
             Offset_ADC4 = Offset_ADC4 * OFFSET_COUNT_INV;
 
-            Offset_stop = 1; // Arret de l'echantillonnage
+            Offset_stop = true; // Arret de l'echantillonnage
 
             // Mesure de position une fois stabilisée
             Position_c1_dec = Position1 * POS_DETECT;
@@ -303,7 +301,7 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 4. MACHINE D'ETAT & REGULATION (Si activée)
      * --------------------------------------------------------------------- */
-    if(start_ISOZ == 1 || state_PIN == 1)
+    if(ButtonS2 || state_PIN)
     {
         GPIO_writePin(myLED_D2, 0); // Allumage LED2 (Indicateur sustentation)
 
@@ -323,9 +321,9 @@ __interrupt void adcA1ISR(void)
         // ================================================================= //
         // A. INDUCTEURS 1 & 2 : STRATEGIE DE DECOLLAGE
         // ================================================================= //
-        if(takeOff == 1)
+        if(takeOff)
         {
-            if(phase1 == 1)
+            if(phase1)
             {
                 mean1 += Current1;
                 mean2 += Current2;
@@ -343,7 +341,7 @@ __interrupt void adcA1ISR(void)
                     if(mean1 <= I_SP105 && mean1 >= I_SP095 && mean2 <= I_SP105 && mean2 >= I_SP095 &&
                        mean3 <= I_SP105 && mean3 >= I_SP095 && mean4 <= I_SP105 && mean4 >= I_SP095)
                     {
-                        phase1 = 0;
+                        phase1 = false;
                     }
                     else
                     {
@@ -361,7 +359,7 @@ __interrupt void adcA1ISR(void)
             {
                 if(Position1 < Position_c1_dec)
                 {
-                    takeOff = 0;
+                    takeOff = false;
                     Position_c1 = Position1;
                 }
                 else if(ic1 < 7.82f)
@@ -378,8 +376,8 @@ __interrupt void adcA1ISR(void)
         else // --- Fin du TakeOff 1 & 2 : Régulation d'état ---
         {
             // Set point generator (Ramp from 3mm to 2mm)
-            if(Position_c1 > Pos1_to_regul) Position_c1 -= 2.5 * 4e-7; else Position_c1 = Pos1_to_regul;
-            if(Position_c2 > Pos2_to_regul) Position_c2 -= 2.5 * 4e-7; else Position_c2 = Pos2_to_regul;
+            if(Position_c1 > DELTA_N) Position_c1 -= 2.5 * 4e-7; else Position_c1 = DELTA_N;
+            if(Position_c2 > DELTA_N) Position_c2 -= 2.5 * 4e-7; else Position_c2 = DELTA_N;
 
             // Inductor 1 : Filtre Bandstop + State Regulation
             IN1[0] = fc1;
@@ -395,7 +393,7 @@ __interrupt void adcA1ISR(void)
             fc1 = fc1_prim;
             if (fc1_prim <= 0)   fc1 = 0;
             if (fc1_prim >= FMAX) fc1 = FMAX;
-            fce1 = (fc1_prim - fc1) * K_antiwindup * antiwindup_pos;
+            fce1 = (fc1_prim - fc1) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Inductor 2 : Filtre Bandstop + State Regulation
             IN2[0] = fc2;
@@ -411,7 +409,27 @@ __interrupt void adcA1ISR(void)
             fc2 = fc2_prim;
             if (fc2_prim <= 0)   fc2 = 0;
             if (fc2_prim >= FMAX) fc2 = FMAX;
-            fce2 = (fc2_prim - fc2) * K_antiwindup * antiwindup_pos;
+            fce2 = (fc2_prim - fc2) * K_ANTIWINDUP * ANTIWINDUP_EN;
+
+            /*
+            // --- ARCHIVE : PID Regulation for Inductor 2 ---
+            // Erreur + composante P
+            ep2 = (Position_c2 - Position2);
+            kep2 = ep2 * Kp_pid;
+
+            // Composante I
+            xr2 += Ki_pid * H * (ep2 - (fc2_prim - fc2) * K_antiwindupPID * ANTIWINDUP_EN);
+
+            // Composante D
+            dpos2 = v2 * Kd_pid;
+
+            // Assemblage des 3 composantes
+            fc2_prim = (ep2 + xr2 - dpos2);
+
+            fc2 = fc2_prim;
+            if (fc2_prim <= 0)   fc2 = 0;
+            if (fc2_prim >= FMAX) fc2 = FMAX;
+            */
 
             // Inverse fourier transform
             ic1 = (sqrtf(K_FC * fc1f)) * Position1;
@@ -419,19 +437,19 @@ __interrupt void adcA1ISR(void)
         }
 
         // --- Changement du placement de pôles ---
-        if(i_store >= i_store_change_poles_placement)
+        if(i_store >= I_STORE_CHANGE_POLES_PLACEMENT)
         {
-            Kr = Kr_change; Kw = Kw_change; Kd = Kd_change; Kddot = Kddot_change;
+            Kr = KR_CHANGE; Kw = KW_CHANGE; Kd = KD_CHANGE; Kddot = KDDOT_CHANGE;
         }
 
         // ================================================================= //
         // B. INDUCTEURS 3 & 4 : STRATEGIE DE DECOLLAGE
         // ================================================================= //
-        if((takeOff == 0) && (takeOff2 == 1) && (i_store >= i_store_2e_decollage))
+        if(!takeOff && takeOff2 && (i_store >= I_STORE_2E_DECOLLAGE))
         {
             if(Position3 < Position_c3_dec)
             {
-                takeOff2 = 0;
+                takeOff2 = false;
                 Position2_c3 = Position3;
             }
             else if(ic3 < 7.82f)
@@ -444,11 +462,11 @@ __interrupt void adcA1ISR(void)
             }
             ic4 = ic3;
         }
-        else if(takeOff2 == 0) // --- Fin du TakeOff 3 & 4 : Régulation d'état ---
+        else if(!takeOff2) // --- Fin du TakeOff 3 & 4 : Régulation d'état ---
         {
             // Set point generator (Ramp from 3mm to 2mm)
-            if(Position2_c3 > Pos3_to_regul) Position2_c3 -= 2.5 * 4e-7; else Position2_c3 = Pos3_to_regul;
-            if(Position2_c4 > Pos4_to_regul) Position2_c4 -= 2.5 * 4e-7; else Position2_c4 = Pos4_to_regul;
+            if(Position2_c3 > DELTA_N) Position2_c3 -= 2.5 * 4e-7; else Position2_c3 = DELTA_N;
+            if(Position2_c4 > DELTA_N) Position2_c4 -= 2.5 * 4e-7; else Position2_c4 = DELTA_N;
 
             // Inductor 3 : Filtre Bandstop + State Regulation
             IN3[0] = fc3;
@@ -458,13 +476,13 @@ __interrupt void adcA1ISR(void)
 
             ep3 = Position2_c3 - Position3;
             xr3 += (ep3 - fce3);
-            sum_vp3 = (v3 * Kddot_sans_int) + (Position3 * Kd_sans_int);
-            fc3_prim = (Kw_sans_int * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
+            sum_vp3 = (v3 * KDDOT_SANS_INT) + (Position3 * KD_SANS_INT);
+            fc3_prim = (KW_SANS_INT * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
 
             fc3 = fc3_prim;
             if (fc3_prim <= 0)   fc3 = 0;
             if (fc3_prim >= FMAX) fc3 = FMAX;
-            fce3 = (fc3_prim - fc3) * K_antiwindup * antiwindup_pos;
+            fce3 = (fc3_prim - fc3) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Inductor 4 : Filtre Bandstop + State Regulation
             IN4[0] = fc4;
@@ -480,14 +498,14 @@ __interrupt void adcA1ISR(void)
             fc4 = fc4_prim;
             if (fc4_prim <= 0)   fc4 = 0;
             if (fc4_prim >= FMAX) fc4 = FMAX;
-            fce4 = (fc4_prim - fc4) * K_antiwindup * antiwindup_pos;
+            fce4 = (fc4_prim - fc4) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Inverse fourier transform
             ic3 = sqrtf(K_FC * fc3f) * Position3;
             ic4 = sqrtf(K_FC * fc4f) * Position4;
         }
 
-        if(i_store >= (i_store_2e_decollage + 1000))
+        if(i_store >= (I_STORE_2E_DECOLLAGE + 1000))
         {
             Kr_sans_int = -1.0;
         }
@@ -509,7 +527,7 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 5. MISE A JOUR DES PWM & CALIBRATION SFO
      * --------------------------------------------------------------------- */
-    if(start_ISOZ == 1 || state_PIN == 1)
+    if(ButtonS2 || state_PIN)
     {
         // Conversion en pourcentage
         duty1 = dutyCycle1 * 100;
@@ -544,13 +562,13 @@ __interrupt void adcA1ISR(void)
         HRPWM_setCounterCompareValue(ePWM[4], HRPWM_COUNTER_COMPARE_A, compCount);
         HRPWM_setCounterCompareValue(ePWM[4], HRPWM_COUNTER_COMPARE_B, compCount);
 
-        if(takeOff == 0) i_store++;
+        if(!takeOff) i_store++;
 
         // SFO Calibration
         status = SFO();
         if (status == SFO_ERROR) error();
     }
-    else if(stop_ISOZ == 1 || state_PIN == 0) // --- Arrêt Sustentation ---
+    else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
     {
         GPIO_writePin(myLED_D2, 1); // Eteindre LED
 
@@ -572,7 +590,7 @@ __interrupt void adcA1ISR(void)
      * 6. ACQUITTEMENTS & FLAGS (ADC)
      * --------------------------------------------------------------------- */
     ADC_clearInterruptStatus(myADC0_BASE, ADC_INT_NUMBER1);
-    if(true == ADC_getInterruptOverflowStatus(myADC0_BASE, ADC_INT_NUMBER1))
+    if(ADC_getInterruptOverflowStatus(myADC0_BASE, ADC_INT_NUMBER1))
     {
         ADC_clearInterruptOverflowStatus(myADC0_BASE, ADC_INT_NUMBER1);
         ADC_clearInterruptStatus(myADC0_BASE, ADC_INT_NUMBER1);
@@ -582,7 +600,7 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 7. DEBOUNCE BOUTON POUSSOIR EXTERNE
      * --------------------------------------------------------------------- */
-    if(Ext_Int_Flag == 1) // Détection flanc montant
+    if(Ext_Int_Flag) // Détection flanc montant
     {
         count_ext_int = 0;
         // ATTENTION : Ce 'while' crée un délai bloquant dans l'ISR !
@@ -591,10 +609,10 @@ __interrupt void adcA1ISR(void)
 
         if(GPIO_readPin(Push_Button_Start) == 0)
         {
-            if(start_ISOZ == 1)      { start_ISOZ = 0; stop_ISOZ = 1; }
-            else if(start_ISOZ == 0) { start_ISOZ = 1; stop_ISOZ = 0; }
+            // Toggle button state
+            ButtonS2 = !ButtonS2;
         }
-        Ext_Int_Flag = 0;
+        Ext_Int_Flag = false;
     }
 
     // Eteindre LED de debug (fin de boucle de régulation)
@@ -607,7 +625,7 @@ __interrupt void adcA1ISR(void)
 
 __interrupt void INT_Push_Button_Start_XINT_ISR(void)
 {
-    Ext_Int_Flag = 1;
+    Ext_Int_Flag = true;
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
 
@@ -615,7 +633,7 @@ __interrupt void INT_Push_Button_Start_XINT_ISR(void)
 __interrupt void INT_mySCI0_RX_ISR(void)
 {
     uint16_t c;
-    int b; // <-- On déclare 'b' ici, au tout début de la fonction !
+    int b;
 
     while (SCI_getRxFIFOStatus(SCIA_BASE) > 0)
     {
@@ -630,11 +648,12 @@ __interrupt void INT_mySCI0_RX_ISR(void)
 
         if(c == '\x03'){ // Fin de trame
             if(dataIndex > 0 && dataIndex < rxIndex - 1) {
-                state_PIN = (rxBuffer[dataIndex] == '1') ? 1 : 0;
+                // Utilisation d'une évaluation booléenne directe !
+                state_PIN = (rxBuffer[dataIndex] == '1');
             }
             // Reset du buffer
             rxIndex = 0;
-            for(b = 0; b < RX_BUF_LEN; b++) { // <-- On utilise 'b' sans le 'int'
+            for(b = 0; b < RX_BUF_LEN; b++) {
                 rxBuffer[b] = 0;
             }
         }
