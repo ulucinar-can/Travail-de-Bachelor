@@ -522,13 +522,11 @@ __interrupt void adcA1ISR(void)
         dutyCycle2 = 0.5f + (CONV_DUTY_CYCLE * uc2) + DA;
         dutyCycle3 = 0.5f + (CONV_DUTY_CYCLE * uc3) + DA;
         dutyCycle4 = 0.5f + (CONV_DUTY_CYCLE * uc4) + DA;
-    }
 
-    /* --------------------------------------------------------------------- *
-     * 5. MISE A JOUR DES PWM & CALIBRATION SFO
-     * --------------------------------------------------------------------- */
-    if(ButtonS2 || state_PIN)
-    {
+        /* --------------------------------------------------------------------- *
+         * 5. MISE A JOUR DES PWM & CALIBRATION SFO
+         * --------------------------------------------------------------------- */
+
         // Conversion en pourcentage
         duty1 = dutyCycle1 * 100;
         duty2 = dutyCycle2 * 100;
@@ -567,8 +565,7 @@ __interrupt void adcA1ISR(void)
         // SFO Calibration
         status = SFO();
         if (status == SFO_ERROR) error();
-    }
-    else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
+    } else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
     {
         GPIO_writePin(myLED_D2, 1); // Eteindre LED
 
