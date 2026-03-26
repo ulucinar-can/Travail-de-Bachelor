@@ -121,11 +121,11 @@ float fc4f = 0.0, IN4[Nb] ={[0 ... 2] = 0}, OUT4[Na] = {[0 ... 1] = 0};
 // --- PWM Management ---
 float dutyFine = MIN_HRPWM_DUTY_PERCENT;
 float duty1 = 50, duty2 = 50, duty3 = 50, duty4 = 50;
-float duty_table[] = {0, DUTY_CYCLE_1, DUTY_CYCLE_2, DUTY_CYCLE_3, DUTY_CYCLE_4};
+const float duty_table[] = {0, DUTY_CYCLE_1, DUTY_CYCLE_2, DUTY_CYCLE_3, DUTY_CYCLE_4};
 float count = 0;
 uint32_t compCount = 0;
 uint16_t i = 1, status;
-volatile uint32_t ePWM[] = {0, myEPWM1_BASE, myEPWM2_BASE, myEPWM3_BASE, myEPWM4_BASE};
+const uint32_t ePWM[] = {0, myEPWM1_BASE, myEPWM2_BASE, myEPWM3_BASE, myEPWM4_BASE};
 
 // --- User Interface & Buttons ---
 bool ButtonS2 = false, Ext_Int_Flag = false, state_PIN = false;

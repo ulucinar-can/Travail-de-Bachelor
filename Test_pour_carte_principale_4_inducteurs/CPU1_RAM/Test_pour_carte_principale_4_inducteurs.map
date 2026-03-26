@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker Unix v22.6.1                   
 ******************************************************************************
->> Linked Thu Mar 26 19:12:43 2026
+>> Linked Thu Mar 26 19:23:58 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -13,7 +13,7 @@ MEMORY CONFIGURATION
 ----------------------  --------  ---------  --------  --------  ----  --------
   BEGIN                 00000000   00000002  00000002  00000000  RWIX
   BOOT_RSVD             00000002   00000126  00000000  00000126  RWIX
-  RAMM0                 00000128   000002d8  0000005a  0000027e  RWIX
+  RAMM0                 00000128   000002d8  00000050  00000288  RWIX
   RAMM1                 00000400   000003f8  00000200  000001f8  RWIX
   RAMLS0                00008000   00000800  00000800  00000000  RWIX
   RAMLS1                00008800   00000800  00000800  00000000  RWIX
@@ -21,7 +21,7 @@ MEMORY CONFIGURATION
   RAMLS3                00009800   00000800  0000065b  000001a5  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
   RAMLS5                0000a800   00000800  0000059e  00000262  RWIX
-  RAMLS6_7              0000b000   00001000  0000097d  00000683  RWIX
+  RAMLS6_7              0000b000   00001000  0000097c  00000684  RWIX
   RAMGS0                0000c000   00001000  00000000  00001000  RWIX
   RAMGS1                0000d000   00001000  00000000  00001000  RWIX
   RAMGS2                0000e000   00001000  00000000  00001000  RWIX
@@ -92,65 +92,65 @@ codestart
 *          0    00000128    00000004     
                   00000128    00000004     driverlib.lib : sysctl.obj (.TI.ramfunc)
 
-.cinit     0    0000012c    00000056     
-                  0000012c    00000043     (.cinit..data.load) [load image, compression = lzss]
-                  0000016f    00000001     --HOLE-- [fill = 0]
-                  00000170    00000006     (__TI_handler_table)
-                  00000176    00000004     (.cinit..bss.load) [load image, compression = zero_init]
-                  0000017a    00000008     (__TI_cinit_table)
+.cinit     0    0000012c    0000004c     
+                  0000012c    00000039     (.cinit..data.load) [load image, compression = lzss]
+                  00000165    00000001     --HOLE-- [fill = 0]
+                  00000166    00000006     (__TI_handler_table)
+                  0000016c    00000004     (.cinit..bss.load) [load image, compression = zero_init]
+                  00000170    00000008     (__TI_cinit_table)
 
 .reset     0    003fffc0    00000000     DSECT
 
 .stack     0    00000400    00000200     UNINITIALIZED
                   00000400    00000200     --HOLE--
 
-.bss       0    0000a95e    00000098     UNINITIALIZED
-                  0000a95e    00000040     Sustentation_Main.obj (.bss:rxBuffer)
-                  0000a99e    00000040     Sustentation_Main.obj (.bss:txBuffer)
-                  0000a9de    0000000a     Sustentation_Main.obj (.bss)
-                  0000a9e8    00000009     SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib : SFO_v8_fpu_lib_build_c28_driverlib.obj (.bss:MEP_SF)
-                  0000a9f1    00000005                                                 : SFO_v8_fpu_lib_build_c28_driverlib.obj (.bss)
+.bss       0    0000a94a    00000098     UNINITIALIZED
+                  0000a94a    00000040     Sustentation_Main.obj (.bss:rxBuffer)
+                  0000a98a    00000040     Sustentation_Main.obj (.bss:txBuffer)
+                  0000a9ca    0000000a     Sustentation_Main.obj (.bss)
+                  0000a9d4    00000009     SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib : SFO_v8_fpu_lib_build_c28_driverlib.obj (.bss:MEP_SF)
+                  0000a9dd    00000005                                                 : SFO_v8_fpu_lib_build_c28_driverlib.obj (.bss)
 
 .init_array 
 *          0    00000128    00000000     UNINITIALIZED
 
-.data      0    0000a800    0000015e     UNINITIALIZED
+.data      0    0000a800    0000014a     UNINITIALIZED
                   0000a800    000000c4     Sustentation_Main.obj (.data)
                   0000a8c4    00000012     Sustentation_Main.obj (.data:pos1Buff)
                   0000a8d6    00000012     Sustentation_Main.obj (.data:pos2Buff)
                   0000a8e8    00000012     Sustentation_Main.obj (.data:pos3Buff)
                   0000a8fa    00000012     Sustentation_Main.obj (.data:pos4Buff)
-                  0000a90c    0000000a     Sustentation_Main.obj (.data:duty_table)
-                  0000a916    0000000a     Sustentation_Main.obj (.data:ePWM)
-                  0000a920    00000006     Sustentation_Main.obj (.data:IN1)
-                  0000a926    00000006     Sustentation_Main.obj (.data:IN2)
-                  0000a92c    00000006     Sustentation_Main.obj (.data:IN3)
-                  0000a932    00000006     Sustentation_Main.obj (.data:IN4)
-                  0000a938    00000006     FunctionHeader2.obj (.data:b)
-                  0000a93e    00000002     rts2800_fpu32_eabi.lib : _lock.c.obj (.data:_lock)
-                  0000a940    00000006                            : exit.c.obj (.data)
-                  0000a946    00000004     Sustentation_Main.obj (.data:OUT1)
-                  0000a94a    00000004     Sustentation_Main.obj (.data:OUT2)
-                  0000a94e    00000004     Sustentation_Main.obj (.data:OUT3)
-                  0000a952    00000004     Sustentation_Main.obj (.data:OUT4)
-                  0000a956    00000004     FunctionHeader2.obj (.data:a)
-                  0000a95a    00000002     rts2800_fpu32_eabi.lib : _lock.c.obj (.data:_unlock)
-                  0000a95c    00000001     SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib : SFO_v8_fpu_lib_build_c28_driverlib.obj (.data)
-                  0000a95d    00000001     rts2800_fpu32_eabi.lib : errno.c.obj (.data)
+                  0000a90c    00000006     Sustentation_Main.obj (.data:IN1)
+                  0000a912    00000006     Sustentation_Main.obj (.data:IN2)
+                  0000a918    00000006     Sustentation_Main.obj (.data:IN3)
+                  0000a91e    00000006     Sustentation_Main.obj (.data:IN4)
+                  0000a924    00000006     FunctionHeader2.obj (.data:b)
+                  0000a92a    00000006     rts2800_fpu32_eabi.lib : exit.c.obj (.data)
+                  0000a930    00000004     Sustentation_Main.obj (.data:OUT1)
+                  0000a934    00000004     Sustentation_Main.obj (.data:OUT2)
+                  0000a938    00000004     Sustentation_Main.obj (.data:OUT3)
+                  0000a93c    00000004     Sustentation_Main.obj (.data:OUT4)
+                  0000a940    00000004     FunctionHeader2.obj (.data:a)
+                  0000a944    00000002     rts2800_fpu32_eabi.lib : _lock.c.obj (.data:_lock)
+                  0000a946    00000002                            : _lock.c.obj (.data:_unlock)
+                  0000a948    00000001     SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib : SFO_v8_fpu_lib_build_c28_driverlib.obj (.data)
+                  0000a949    00000001     rts2800_fpu32_eabi.lib : errno.c.obj (.data)
 
-.const     0    0000a9f6    000003a8     
-                  0000a9f6    0000009a     driverlib.lib : sysctl.obj (.const:.string)
-                  0000aa90    00000098                   : epwm.obj (.const:.string)
-                  0000ab28    00000098                   : gpio.obj (.const:.string)
-                  0000abc0    00000097                   : sci.obj (.const:.string)
-                  0000ac57    00000001     --HOLE-- [fill = 0]
-                  0000ac58    00000050                   : cputimer.obj (.const:.string)
-                  0000aca8    0000004b                   : adc.obj (.const:.string)
-                  0000acf3    00000001     --HOLE-- [fill = 0]
-                  0000acf4    00000046     Sustentation_Main.obj (.const:.string)
-                  0000ad3a    00000045     board.obj (.const:.string)
-                  0000ad7f    00000001     --HOLE-- [fill = 0]
-                  0000ad80    00000012     FunctionHeader2.obj (.const:SAVITZKY)
+.const     0    0000a9e2    000003bc     
+                  0000a9e2    0000009a     driverlib.lib : sysctl.obj (.const:.string)
+                  0000aa7c    00000098                   : epwm.obj (.const:.string)
+                  0000ab14    00000098                   : gpio.obj (.const:.string)
+                  0000abac    00000097                   : sci.obj (.const:.string)
+                  0000ac43    00000001     --HOLE-- [fill = 0]
+                  0000ac44    00000050                   : cputimer.obj (.const:.string)
+                  0000ac94    0000004b                   : adc.obj (.const:.string)
+                  0000acdf    00000001     --HOLE-- [fill = 0]
+                  0000ace0    00000046     Sustentation_Main.obj (.const:.string)
+                  0000ad26    00000045     board.obj (.const:.string)
+                  0000ad6b    00000001     --HOLE-- [fill = 0]
+                  0000ad6c    00000012     FunctionHeader2.obj (.const:SAVITZKY)
+                  0000ad7e    0000000a     Sustentation_Main.obj (.const:duty_table)
+                  0000ad88    0000000a     Sustentation_Main.obj (.const:ePWM)
                   0000ad92    00000004     rts2800_fpu32_eabi.lib : e_powf.c.obj (.const:bp)
                   0000ad96    00000004                            : e_powf.c.obj (.const:dp_h)
                   0000ad9a    00000004                            : e_powf.c.obj (.const:dp_l)
@@ -270,18 +270,18 @@ codestart
                   00009e56    00000003     Sustentation_Main.obj (.text:main)
                   00009e59    00000002     rts2800_fpu32_eabi.lib : pre_init.c.obj (.text)
 
-.text.5    0    0000b000    0000097d     
-                  0000b000    0000097d     Sustentation_Main.obj (.text:adcA1ISR)
+.text.5    0    0000b000    0000097c     
+                  0000b000    0000097c     Sustentation_Main.obj (.text:adcA1ISR)
 
 MODULE SUMMARY
 
        Module                                   code    ro data   rw data
        ------                                   ----    -------   -------
     ./
-       Sustentation_Main.obj                    2912    70        466    
+       Sustentation_Main.obj                    2911    90        446    
        FunctionHeader2.obj                      469     18        10     
     +--+----------------------------------------+-------+---------+---------+
-       Total:                                   3381    88        476    
+       Total:                                   3380    108       456    
                                                                          
     ./device/
        device.obj                               305     0         0      
@@ -332,21 +332,21 @@ MODULE SUMMARY
        Total:                                   1417    12        11     
                                                                          
        Stack:                                   0       0         512    
-       Linker Generated:                        0       85        0      
+       Linker Generated:                        0       75        0      
     +--+----------------------------------------+-------+---------+---------+
-       Grand Total:                             10205   1018      1014   
+       Grand Total:                             10204   1028      994    
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 0000017a records: 2, size/record: 4, table size: 8
-	.data: load addr=0000012c, load size=00000043 bytes, run addr=0000a800, run size=0000015e bytes, compression=lzss
-	.bss: load addr=00000176, load size=00000004 bytes, run addr=0000a95e, run size=00000098 bytes, compression=zero_init
+__TI_cinit_table @ 00000170 records: 2, size/record: 4, table size: 8
+	.data: load addr=0000012c, load size=00000039 bytes, run addr=0000a800, run size=0000014a bytes, compression=lzss
+	.bss: load addr=0000016c, load size=00000004 bytes, run addr=0000a94a, run size=00000098 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 00000170 records: 3, size/record: 2, table size: 6
+__TI_handler_table @ 00000166 records: 3, size/record: 2, table size: 6
 	index: 0, handler: __TI_zero_init
 	index: 1, handler: __TI_decompress_lzss
 	index: 2, handler: __TI_decompress_none
@@ -470,57 +470,58 @@ address     data page           name
 0000a8e8     2a3 (0000a8c0)     pos3Buff
 0000a8fa     2a3 (0000a8c0)     pos4Buff
 
-0000a90c     2a4 (0000a900)     duty_table
-0000a916     2a4 (0000a900)     ePWM
-0000a920     2a4 (0000a900)     IN1
-0000a926     2a4 (0000a900)     IN2
-0000a92c     2a4 (0000a900)     IN3
-0000a932     2a4 (0000a900)     IN4
-0000a938     2a4 (0000a900)     b
-0000a93e     2a4 (0000a900)     _lock
+0000a90c     2a4 (0000a900)     IN1
+0000a912     2a4 (0000a900)     IN2
+0000a918     2a4 (0000a900)     IN3
+0000a91e     2a4 (0000a900)     IN4
+0000a924     2a4 (0000a900)     b
+0000a92a     2a4 (0000a900)     __TI_enable_exit_profile_output
+0000a92c     2a4 (0000a900)     __TI_cleanup_ptr
+0000a92e     2a4 (0000a900)     __TI_dtors_ptr
+0000a930     2a4 (0000a900)     OUT1
+0000a934     2a4 (0000a900)     OUT2
+0000a938     2a4 (0000a900)     OUT3
+0000a93c     2a4 (0000a900)     OUT4
 
-0000a940     2a5 (0000a940)     __TI_enable_exit_profile_output
-0000a942     2a5 (0000a940)     __TI_cleanup_ptr
-0000a944     2a5 (0000a940)     __TI_dtors_ptr
-0000a946     2a5 (0000a940)     OUT1
-0000a94a     2a5 (0000a940)     OUT2
-0000a94e     2a5 (0000a940)     OUT3
-0000a952     2a5 (0000a940)     OUT4
-0000a956     2a5 (0000a940)     a
-0000a95a     2a5 (0000a940)     _unlock
-0000a95d     2a5 (0000a940)     errno
-0000a95e     2a5 (0000a940)     rxBuffer
+0000a940     2a5 (0000a940)     a
+0000a944     2a5 (0000a940)     _lock
+0000a946     2a5 (0000a940)     _unlock
+0000a949     2a5 (0000a940)     errno
+0000a94a     2a5 (0000a940)     rxBuffer
 
-0000a99e     2a6 (0000a980)     txBuffer
+0000a98a     2a6 (0000a980)     txBuffer
 
-0000a9de     2a7 (0000a9c0)     MEP_ScaleFactor
-0000a9df     2a7 (0000a9c0)     ADC_pos_1
-0000a9e0     2a7 (0000a9c0)     ADC_pos_2
-0000a9e1     2a7 (0000a9c0)     ADC_pos_3
-0000a9e2     2a7 (0000a9c0)     ADC_pos_4
-0000a9e3     2a7 (0000a9c0)     ADC_cur_1
-0000a9e4     2a7 (0000a9c0)     ADC_cur_2
-0000a9e5     2a7 (0000a9c0)     ADC_cur_3
-0000a9e6     2a7 (0000a9c0)     ADC_cur_4
-0000a9e7     2a7 (0000a9c0)     status
-0000a9e8     2a7 (0000a9c0)     MEP_SF
-0000a9f1     2a7 (0000a9c0)     SFO_CAL
+0000a9ca     2a7 (0000a9c0)     MEP_ScaleFactor
+0000a9cb     2a7 (0000a9c0)     ADC_pos_1
+0000a9cc     2a7 (0000a9c0)     ADC_pos_2
+0000a9cd     2a7 (0000a9c0)     ADC_pos_3
+0000a9ce     2a7 (0000a9c0)     ADC_pos_4
+0000a9cf     2a7 (0000a9c0)     ADC_cur_1
+0000a9d0     2a7 (0000a9c0)     ADC_cur_2
+0000a9d1     2a7 (0000a9c0)     ADC_cur_3
+0000a9d2     2a7 (0000a9c0)     ADC_cur_4
+0000a9d3     2a7 (0000a9c0)     status
+0000a9d4     2a7 (0000a9c0)     MEP_SF
+0000a9dd     2a7 (0000a9c0)     SFO_CAL
 
-0000ad80     2b6 (0000ad80)     SAVITZKY
+0000ad6c     2b5 (0000ad40)     SAVITZKY
+0000ad7e     2b5 (0000ad40)     duty_table
+
+0000ad88     2b6 (0000ad80)     ePWM
 
 
 GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
 
 page  address   name                             
 ----  -------   ----                             
-0     0000a9e3  ADC_cur_1                        
-0     0000a9e4  ADC_cur_2                        
-0     0000a9e5  ADC_cur_3                        
-0     0000a9e6  ADC_cur_4                        
-0     0000a9df  ADC_pos_1                        
-0     0000a9e0  ADC_pos_2                        
-0     0000a9e1  ADC_pos_3                        
-0     0000a9e2  ADC_pos_4                        
+0     0000a9cf  ADC_cur_1                        
+0     0000a9d0  ADC_cur_2                        
+0     0000a9d1  ADC_cur_3                        
+0     0000a9d2  ADC_cur_4                        
+0     0000a9cb  ADC_pos_1                        
+0     0000a9cc  ADC_pos_2                        
+0     0000a9cd  ADC_pos_3                        
+0     0000a9ce  ADC_pos_4                        
 0     00009a0f  ADC_setOffsetTrimAll             
 0     00009a37  ADC_setVREF                      
 0     00009dbc  ASYSCTL_init                     
@@ -550,10 +551,10 @@ page  address   name
 0     00009837  GPIO_setQualificationMode        
 0     0000a842  I                                
 0     000096e5  IIR_Filter                       
-0     0000a920  IN1                              
-0     0000a926  IN2                              
-0     0000a92c  IN3                              
-0     0000a932  IN4                              
+0     0000a90c  IN1                              
+0     0000a912  IN2                              
+0     0000a918  IN3                              
+0     0000a91e  IN4                              
 0     00009939  INTERRUPT_init                   
 0     00009d2d  INT_Push_Button_Start_XINT_ISR   
 0     00009081  INT_mySCI0_RX_ISR                
@@ -569,12 +570,12 @@ page  address   name
 0     0000a84a  Kr                               
 0     0000a84c  Kr_sans_int                      
 0     0000a844  Kw                               
-0     0000a9e8  MEP_SF                           
-0     0000a9de  MEP_ScaleFactor                  
-0     0000a946  OUT1                             
-0     0000a94a  OUT2                             
-0     0000a94e  OUT3                             
-0     0000a952  OUT4                             
+0     0000a9d4  MEP_SF                           
+0     0000a9ca  MEP_ScaleFactor                  
+0     0000a930  OUT1                             
+0     0000a934  OUT2                             
+0     0000a938  OUT3                             
+0     0000a93c  OUT4                             
 0     0000a812  Offset_ADC1                      
 0     0000a814  Offset_ADC2                      
 0     0000a816  Offset_ADC3                      
@@ -595,14 +596,14 @@ page  address   name
 0     0000a87e  Position_c2_dec                  
 0     0000a894  Position_c3_dec                  
 0     00009dac  Push_Button_Start_XINT_init      
-0     0000ad80  SAVITZKY                         
+0     0000ad6c  SAVITZKY                         
 0     00009557  SCI_clearInterruptStatus         
 0     0000959c  SCI_disableInterrupt             
 0     00009626  SCI_enableInterrupt              
 0     000090ff  SCI_init                         
 0     0000966a  SCI_setConfig                    
 0     00008800  SFO                              
-0     0000a9f1  SFO_CAL                          
+0     0000a9dd  SFO_CAL                          
 0     00009d7a  SYNC_init                        
 0     00008e29  SendFloatAsText                  
 0     00000128  SysCtl_delay                     
@@ -615,19 +616,19 @@ page  address   name
 0     000086c3  SysCtl_setClock                  
 0     0000a80a  UartCounter                      
 0     00009dac  XINT_init                        
-0     0000017a  __TI_CINIT_Base                  
-0     00000182  __TI_CINIT_Limit                 
-0     00000182  __TI_CINIT_Warm                  
-0     00000170  __TI_Handler_Table_Base          
-0     00000176  __TI_Handler_Table_Limit         
+0     00000170  __TI_CINIT_Base                  
+0     00000178  __TI_CINIT_Limit                 
+0     00000178  __TI_CINIT_Warm                  
+0     00000166  __TI_Handler_Table_Base          
+0     0000016c  __TI_Handler_Table_Limit         
 0     00000600  __TI_STACK_END                   
 abs   00000200  __TI_STACK_SIZE                  
 0     00009991  __TI_auto_init_nobinit_nopinit   
-0     0000a942  __TI_cleanup_ptr                 
+0     0000a92c  __TI_cleanup_ptr                 
 0     00009909  __TI_decompress_lzss             
 0     00009e2d  __TI_decompress_none             
-0     0000a944  __TI_dtors_ptr                   
-0     0000a940  __TI_enable_exit_profile_output  
+0     0000a92e  __TI_dtors_ptr                   
+0     0000a92a  __TI_enable_exit_profile_output  
 abs   ffffffff  __TI_pprof_out_hndl              
 abs   ffffffff  __TI_prof_data_size              
 abs   ffffffff  __TI_prof_data_start             
@@ -638,17 +639,17 @@ n/a   UNDEFED   __c_args__
 0     00000400  __stack                          
 0     00009df0  _args_main                       
 0     00009c2f  _c_int00                         
-0     0000a93e  _lock                            
+0     0000a944  _lock                            
 0     00009e2c  _nop                             
 0     00009e28  _register_lock                   
 0     00009e24  _register_unlock                 
 0     00008fff  _system_post_cinit               
 0     00009e59  _system_pre_init                 
-0     0000a95a  _unlock                          
-0     0000a956  a                                
+0     0000a946  _unlock                          
+0     0000a940  a                                
 0     000099e6  abort                            
 0     0000b000  adcA1ISR                         
-0     0000a938  b                                
+0     0000a924  b                                
 0     00000000  code_start                       
 0     0000a8c2  compCount                        
 0     00009d8b  copysignf                        
@@ -664,13 +665,13 @@ n/a   UNDEFED   __c_args__
 0     0000a82e  dutyCycle3                       
 0     0000a830  dutyCycle4                       
 0     0000a8b6  dutyFine                         
-0     0000a90c  duty_table                       
-0     0000a916  ePWM                             
+0     0000ad7e  duty_table                       
+0     0000ad88  ePWM                             
 0     0000a85a  ep1                              
 0     0000a872  ep2                              
 0     0000a88a  ep3                              
 0     0000a8a2  ep4                              
-0     0000a95d  errno                            
+0     0000a949  errno                            
 0     00009e53  error                            
 0     000099e8  exit                             
 0     0000a856  fc1                              
@@ -722,20 +723,20 @@ n/a   UNDEFED   __c_args__
 0     0000a8fa  pos4Buff                         
 0     00008000  powf                             
 0     00009cdc  reverse                          
-0     0000a95e  rxBuffer                         
+0     0000a94a  rxBuffer                         
 0     0000a80d  rxIndex                          
 0     00009ace  savitzky_Filter                  
 0     000093d3  scalbnf                          
 0     00009a5e  sqrtf                            
 0     0000a808  state_PIN                        
-0     0000a9e7  status                           
+0     0000a9d3  status                           
 0     0000a860  sum_vp1                          
 0     0000a878  sum_vp2                          
 0     0000a890  sum_vp3                          
 0     0000a8a8  sum_vp4                          
 0     0000a802  takeOff                          
 0     0000a803  takeOff2                         
-0     0000a99e  txBuffer                         
+0     0000a98a  txBuffer                         
 0     0000a80b  txIndex                          
 0     0000a80c  txLength                         
 0     0000a832  uc1                              
@@ -762,11 +763,11 @@ page  address   name
 ----  -------   ----                             
 0     00000000  code_start                       
 0     00000128  SysCtl_delay                     
-0     00000170  __TI_Handler_Table_Base          
-0     00000176  __TI_Handler_Table_Limit         
-0     0000017a  __TI_CINIT_Base                  
-0     00000182  __TI_CINIT_Limit                 
-0     00000182  __TI_CINIT_Warm                  
+0     00000166  __TI_Handler_Table_Base          
+0     0000016c  __TI_Handler_Table_Limit         
+0     00000170  __TI_CINIT_Base                  
+0     00000178  __TI_CINIT_Limit                 
+0     00000178  __TI_CINIT_Warm                  
 0     00000400  __stack                          
 0     00000600  __TI_STACK_END                   
 0     00008000  powf                             
@@ -962,39 +963,39 @@ page  address   name
 0     0000a8d6  pos2Buff                         
 0     0000a8e8  pos3Buff                         
 0     0000a8fa  pos4Buff                         
-0     0000a90c  duty_table                       
-0     0000a916  ePWM                             
-0     0000a920  IN1                              
-0     0000a926  IN2                              
-0     0000a92c  IN3                              
-0     0000a932  IN4                              
-0     0000a938  b                                
-0     0000a93e  _lock                            
-0     0000a940  __TI_enable_exit_profile_output  
-0     0000a942  __TI_cleanup_ptr                 
-0     0000a944  __TI_dtors_ptr                   
-0     0000a946  OUT1                             
-0     0000a94a  OUT2                             
-0     0000a94e  OUT3                             
-0     0000a952  OUT4                             
-0     0000a956  a                                
-0     0000a95a  _unlock                          
-0     0000a95d  errno                            
-0     0000a95e  rxBuffer                         
-0     0000a99e  txBuffer                         
-0     0000a9de  MEP_ScaleFactor                  
-0     0000a9df  ADC_pos_1                        
-0     0000a9e0  ADC_pos_2                        
-0     0000a9e1  ADC_pos_3                        
-0     0000a9e2  ADC_pos_4                        
-0     0000a9e3  ADC_cur_1                        
-0     0000a9e4  ADC_cur_2                        
-0     0000a9e5  ADC_cur_3                        
-0     0000a9e6  ADC_cur_4                        
-0     0000a9e7  status                           
-0     0000a9e8  MEP_SF                           
-0     0000a9f1  SFO_CAL                          
-0     0000ad80  SAVITZKY                         
+0     0000a90c  IN1                              
+0     0000a912  IN2                              
+0     0000a918  IN3                              
+0     0000a91e  IN4                              
+0     0000a924  b                                
+0     0000a92a  __TI_enable_exit_profile_output  
+0     0000a92c  __TI_cleanup_ptr                 
+0     0000a92e  __TI_dtors_ptr                   
+0     0000a930  OUT1                             
+0     0000a934  OUT2                             
+0     0000a938  OUT3                             
+0     0000a93c  OUT4                             
+0     0000a940  a                                
+0     0000a944  _lock                            
+0     0000a946  _unlock                          
+0     0000a949  errno                            
+0     0000a94a  rxBuffer                         
+0     0000a98a  txBuffer                         
+0     0000a9ca  MEP_ScaleFactor                  
+0     0000a9cb  ADC_pos_1                        
+0     0000a9cc  ADC_pos_2                        
+0     0000a9cd  ADC_pos_3                        
+0     0000a9ce  ADC_pos_4                        
+0     0000a9cf  ADC_cur_1                        
+0     0000a9d0  ADC_cur_2                        
+0     0000a9d1  ADC_cur_3                        
+0     0000a9d2  ADC_cur_4                        
+0     0000a9d3  status                           
+0     0000a9d4  MEP_SF                           
+0     0000a9dd  SFO_CAL                          
+0     0000ad6c  SAVITZKY                         
+0     0000ad7e  duty_table                       
+0     0000ad88  ePWM                             
 0     0000b000  adcA1ISR                         
 abs   00000200  __TI_STACK_SIZE                  
 abs   ffffffff  __TI_pprof_out_hndl              
