@@ -187,19 +187,19 @@ epwm4.epwm.epwm_aPin.$assign                                   = "GPIO6";
 epwm4.epwm.epwm_bPin.$assign                                   = "GPIO7";
 
 gpio1.direction       = "GPIO_DIR_MODE_OUT";
-gpio1.$name           = "myLED_D1";
+gpio1.$name           = "LED_D1";
 gpio1.gpioPin.$assign = "GPIO31";
 
-gpio2.$name           = "myLED_D2";
 gpio2.direction       = "GPIO_DIR_MODE_OUT";
+gpio2.$name           = "LED_D2";
 gpio2.gpioPin.$assign = "GPIO34";
 
-gpio3.$name           = "LED_D5_carte_principale";
 gpio3.direction       = "GPIO_DIR_MODE_OUT";
+gpio3.$name           = "LED_D5";
 gpio3.gpioPin.$assign = "GPIO40";
 
-gpio4.$name           = "LED_D6_carte_principale";
 gpio4.direction       = "GPIO_DIR_MODE_OUT";
+gpio4.$name           = "LED_D6";
 gpio4.gpioPin.$assign = "GPIO41";
 
 gpio5.$name                     = "Push_Button_Start";

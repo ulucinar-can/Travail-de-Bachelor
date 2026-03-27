@@ -524,10 +524,10 @@ void main(void)
     }
 
     // Extinctions LEDs
-    GPIO_writePin(myLED_D1,1);
-    GPIO_writePin(myLED_D2,1);
-    GPIO_writePin(LED_D5_carte_principale,0);
-    GPIO_writePin(LED_D6_carte_principale,0);
+    GPIO_writePin(LED_D1,1);
+    GPIO_writePin(LED_D2,1);
+    GPIO_writePin(LED_D5,0);
+    GPIO_writePin(LED_D6,0);
 
 // Infinite loop
     for(;;)
@@ -548,7 +548,7 @@ void error (void)
 // la lecture du bouton poussoir
 __interrupt void adcA1ISR(void)
 {
-    GPIO_writePin(LED_D5_carte_principale,0); // Allumer LED pendant sustentation
+    GPIO_writePin(LED_D5, 1); // Allumer LED pendant sustentation
 
     //////////////////////////////////////////////////////////////////////////////
     //                          Lecture ADC                                     //
@@ -629,7 +629,7 @@ __interrupt void adcA1ISR(void)
      if(start_ISOZ == 1 || state_PIN == 1) // SI bouton poussoir press� physique ou sur page web -> debut de la sustentation
      {
          // allumage lors de la sustentation, led2 d'indication sur DSP
-         GPIO_writePin(myLED_D2,0);
+         GPIO_writePin(LED_D2,0);
 
          //////////////////////////////////////////////////////////////////////////////
          //                          Savitzky speed calulation                       //
@@ -1075,7 +1075,7 @@ __interrupt void adcA1ISR(void)
     // Arret de la sustentation
     else if(stop_ISOZ == 1 || state_PIN == 0)
     {
-        GPIO_writePin(myLED_D2,1); // Eteindre la LED2 apres sustentation
+        GPIO_writePin(LED_D2,1); // Eteindre la LED2 apres sustentation
 
         for(i = 1;i<1+NUM_OF_PWM_CHANNEL;i++)
             {
@@ -1157,7 +1157,7 @@ __interrupt void adcA1ISR(void)
 //************************************//
 
     // Led de debug
-    GPIO_writePin(LED_D5_carte_principale,1); // Led de debug pour mesurer la frequence de l interruption
+    GPIO_writePin(LED_D5, 0); // Led de debug pour mesurer la frequence de l interruption
 }
 
 __interrupt void INT_Push_Button_Start_XINT_ISR(void)

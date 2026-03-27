@@ -213,10 +213,10 @@ void init(void)
     }
 
     // Extinctions LEDs
-    GPIO_writePin(myLED_D1,1);
-    GPIO_writePin(myLED_D2,1);
-    GPIO_writePin(LED_D5_carte_principale,0);
-    GPIO_writePin(LED_D6_carte_principale,0);
+    GPIO_writePin(LED_D1,1);
+    GPIO_writePin(LED_D2,1);
+    GPIO_writePin(LED_D5,0);
+    GPIO_writePin(LED_D6,0);
 }
 
 void error (void)
@@ -231,7 +231,7 @@ void error (void)
 __interrupt void adcA1ISR(void)
 {
     // Allumer LED de debug pour mesurer le temps d'exécution de la boucle
-    GPIO_writePin(LED_D5_carte_principale, 0);
+    GPIO_writePin(LED_D5, 1);
 
     /* --------------------------------------------------------------------- *
      * 1. LECTURE ADC & CALIBRATION
@@ -304,7 +304,7 @@ __interrupt void adcA1ISR(void)
      * --------------------------------------------------------------------- */
     if(ButtonS2 || state_PIN)
     {
-        GPIO_writePin(myLED_D2, 0); // Allumage LED2 (Indicateur sustentation)
+        GPIO_writePin(LED_D2, 0); // Allumage LED2 (Indicateur sustentation)
 
         // --- Filtres de vitesse Savitzky-Golay ---
         pos1Buff[FILTWINDOW-1] = Position1;
@@ -559,7 +559,7 @@ __interrupt void adcA1ISR(void)
     }
     else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
     {
-        GPIO_writePin(myLED_D2, 1); // Eteindre LED
+        GPIO_writePin(LED_D2, 1); // Eteindre LED
 
         // Forcer les PWM à 50%
         for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
@@ -605,7 +605,7 @@ __interrupt void adcA1ISR(void)
     }
 
     // Eteindre LED de debug (fin de boucle de régulation)
-    GPIO_writePin(LED_D5_carte_principale, 1);
+    GPIO_writePin(LED_D5, 0);
 }
 
 /* ========================================================================= *

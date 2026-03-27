@@ -128,19 +128,19 @@ extern "C"
 //
 // GPIO31 - GPIO Settings
 //
-#define myLED_D1_GPIO_PIN_CONFIG GPIO_31_GPIO31
+#define LED_D1_GPIO_PIN_CONFIG GPIO_31_GPIO31
 //
 // GPIO34 - GPIO Settings
 //
-#define myLED_D2_GPIO_PIN_CONFIG GPIO_34_GPIO34
+#define LED_D2_GPIO_PIN_CONFIG GPIO_34_GPIO34
 //
 // GPIO40 - GPIO Settings
 //
-#define LED_D5_carte_principale_GPIO_PIN_CONFIG GPIO_40_GPIO40
+#define LED_D5_GPIO_PIN_CONFIG GPIO_40_GPIO40
 //
 // GPIO41 - GPIO Settings
 //
-#define LED_D6_carte_principale_GPIO_PIN_CONFIG GPIO_41_GPIO41
+#define LED_D6_GPIO_PIN_CONFIG GPIO_41_GPIO41
 //
 // GPIO59 - GPIO Settings
 //
@@ -293,14 +293,14 @@ void myCPUTIMER0_init();
 // GPIO Configurations
 //
 //*****************************************************************************
-#define myLED_D1 31
-void myLED_D1_init();
-#define myLED_D2 34
-void myLED_D2_init();
-#define LED_D5_carte_principale 40
-void LED_D5_carte_principale_init();
-#define LED_D6_carte_principale 41
-void LED_D6_carte_principale_init();
+#define LED_D1 31
+void LED_D1_init();
+#define LED_D2 34
+void LED_D2_init();
+#define LED_D5 40
+void LED_D5_init();
+#define LED_D6 41
+void LED_D6_init();
 #define Push_Button_Start 59
 void Push_Button_Start_init();
 
