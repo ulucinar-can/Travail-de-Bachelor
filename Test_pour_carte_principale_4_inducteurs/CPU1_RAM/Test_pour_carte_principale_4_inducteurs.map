@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker Unix v22.6.1                   
 ******************************************************************************
->> Linked Thu Mar 26 19:26:29 2026
+>> Linked Fri Mar 27 11:34:01 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000

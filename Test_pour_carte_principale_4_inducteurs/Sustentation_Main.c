@@ -4,7 +4,9 @@
 //
 // TITLE:   Power command and regulation for magnetic sustenance
 //
-// AUTHOR : Thomas Freyche - 2025
+// AUTHOR :
+//          - Thomas Freyche - 2025
+//          - Can Uluçinar   - 2026
 //
 //###########################################################################
 
@@ -68,8 +70,7 @@ unsigned int dt_mean = 0;
 
 // --- Shared Control Variables ---
 float I = 1; // Conservée en variable pour pouvoir couper l'intégrateur en direct via debugger
-float Kw = KW, Kd = KD, Kddot = KDDOT, Kr = KR;
-float Kr_sans_int = KR_SANS_INT; // Conservée car modifiée dynamiquement plus tard
+float Kw = KW, Kd = KD, Kddot = KDDOT, Kr = KR, Kr_sans_int = KR_SANS_INT;
 
 bool takeOff = true;
 bool takeOff2 = true;
