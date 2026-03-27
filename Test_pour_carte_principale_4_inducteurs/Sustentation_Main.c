@@ -121,12 +121,12 @@ float fc4f = 0.0, IN4[Nb] ={[0 ... 2] = 0}, OUT4[Na] = {[0 ... 1] = 0};
 
 // --- PWM Management ---
 float dutyFine = MIN_HRPWM_DUTY_PERCENT;
-float duty1 = 50, duty2 = 50, duty3 = 50, duty4 = 50;
-const float duty_table[] = {0, DUTY_CYCLE_1, DUTY_CYCLE_2, DUTY_CYCLE_3, DUTY_CYCLE_4};
+float duty_table[NUM_OF_PWM_CHANNEL] ={50, 50, 50, 50};
+const float duty_cycle_table[NUM_OF_PWM_CHANNEL] = {DUTY_CYCLE_1, DUTY_CYCLE_2, DUTY_CYCLE_3, DUTY_CYCLE_4};
 float count = 0;
 uint32_t compCount = 0;
-uint16_t i = 1, status;
-const uint32_t ePWM[] = {0, myEPWM1_BASE, myEPWM2_BASE, myEPWM3_BASE, myEPWM4_BASE};
+uint16_t i = 0, status;
+const uint32_t ePWM[NUM_OF_PWM_CHANNEL] = {myEPWM1_BASE, myEPWM2_BASE, myEPWM3_BASE, myEPWM4_BASE};
 
 // --- User Interface & Buttons ---
 bool ButtonS2 = false, Ext_Int_Flag = false, state_PIN = false;
@@ -203,9 +203,9 @@ void init(void)
     ERTM;
 
     // Affection des PWMs
-    for(i = 1;i<1+NUM_OF_PWM_CHANNEL;i++)
+    for(i = 0;i < NUM_OF_PWM_CHANNEL;i++)
     {
-        dutyFine = ((float)(duty_table[i]*TIME_BASE_PERIOD) * INV_FACTOR);
+        dutyFine = ((float)(duty_cycle_table[i]*TIME_BASE_PERIOD) * INV_FACTOR);
         count = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
         compCount = (count);
         HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
@@ -529,51 +529,42 @@ __interrupt void adcA1ISR(void)
          * --------------------------------------------------------------------- */
 
         // Conversion en pourcentage
-        duty1 = dutyCycle1 * 100;
-        duty2 = dutyCycle2 * 100;
-        duty3 = dutyCycle3 * 100;
-        duty4 = dutyCycle4 * 100;
+        duty_table[0] = dutyCycle1 * 100;
+        duty_table[1] = dutyCycle2 * 100;
+        duty_table[2] = dutyCycle3 * 100;
+        duty_table[3] = dutyCycle4 * 100;
 
-        // Saturation des PWM
-        if(duty1 >= LIMITE_MAX_DUTY_FINE) duty1 = LIMITE_MAX_DUTY_FINE; else if(duty1 <= LIMITE_MIN_DUTY_FINE) duty1 = LIMITE_MIN_DUTY_FINE;
-        if(duty2 >= LIMITE_MAX_DUTY_FINE) duty2 = LIMITE_MAX_DUTY_FINE; else if(duty2 <= LIMITE_MIN_DUTY_FINE) duty2 = LIMITE_MIN_DUTY_FINE;
-        if(duty3 >= LIMITE_MAX_DUTY_FINE) duty3 = LIMITE_MAX_DUTY_FINE; else if(duty3 <= LIMITE_MIN_DUTY_FINE) duty3 = LIMITE_MIN_DUTY_FINE;
-        if(duty4 >= LIMITE_MAX_DUTY_FINE) duty4 = LIMITE_MAX_DUTY_FINE; else if(duty4 <= LIMITE_MIN_DUTY_FINE) duty4 = LIMITE_MIN_DUTY_FINE;
+        for (i = 0; i < NUM_OF_PWM_CHANNEL; i++)
+        {
+            // Vérification des limites MIN et MAX avec le bon index [i]
+            if (duty_table[i] >= LIMITE_MAX_DUTY_FINE) {
+                duty_table[i] = LIMITE_MAX_DUTY_FINE;
+            }
+            else if (duty_table[i] <= LIMITE_MIN_DUTY_FINE) {
+                duty_table[i] = LIMITE_MIN_DUTY_FINE;
+            }
 
-        // Mise à jour des registres HRPWM
-        dutyFine = ((float)(duty1 * TIME_BASE_PERIOD) * INV_FACTOR);
-        compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-        HRPWM_setCounterCompareValue(ePWM[1], HRPWM_COUNTER_COMPARE_A, compCount);
-        HRPWM_setCounterCompareValue(ePWM[1], HRPWM_COUNTER_COMPARE_B, compCount);
-
-        dutyFine = ((float)(duty2 * TIME_BASE_PERIOD) * INV_FACTOR);
-        compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-        HRPWM_setCounterCompareValue(ePWM[2], HRPWM_COUNTER_COMPARE_A, compCount);
-        HRPWM_setCounterCompareValue(ePWM[2], HRPWM_COUNTER_COMPARE_B, compCount);
-
-        dutyFine = ((float)(duty3 * TIME_BASE_PERIOD) * INV_FACTOR);
-        compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-        HRPWM_setCounterCompareValue(ePWM[3], HRPWM_COUNTER_COMPARE_A, compCount);
-        HRPWM_setCounterCompareValue(ePWM[3], HRPWM_COUNTER_COMPARE_B, compCount);
-
-        dutyFine = ((float)(duty4 * TIME_BASE_PERIOD) * INV_FACTOR);
-        compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-        HRPWM_setCounterCompareValue(ePWM[4], HRPWM_COUNTER_COMPARE_A, compCount);
-        HRPWM_setCounterCompareValue(ePWM[4], HRPWM_COUNTER_COMPARE_B, compCount);
+            // Mise à jour des registres HRPWM
+            dutyFine = ((float)(duty_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
+            compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
+            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
+            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+        }
 
         if(!takeOff) i_store++;
 
         // SFO Calibration
         status = SFO();
         if (status == SFO_ERROR) error();
-    } else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
+    }
+    else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
     {
         GPIO_writePin(myLED_D2, 1); // Eteindre LED
 
         // Forcer les PWM à 50%
-        for(i = 1; i < 1 + NUM_OF_PWM_CHANNEL; i++)
+        for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
         {
-            dutyFine = ((float)(duty_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
+            dutyFine = ((float)(duty_cycle_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
             compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
             HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
             HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
