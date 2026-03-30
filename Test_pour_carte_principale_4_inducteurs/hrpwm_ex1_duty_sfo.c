@@ -548,7 +548,7 @@ void error (void)
 // la lecture du bouton poussoir
 __interrupt void adcA1ISR(void)
 {
-    GPIO_writePin(LED_D5, 1); // Allumer LED pendant sustentation
+
 
     //////////////////////////////////////////////////////////////////////////////
     //                          Lecture ADC                                     //
@@ -628,6 +628,7 @@ __interrupt void adcA1ISR(void)
 //--------------------------------------------------------------------------------------------------------------------------
      if(start_ISOZ == 1 || state_PIN == 1) // SI bouton poussoir press� physique ou sur page web -> debut de la sustentation
      {
+         GPIO_writePin(LED_D5, 1); // Allumer LED pendant sustentation
          // allumage lors de la sustentation, led2 d'indication sur DSP
          GPIO_writePin(LED_D2,0);
 
@@ -973,6 +974,9 @@ __interrupt void adcA1ISR(void)
         //                           END OF REGULATION                              //
         //////////////////////////////////////////////////////////////////////////////
 
+       // Led de debug
+       GPIO_writePin(LED_D5, 0); // Led de debug pour mesurer la frequence de l interruption
+
          // Calcul de l'angle theta
     //            theta = ((Position1)-(Position2))*UN_SUR_d;
                 // Convert Uc1,...,Uc3 into dutycycle and add DA (dutycycle correction) as ucx will always be >0 in our application, otherwise
@@ -1155,9 +1159,6 @@ __interrupt void adcA1ISR(void)
 //************************************//
 //      --->  BOUTON EXTINT
 //************************************//
-
-    // Led de debug
-    GPIO_writePin(LED_D5, 0); // Led de debug pour mesurer la frequence de l interruption
 }
 
 __interrupt void INT_Push_Button_Start_XINT_ISR(void)

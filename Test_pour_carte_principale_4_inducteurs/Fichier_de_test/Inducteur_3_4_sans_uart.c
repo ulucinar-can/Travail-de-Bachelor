@@ -500,7 +500,7 @@ void main(void)
     // Initialize the EPWM GPIO Pins, the SCI and change the XBAR inputs from using GPIO0
     //
     Board_init();
-    SCI_enableInterrupt(mySCI0_BASE, SCI_INT_RXFF); // Autorise l'interruption Rx
+    // SCI_enableInterrupt(mySCI0_BASE, SCI_INT_RXFF); // Autorise l'interruption Rx
 
     //
     // Enable sync and clock to PWM
@@ -617,13 +617,13 @@ __interrupt void adcA1ISR(void)
       // Envoi des donn�es UART toute les 40*10e-6 * 25000 = 1 s
       UartCounter++;
 
-      if (UartCounter >= 25000) {
-          UartCounter = 0; // Reset du compteur
-          SendFloatAsText(Position1*1000.0f,Position2*1000.0f,Position3*1000.0f,Position4*1000.0f);
-
-//          SendFloatAsText(1.234f,2.567f,3.891,4.234f); // Trame de test envoy�e : "\x02float1,float2,float3float4\x03" avec les float sous cette forme x.xxx
-//          sendString("\x02Hello World!\r\x03");
-      }
+//      if (UartCounter >= 25000) {
+//          UartCounter = 0; // Reset du compteur
+//          SendFloatAsText(Position1*1000.0f,Position2*1000.0f,Position3*1000.0f,Position4*1000.0f);
+//
+////          SendFloatAsText(1.234f,2.567f,3.891,4.234f); // Trame de test envoy�e : "\x02float1,float2,float3float4\x03" avec les float sous cette forme x.xxx
+////          sendString("\x02Hello World!\r\x03");
+//      }
 
 //--------------------------------------------------------------------------------------------------------------------------
      if(start_ISOZ == 1 || state_PIN == 1) // SI bouton poussoir press� physique ou sur page web -> debut de la sustentation

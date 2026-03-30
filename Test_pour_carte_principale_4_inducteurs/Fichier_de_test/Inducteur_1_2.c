@@ -549,6 +549,7 @@ void error (void)
 __interrupt void adcA1ISR(void)
 {
 
+
     //////////////////////////////////////////////////////////////////////////////
     //                          Lecture ADC                                     //
     //////////////////////////////////////////////////////////////////////////////
@@ -613,6 +614,8 @@ __interrupt void adcA1ISR(void)
       Current3     = (((float)(ADC_cur_3) - ADC_ZERO_CURRENT - Offset_ADC3) / (ADC_ZERO_CURRENT + Offset_ADC3)) * I_MAX;
       Current4     = (((float)(ADC_cur_4) - ADC_ZERO_CURRENT - Offset_ADC4) / (ADC_ZERO_CURRENT + Offset_ADC4)) * I_MAX;
 
+
+
       // Envoi des donn�es UART toute les 40*10e-6 * 25000 = 1 s
       UartCounter++;
 
@@ -627,7 +630,7 @@ __interrupt void adcA1ISR(void)
 //--------------------------------------------------------------------------------------------------------------------------
      if(start_ISOZ == 1 || state_PIN == 1) // SI bouton poussoir press� physique ou sur page web -> debut de la sustentation
      {
-         GPIO_writePin(LED_D5, 1); // Allumer LED pendant sustentation
+
 
          // allumage lors de la sustentation, led2 d'indication sur DSP
          // GPIO_writePin(LED_D2,0);
@@ -969,6 +972,9 @@ __interrupt void adcA1ISR(void)
 //           // Inductor 4
 //           PI_current_regulator(ic4, Current4, &integral_i4, &ue4, &uc4);
 
+           // Led de debug
+
+
         //////////////////////////////////////////////////////////////////////////////
         //                           END OF REGULATION                              //
         //////////////////////////////////////////////////////////////////////////////
@@ -989,7 +995,7 @@ __interrupt void adcA1ISR(void)
         //////////////////////////////////////////////////////////////////////////////
         //                           CALCUL DES PWMs                                //
         //////////////////////////////////////////////////////////////////////////////
-
+        GPIO_writePin(LED_D5, 1); // Allumer LED pendant sustentation
     // Travail avec DC en pourcent, de 0 � 100 [%]
         duty1 = dutyCycle1 * 100;
         duty2 = dutyCycle2 * 100;
@@ -1071,6 +1077,7 @@ __interrupt void adcA1ISR(void)
             error();   // SFO function returns 2 if an error occurs & #
                        // of MEP steps/coarse step
         }              // exceeds maximum of 255.
+        GPIO_writePin(LED_D5, 0); // Led de debug pour mesurer la frequence de l'interruption
     }
     // Arret de la sustentation
     else if(stop_ISOZ == 1 || state_PIN == 0)
@@ -1155,9 +1162,6 @@ __interrupt void adcA1ISR(void)
 //************************************//
 //      --->  BOUTON EXTINT
 //************************************//
-
-    // Led de debug
-    GPIO_writePin(LED_D5, 0); // Led de debug pour mesurer la frequence de l'interruption
 
 }
 

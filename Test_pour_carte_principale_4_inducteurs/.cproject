@@ -124,7 +124,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Fichier_de_test/Inducteur_3_4.c|hrpwm_ex1_duty_sfo.c|FunctionHeader2.c|Sustentation_Main.c|device/driverlib|28003x_generic_flash_lnk.cmd|targetConfigs/TMS320F280039C_LaunchPad.ccxml" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="hrpwm_ex1_duty_sfo.c|Fichier_de_test/Inducteur_3_4_sans_uart.c|Fichier_de_test/Inducteur_1_2_sans_uart.c|Fichier_de_test/hrpwm_ex1_duty_sfo_sans_uart.c|Fichier_de_test/Inducteur_3_4.c|FunctionHeader2.c|Sustentation_Main.c|device/driverlib|28003x_generic_flash_lnk.cmd|targetConfigs/TMS320F280039C_LaunchPad.ccxml" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
