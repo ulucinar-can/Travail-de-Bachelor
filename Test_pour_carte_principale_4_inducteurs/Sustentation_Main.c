@@ -345,6 +345,40 @@ __interrupt void adcA1ISR(void)
 //            // Rampe de courant sur les inducteur 1&2 jusqu'à atteindre les 3A
 //            case STATE_1:
 //
+//                // Rampe vers 3A par pas de 0.04A
+//                if(ic1 < I_SP)
+//                {
+//                    ic1 += TAKEOFF_CURRENT_STEP1;
+//                }
+//                else
+//                {
+//                    ic1 = I_SP;
+//                }
+//
+//                // Fixe le courant de consigne 2 par rapport à ic1
+//                ic2 = ic1;
+//
+//
+//                if(dt_mean == 200) // dt = 8ms
+//                {
+//                    mean1 = mean1 / dt_mean;
+//                    mean2 = mean2 / dt_mean;
+//
+//                    if((mean1 <= I_SP105 && mean1 >= I_SP095) && (mean2 <= I_SP105 && mean2 >= I_SP095))
+//                    {
+//                        state = STATE_1;;
+//                    }
+//                    else
+//                    {
+//                        mean1 = 0;
+//                        mean2 = 0;
+//                    }
+//                }
+//
+//                mean1 += Current1;
+//                mean2 += Current2;
+//                dt_mean++;
+//
 //                break;
 //
 //            // State 2 :
