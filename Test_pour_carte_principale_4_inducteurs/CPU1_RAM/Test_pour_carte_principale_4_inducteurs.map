@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker Unix v22.6.1                   
 ******************************************************************************
->> Linked Mon Mar 30 08:17:21 2026
+>> Linked Mon Mar 30 08:50:47 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -93,8 +93,7 @@ codestart
                   00000128    00000004     driverlib.lib : sysctl.obj (.TI.ramfunc)
 
 .cinit     0    0000012c    0000004e     
-                  0000012c    0000003b     (.cinit..data.load) [load image, compression = lzss]
-                  00000167    00000001     --HOLE-- [fill = 0]
+                  0000012c    0000003c     (.cinit..data.load) [load image, compression = lzss]
                   00000168    00000006     (__TI_handler_table)
                   0000016e    00000004     (.cinit..bss.load) [load image, compression = zero_init]
                   00000172    00000008     (__TI_cinit_table)
@@ -334,15 +333,15 @@ MODULE SUMMARY
        Total:                                   1417   12        11     
                                                                         
        Stack:                                   0      0         512    
-       Linker Generated:                        0      77        0      
+       Linker Generated:                        0      78        0      
     +--+----------------------------------------+------+---------+---------+
-       Grand Total:                             9819   1026      994    
+       Grand Total:                             9819   1027      994    
 
 
 LINKER GENERATED COPY TABLES
 
 __TI_cinit_table @ 00000172 records: 2, size/record: 4, table size: 8
-	.data: load addr=0000012c, load size=0000003b bytes, run addr=0000a800, run size=0000014a bytes, compression=lzss
+	.data: load addr=0000012c, load size=0000003c bytes, run addr=0000a800, run size=0000014a bytes, compression=lzss
 	.bss: load addr=0000016e, load size=00000004 bytes, run addr=0000a94a, run size=00000098 bytes, compression=zero_init
 
 
