@@ -6,6 +6,7 @@
 
 #include "driverlib.h"
 #include "device.h"
+#include "board.h"
 #include <math.h>
 #include <stdint.h>
 #include <stdbool.h>

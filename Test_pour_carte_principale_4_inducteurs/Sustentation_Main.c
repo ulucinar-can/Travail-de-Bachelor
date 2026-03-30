@@ -48,6 +48,17 @@
 
 #define RX_BUF_LEN                  64
 
+#define STATE_1                     1
+#define STATE_2                     2
+#define STATE_3                     3
+#define STATE_4                     4
+#define STATE_5                     5
+#define STATE_6                     6
+#define STATE_7                     7
+#define STATE_8                     8
+#define STATE_9                     9
+
+
 /* ========================================================================= *
  * GLOBAL VARIABLES
  * ========================================================================= */
@@ -141,6 +152,9 @@ volatile uint16_t txLength = 0;
 volatile char rxBuffer[RX_BUF_LEN];
 volatile uint16_t rxIndex = 0;
 static uint16_t dataIndex = 0;
+
+// --- State machine variable ---
+uint8_t state = STATE_1;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -302,6 +316,9 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 4. MACHINE D'ETAT & REGULATION (Si activée)
      * --------------------------------------------------------------------- */
+
+    // State 0 :
+    // Vérification de l'enclenchement de la régulation
     if(ButtonS2 || state_PIN)
     {
         GPIO_writePin(LED_D2, 0); // Allumage LED2 (Indicateur sustentation)
@@ -320,196 +337,68 @@ __interrupt void adcA1ISR(void)
         v4 = savitzky_Filter(pos4Buff);
 
         // ================================================================= //
-        // A. INDUCTEURS 1 & 2 : STRATEGIE DE DECOLLAGE
+        // STATE MACHINE BEGINING
         // ================================================================= //
-        if(takeOff)
+
+        switch(state)
         {
-            if(phase1)
-            {
-                mean1 += Current1;
-                mean2 += Current2;
-                mean3 += Current3;
-                mean4 += Current4;
-                dt_mean++;
+            // State 1 :
+            // Rampe de courant sur les inducteur 1&2 jusqu'à atteindre les 3A
+            case STATE_1:
 
-                if(dt_mean == 200) // dt = 8ms
-                {
-                    mean1 = mean1 / dt_mean;
-                    mean2 = mean2 / dt_mean;
-                    mean3 = mean3 / dt_mean;
-                    mean4 = mean4 / dt_mean;
+                break;
 
-                    if(mean1 <= I_SP105 && mean1 >= I_SP095 && mean2 <= I_SP105 && mean2 >= I_SP095 &&
-                       mean3 <= I_SP105 && mean3 >= I_SP095 && mean4 <= I_SP105 && mean4 >= I_SP095)
-                    {
-                        phase1 = false;
-                    }
-                    else
-                    {
-                        mean1 = 0; mean2 = 0; mean3 = 0; mean4 = 0; dt_mean = 0;
-                    }
-                }
+            // State 2 :
+            // Rampe de courant "infinie" pour atteindre un courant
+            // assez grand pour faire décoller l'avant
+            case STATE_2:
 
-                if(ic1 < I_SP) {
-                    ic1 += TAKEOFF_CURRENT_STEP1; // Rampe vers 3A
-                } else {
-                    ic1 = I_SP; ic2 = ic1; ic3 = ic1; ic4 = ic1;
-                }
-            }
-            else // Phase 2 for inductor 1,2
-            {
-                if(Position1 < Position_c1_dec)
-                {
-                    takeOff = false;
-                    Position_c1 = Position1;
-                }
-                else if(ic1 < 7.82f)
-                {
-                    ic1 += TAKEOFF_CURRENT_STEP1;
-                }
-                else
-                {
-                    ic1 = 7.82;
-                }
-                ic2 = ic1;
-            }
+                break;
+
+            // State 3 :
+            // Activation de la régulation de position pour atteindre les 2mm
+            // à l'avant
+            case STATE_3:
+
+                break;
+
+            // State 4 :
+            // Rampe de courant sur les inducteur 3&4 jusqu'à atteindre les 3A
+            case STATE_4:
+
+                break;
+
+            // State 5 :
+            // Rampe de courant "infinie" pour atteindre un courant
+            // assez grand pour faire décoller l'arrière
+            case STATE_5:
+
+                break;
+
+            // State 6 :
+            // Activation de la régulation de position pour atteindre les 2mm
+            // à l'arrière
+            case STATE_6:
+
+                break;
+
+            // State 7 :
+            // Régulation de maintien pour tenir la maquette en l'air
+            case STATE_7:
+
+                break;
+
+            // Default :
+            // Something went wrong so let's just go to state 9 for an error
+            default:
+                state = STATE_9;
+                break;
+
         }
-        else // --- Fin du TakeOff 1 & 2 : Régulation d'état ---
-        {
-            // Set point generator (Ramp from 3mm to 2mm)
-            if(Position_c1 > DELTA_N) Position_c1 -= 2.5 * 4e-7; else Position_c1 = DELTA_N;
-            if(Position_c2 > DELTA_N) Position_c2 -= 2.5 * 4e-7; else Position_c2 = DELTA_N;
-
-            // Inductor 1 : Filtre Bandstop + State Regulation
-            IN1[0] = fc1;
-            fc1f = IIR_Filter(IN1, OUT1);
-            if (fc1f <= 0)   fc1f = 0;
-            if (fc1f >= FMAX) fc1f = FMAX;
-
-            ep1 = Position_c1 - Position1;
-            xr1 += (ep1 - fce1);
-            sum_vp1 = v1 * Kddot + Position1 * Kd;
-            fc1_prim = Kw * Position_c1 + Kr * xr1 * I - sum_vp1 + FP;
-
-            fc1 = fc1_prim;
-            if (fc1_prim <= 0)   fc1 = 0;
-            if (fc1_prim >= FMAX) fc1 = FMAX;
-            fce1 = (fc1_prim - fc1) * K_ANTIWINDUP * ANTIWINDUP_EN;
-
-            // Inductor 2 : Filtre Bandstop + State Regulation
-            IN2[0] = fc2;
-            fc2f = IIR_Filter(IN2, OUT2);
-            if (fc2f <= 0)   fc2f = 0;
-            if (fc2f >= FMAX) fc2f = FMAX;
-
-            ep2 = Position_c2 - Position2;
-            xr2 += (ep2 - fce2);
-            sum_vp2 = v2 * Kddot + Position2 * Kd;
-            fc2_prim = Kw * Position_c2 + Kr * xr2 * I - sum_vp2 + FP;
-
-            fc2 = fc2_prim;
-            if (fc2_prim <= 0)   fc2 = 0;
-            if (fc2_prim >= FMAX) fc2 = FMAX;
-            fce2 = (fc2_prim - fc2) * K_ANTIWINDUP * ANTIWINDUP_EN;
-
-            /*
-            // --- ARCHIVE : PID Regulation for Inductor 2 ---
-            // Erreur + composante P
-            ep2 = (Position_c2 - Position2);
-            kep2 = ep2 * Kp_pid;
-
-            // Composante I
-            xr2 += Ki_pid * H * (ep2 - (fc2_prim - fc2) * K_antiwindupPID * ANTIWINDUP_EN);
-
-            // Composante D
-            dpos2 = v2 * Kd_pid;
-
-            // Assemblage des 3 composantes
-            fc2_prim = (ep2 + xr2 - dpos2);
-
-            fc2 = fc2_prim;
-            if (fc2_prim <= 0)   fc2 = 0;
-            if (fc2_prim >= FMAX) fc2 = FMAX;
-            */
-
-            // Inverse fourier transform
-            ic1 = (sqrtf(K_FC * fc1f)) * Position1;
-            ic2 = (sqrtf(K_FC * fc2f)) * Position2;
-        }
-
-        // --- Changement du placement de pôles ---
-        if(i_store >= I_STORE_CHANGE_POLES_PLACEMENT)
-        {
-            Kr = KR_CHANGE; Kw = KW_CHANGE; Kd = KD_CHANGE; Kddot = KDDOT_CHANGE;
-        }
-
         // ================================================================= //
-        // B. INDUCTEURS 3 & 4 : STRATEGIE DE DECOLLAGE
+        // STATE MACHINE END
         // ================================================================= //
-        if(!takeOff && takeOff2 && (i_store >= I_STORE_2E_DECOLLAGE))
-        {
-            if(Position3 < Position_c3_dec)
-            {
-                takeOff2 = false;
-                Position2_c3 = Position3;
-            }
-            else if(ic3 < 7.82f)
-            {
-                ic3 += TAKEOFF_CURRENT_STEP1;
-            }
-            else
-            {
-                ic3 = 7.82;
-            }
-            ic4 = ic3;
-        }
-        else if(!takeOff2) // --- Fin du TakeOff 3 & 4 : Régulation d'état ---
-        {
-            // Set point generator (Ramp from 3mm to 2mm)
-            if(Position2_c3 > DELTA_N) Position2_c3 -= 2.5 * 4e-7; else Position2_c3 = DELTA_N;
-            if(Position2_c4 > DELTA_N) Position2_c4 -= 2.5 * 4e-7; else Position2_c4 = DELTA_N;
 
-            // Inductor 3 : Filtre Bandstop + State Regulation
-            IN3[0] = fc3;
-            fc3f = IIR_Filter(IN3, OUT3);
-            if (fc3f <= 0)   fc3f = 0;
-            if (fc3f >= FMAX) fc3f = FMAX;
-
-            ep3 = Position2_c3 - Position3;
-            xr3 += (ep3 - fce3);
-            sum_vp3 = (v3 * KDDOT_SANS_INT) + (Position3 * KD_SANS_INT);
-            fc3_prim = (KW_SANS_INT * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
-
-            fc3 = fc3_prim;
-            if (fc3_prim <= 0)   fc3 = 0;
-            if (fc3_prim >= FMAX) fc3 = FMAX;
-            fce3 = (fc3_prim - fc3) * K_ANTIWINDUP * ANTIWINDUP_EN;
-
-            // Inductor 4 : Filtre Bandstop + State Regulation
-            IN4[0] = fc4;
-            fc4f = IIR_Filter(IN4, OUT4);
-            if (fc4f <= 0)   fc4f = 0;
-            if (fc4f >= FMAX) fc4f = FMAX;
-
-            ep4 = Position2_c4 - Position4;
-            xr4 += (ep4 - fce4);
-            sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
-            fc4_prim = (Kw * Position2_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
-
-            fc4 = fc4_prim;
-            if (fc4_prim <= 0)   fc4 = 0;
-            if (fc4_prim >= FMAX) fc4 = FMAX;
-            fce4 = (fc4_prim - fc4) * K_ANTIWINDUP * ANTIWINDUP_EN;
-
-            // Inverse fourier transform
-            ic3 = sqrtf(K_FC * fc3f) * Position3;
-            ic4 = sqrtf(K_FC * fc4f) * Position4;
-        }
-
-        if(i_store >= (I_STORE_2E_DECOLLAGE + 1000))
-        {
-            Kr_sans_int = -1.0;
-        }
 
         // ================================================================= //
         // C. REGULATION DE COURANT (PI) & RAPPORT CYCLIQUE
@@ -557,6 +446,8 @@ __interrupt void adcA1ISR(void)
         status = SFO();
         if (status == SFO_ERROR) error();
     }
+    // State 8 :
+    // Arrêt de la machine
     else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
     {
         GPIO_writePin(LED_D2, 1); // Eteindre LED
@@ -573,6 +464,10 @@ __interrupt void adcA1ISR(void)
         i_store = 0;
         status = SFO();
         if (status == SFO_ERROR) error();
+
+        // State 9 :
+        // Arrêt de la machine avec une erreur
+
     }
 
     /* --------------------------------------------------------------------- *

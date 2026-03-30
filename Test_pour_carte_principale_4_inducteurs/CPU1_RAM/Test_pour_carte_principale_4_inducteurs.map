@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker Unix v22.6.1                   
 ******************************************************************************
->> Linked Fri Mar 27 13:14:30 2026
+>> Linked Mon Mar 30 08:17:21 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -374,6 +374,7 @@ address     data page           name
 0000a80b     2a0 (0000a800)     txIndex
 0000a80c     2a0 (0000a800)     txLength
 0000a80d     2a0 (0000a800)     rxIndex
+0000a80f     2a0 (0000a800)     state
 0000a810     2a0 (0000a800)     Offset_count
 0000a812     2a0 (0000a800)     Offset_ADC1
 0000a814     2a0 (0000a800)     Offset_ADC2
@@ -724,6 +725,7 @@ n/a   UNDEFED   __c_args__
 0     0000a2cc  savitzky_Filter                  
 0     00009bd3  scalbnf                          
 0     0000a25c  sqrtf                            
+0     0000a80f  state                            
 0     0000a808  state_PIN                        
 0     0000a9d3  status                           
 0     0000a860  sum_vp1                          
@@ -866,6 +868,7 @@ page  address   name
 0     0000a80b  txIndex                          
 0     0000a80c  txLength                         
 0     0000a80d  rxIndex                          
+0     0000a80f  state                            
 0     0000a810  Offset_count                     
 0     0000a812  Offset_ADC1                      
 0     0000a814  Offset_ADC2                      
@@ -996,4 +999,4 @@ abs   ffffffff  __TI_prof_data_size
 abs   ffffffff  __TI_prof_data_start             
 n/a   UNDEFED   __c_args__                       
 
-[238 symbols]
+[239 symbols]
