@@ -1,6 +1,6 @@
+"./hrpwm_ex1_duty_sfo.obj"
 "./syscfg/board.obj"
 "./syscfg/c2000ware_libraries.obj"
-"./Fichier_de_test/Inducteur_1_2.obj"
 "./device/device.obj"
 "./device/f28003x_codestartbranch.obj"
 "../28003x_generic_ram_lnk.cmd"

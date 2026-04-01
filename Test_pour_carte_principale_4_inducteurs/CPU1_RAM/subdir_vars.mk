@@ -16,6 +16,7 @@ C:/ti/c2000/C2000Ware_5_02_00_00/libraries/calibration/hrpwm/f28003x/lib/SFO_v8_
 C:/ti/c2000/C2000Ware_5_02_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib 
 
 C_SRCS += \
+../hrpwm_ex1_duty_sfo.c \
 ./syscfg/board.c \
 ./syscfg/c2000ware_libraries.c 
 
@@ -29,6 +30,7 @@ GEN_MISC_DIRS += \
 ./syscfg 
 
 C_DEPS += \
+./hrpwm_ex1_duty_sfo.d \
 ./syscfg/board.d \
 ./syscfg/c2000ware_libraries.d 
 
@@ -37,6 +39,7 @@ GEN_OPTS += \
 ./syscfg/c2000ware_libraries.opt 
 
 OBJS += \
+./hrpwm_ex1_duty_sfo.obj \
 ./syscfg/board.obj \
 ./syscfg/c2000ware_libraries.obj 
 
@@ -55,6 +58,7 @@ GEN_MISC_DIRS__QUOTED += \
 "syscfg" 
 
 OBJS__QUOTED += \
+"hrpwm_ex1_duty_sfo.obj" \
 "syscfg\board.obj" \
 "syscfg\c2000ware_libraries.obj" 
 
@@ -70,6 +74,7 @@ GEN_MISC_FILES__QUOTED += \
 "syscfg\clocktree.h" 
 
 C_DEPS__QUOTED += \
+"hrpwm_ex1_duty_sfo.d" \
 "syscfg\board.d" \
 "syscfg\c2000ware_libraries.d" 
 
@@ -79,11 +84,12 @@ GEN_FILES__QUOTED += \
 "syscfg\c2000ware_libraries.opt" \
 "syscfg\c2000ware_libraries.c" 
 
-SYSCFG_SRCS__QUOTED += \
-"../hrpwm_ex1_duty_sfo.syscfg" 
-
 C_SRCS__QUOTED += \
+"../hrpwm_ex1_duty_sfo.c" \
 "./syscfg/board.c" \
 "./syscfg/c2000ware_libraries.c" 
+
+SYSCFG_SRCS__QUOTED += \
+"../hrpwm_ex1_duty_sfo.syscfg" 
 
 

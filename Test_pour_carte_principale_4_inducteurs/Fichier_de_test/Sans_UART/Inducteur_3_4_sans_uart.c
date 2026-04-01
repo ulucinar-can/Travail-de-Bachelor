@@ -548,8 +548,6 @@ void error (void)
 // la lecture du bouton poussoir
 __interrupt void adcA1ISR(void)
 {
-    GPIO_writePin(LED_D5, 1); // Allumer LED pendant sustentation
-
     //////////////////////////////////////////////////////////////////////////////
     //                          Lecture ADC                                     //
     //////////////////////////////////////////////////////////////////////////////
@@ -628,6 +626,8 @@ __interrupt void adcA1ISR(void)
 //--------------------------------------------------------------------------------------------------------------------------
      if(start_ISOZ == 1 || state_PIN == 1) // SI bouton poussoir press� physique ou sur page web -> debut de la sustentation
      {
+         GPIO_writePin(LED_D5, 1); // Allumer LED pendant sustentation
+
          // allumage lors de la sustentation, led2 d'indication sur DSP
          GPIO_writePin(LED_D2,0);
 
@@ -658,8 +658,8 @@ __interrupt void adcA1ISR(void)
             // Premiere phase de decollage : rampe de courant sur chaque inducteur jusqu'a 3A.
             if(phase1 == 1) //mean calculation
             {
-                mean1 += Current1;
-                mean2 += Current2;
+//                mean1 += Current1;
+//                mean2 += Current2;
                 mean3 += Current3;
                 mean4 += Current4;
                 dt_mean++;
@@ -668,21 +668,20 @@ __interrupt void adcA1ISR(void)
               // phase 1 end and phase2 begins
                 if(dt_mean == 200)//dt = 8ms
                 {
-                   mean1 = mean1 / dt_mean;
-                   mean2 = mean2 / dt_mean;
+//                   mean1 = mean1 / dt_mean;
+//                   mean2 = mean2 / dt_mean;
                    mean3 = mean3 / dt_mean;
                    mean4 = mean4 / dt_mean;
 
                    // Rampe generale de courant pour les 4 inducteurs
-                   if(mean1 <= I_SP105 && mean1 >= I_SP095 && mean2 <= I_SP105 && mean2 >= I_SP095\
-                           && mean3 <= I_SP105 && mean3 >= I_SP095 && mean4 <= I_SP105 && mean4 >= I_SP095){
+                   if(mean3 <= I_SP105 && mean3 >= I_SP095 && mean4 <= I_SP105 && mean4 >= I_SP095){
 
                           phase1 = 0;
                    }
                    else
                    {
-                       mean1 = 0;
-                       mean2 = 0;
+//                       mean1 = 0;
+//                       mean2 = 0;
                        mean3 = 0;
                        mean4 = 0;
                        dt_mean = 0;
@@ -690,28 +689,28 @@ __interrupt void adcA1ISR(void)
                 }
 
               // Set point generator(Current)
-                if(ic1 < I_SP)
+                if(ic3 < I_SP)
                 {
-                    ic1 += TAKEOFF_CURRENT_STEP1; // 0.04 ramp from 0A to 3A (4e-7 [s])
+                    ic3 += TAKEOFF_CURRENT_STEP1; // 0.04 ramp from 0A to 3A (4e-7 [s])
                 }
                 else
                 {
-                    ic1 = I_SP;
-                    ic2 = ic1;
-                    ic3 = ic1;
-                    ic4 = ic1;
+//                    ic1 = I_SP;
+//                    ic2 = ic1;
+                    ic3 = I_SP;
+                    ic4 = ic3;
                 }
             }
-            else // phase2 for inductor 1,2
+            else // phase2 for inductor 3,4
             {
-               if(Position1 < Position_c1_dec) // if inductor starts to move
+               if(Position3 < Position_c3_dec) // if inductor starts to move
                {
                    takeOff = 0;
-                   Position_c1 = Position1;
+                   Position2_c3 = Position3;
                }
                // Current limiting at value necessary to take off inductor at Delta_0 (3mm)
-               else if(ic1 < 7.82f){
-                   ic1 += TAKEOFF_CURRENT_STEP1; //"infinite" ramp until inductor starts to move
+               else if(ic3 < 7.82f){
+                   ic3 += TAKEOFF_CURRENT_STEP1; //"infinite" ramp until inductor starts to move
                }
                else
                {
@@ -719,116 +718,196 @@ __interrupt void adcA1ISR(void)
 //                       ic1 += 0.004f; // rampe plus douce, pour assurer la levitation du sustentateur
 //                   else
 //                       ic1 = 9.0f;
-                   ic1 = 7.82;
+                   ic3 = 7.82;
                }
-               ic2 = ic1;
+               ic4 = ic3;
             }
+
          }
-         // Start takeoff 1 & 2//
          else
          {
 
-         //SET POINT GENERATOR FOR INDUCTOR 1 & 2                                       //
-         // Ce bloc permet de baisser petit � petit la consigne de position pour que    //
-         // la regulation puisse suivre et s'adapter                                    //
-             if(Position_c1 > Pos1_to_regul)
-             {
-                 Position_c1 -= 2.5 * 4e-7; // ramp from 3mm to 2mm with a 0.25 mm step
-             }
-             else
-             {
-                 Position_c1 = Pos1_to_regul;
-             }
+          //SET POINT GENERATOR FOR INDUCTOR 3 & 4 //
+              if(Position2_c3 > Pos3_to_regul)
+              {
+                  Position2_c3 -= 2.5 * 4e-7; // ramp from 3mm to 2mm (4e-7 [s])
+              }
+              else
+              {
+                  Position2_c3 = Pos3_to_regul;
+              }
 
-             if(Position_c2 > Pos2_to_regul)
-             {
-                 Position_c2 -= 2.5 * 4e-7; // ramp from 3mm to 2mm
-             }
-             else
-             {
-                 Position_c2 = Pos2_to_regul;
-             }
+              if(Position2_c4 > Pos4_to_regul)
+              {
+                  Position2_c4 -= 2.5 * 4e-7;
+              }
+              else
+              {
+                  Position2_c4 = Pos4_to_regul;
+              }
 
-        //////////////////////////////////////////////////////////////////////////////
-        //                STATE METHOD REGULATION inductor 1 & 2                    //
-        //           With embedded system, all integrators must be removed          //
-        //////////////////////////////////////////////////////////////////////////////
+          //////////////////////////////////////////////////////////////////////////////
+          //                STATE METHOD REGULATION inductor 3 & 4                    //
+          //           With embedded system, all integrators must be removed          //
+          //////////////////////////////////////////////////////////////////////////////
 
-        //Fc1 bandstop filter
-             IN1[0] = fc1;
-             fc1f = IIR_Filter(IN1,OUT1);
-             //fc1f = fc1;
-             //introducing limit because IIR filter may cause overtaking
-             if (fc1f <= 0)
-                 fc1f = 0;
-             if (fc1f >= FMAX)
-                 fc1f = FMAX;
+              //Fc3 bandstop filter
+              IN3[0] = fc3;
+              fc3f = IIR_Filter(IN3,OUT3);
+              //introducing limit because IIR filter may cause overtaking
+              if (fc3f <= 0)
+                  fc3f = 0;
+              if (fc3f >= FMAX)
+                  fc3f = FMAX;
 
-        // Position control inductor 1 - state regulation
-             ep1 = Position_c1 - Position1;
-             xr1 += (ep1 - fce1);
-             sum_vp1 = v1 * Kddot + Position1 * Kd;
-             fc1_prim = Kw * Position_c1 + Kr * xr1 * I - sum_vp1 + FP;
-//             fc1_prim = fc1_prim - fperturb1;
-             fc1 = fc1_prim;
+              // Position control inductor 3
+              ep3 = Position2_c3 - Position3;
+              xr3 += (ep3 - fce3);
+              sum_vp3 = (v3 * Kddot_sans_int) + (Position3 * Kd_sans_int);
+              fc3_prim = (Kw_sans_int * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
+              //fc3_prim = fc3_prim - fperturb1;
+              fc3 = fc3_prim;
+              if (fc3_prim <= 0){
+                  fc3 = 0;
+              }
+              if (fc3_prim >= FMAX){
+                  fc3 = FMAX;
+              }
+              fce3 = (fc3_prim - fc3) * K_antiwindup * antiwindup_pos;
 
-             if (fc1_prim <= 0){
-                 fc1 = 0;
-             }
-             if (fc1_prim >= FMAX){
-                 fc1 = FMAX;
-             }
-             fce1 = (fc1_prim - fc1) * K_antiwindup * antiwindup_pos;
+              // Fc bandstop filter
+              IN4[0] = fc4;
+              fc4f = IIR_Filter(IN4,OUT4);
+              //introducing limit because IIR filter may cause overtaking
+              if (fc4f <= 0)
+                  fc4f = 0;
+              if (fc4f >= FMAX)
+                  fc4f = FMAX;
 
-        //Fc2 bandstop filter
-             IN2[0] = fc2;
-             fc2f = IIR_Filter(IN2,OUT2);
-             //introducing limit because IIR filter may cause overtaking
-             if (fc2f <= 0)
-                 fc2f = 0;
-             if (fc2f >= FMAX)
-                 fc2f = FMAX;
+              // Position control inductor 4
+              ep4 = Position2_c4 - Position4;
+              xr4 += (ep4 - fce4);
+              sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
+              fc4_prim = (Kw * Position2_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
+              fc4 = fc4_prim;
+              if (fc4_prim <= 0){
+                  fc4 = 0;
+              }
+              if (fc4_prim >= FMAX){
+                  fc4 = FMAX;
+              }
+              fce4 = (fc4_prim - fc4) * K_antiwindup * antiwindup_pos;
 
-        // Position control inductor 2
-             ep2 = Position_c2 - Position2;
-             xr2 += (ep2 - fce2);
-             sum_vp2 = v2 * Kddot + Position2 * Kd;
-             fc2_prim = Kw * Position_c2 + Kr * xr2 * I - sum_vp2 + FP;
-             fc2 = fc2_prim;
+              // Inverse fourier transform
+              ic3 = sqrtf(K_FC * fc3f) * Position3;
+              ic4 = sqrtf(K_FC * fc4f) * Position4;
 
-             if (fc2_prim <= 0){
-                fc2 = 0;
-             }
-             if (fc2_prim >= FMAX){
-                fc2 = FMAX;
-             }
-             fce2 = (fc2_prim - fc2) * K_antiwindup * antiwindup_pos;
 
-          // Position control inductor 2 - PID regulation
-              // Erreur + composante P
-//              ep2 = (Position_c2 - Position2);
-//              kep2 = ep2 * Kp_pid;
-//              // Composante I
-//              xr2 += Ki_pid * H * (ep2 - (fc2_prim - fc2) * K_antiwindupPID * antiwindup_pos);
+//         // Start takeoff 1 & 2//
+//         else
+//         {
 //
-//              // Composante D
-//              dpos2 = v2 * Kd_pid;
+//         //SET POINT GENERATOR FOR INDUCTOR 1 & 2                                       //
+//         // Ce bloc permet de baisser petit � petit la consigne de position pour que    //
+//         // la regulation puisse suivre et s'adapter                                    //
+//             if(Position_c1 > Pos1_to_regul)
+//             {
+//                 Position_c1 -= 2.5 * 4e-7; // ramp from 3mm to 2mm with a 0.25 mm step
+//             }
+//             else
+//             {
+//                 Position_c1 = Pos1_to_regul;
+//             }
 //
-//              // Assemblage des 3 composantes
-//              fc2_prim = (ep2 + xr2 - dpos2);
+//             if(Position_c2 > Pos2_to_regul)
+//             {
+//                 Position_c2 -= 2.5 * 4e-7; // ramp from 3mm to 2mm
+//             }
+//             else
+//             {
+//                 Position_c2 = Pos2_to_regul;
+//             }
 //
-//              fc2 = fc2_prim;
-//              if (fc2_prim <= 0){
-//                 fc2 = 0;
-//              }
-//              if (fc2_prim >= FMAX){
-//                 fc2 = FMAX;
-//              }
-
-             // Inverse fourier transform
-             ic1 = (sqrtf(K_FC * fc1f)) * Position1;
-             ic2 = (sqrtf(K_FC * fc2f)) * Position2;
-
+//        //////////////////////////////////////////////////////////////////////////////
+//        //                STATE METHOD REGULATION inductor 1 & 2                    //
+//        //           With embedded system, all integrators must be removed          //
+//        //////////////////////////////////////////////////////////////////////////////
+//
+//        //Fc1 bandstop filter
+//             IN1[0] = fc1;
+//             fc1f = IIR_Filter(IN1,OUT1);
+//             //fc1f = fc1;
+//             //introducing limit because IIR filter may cause overtaking
+//             if (fc1f <= 0)
+//                 fc1f = 0;
+//             if (fc1f >= FMAX)
+//                 fc1f = FMAX;
+//
+//        // Position control inductor 1 - state regulation
+//             ep1 = Position_c1 - Position1;
+//             xr1 += (ep1 - fce1);
+//             sum_vp1 = v1 * Kddot + Position1 * Kd;
+//             fc1_prim = Kw * Position_c1 + Kr * xr1 * I - sum_vp1 + FP;
+////             fc1_prim = fc1_prim - fperturb1;
+//             fc1 = fc1_prim;
+//
+//             if (fc1_prim <= 0){
+//                 fc1 = 0;
+//             }
+//             if (fc1_prim >= FMAX){
+//                 fc1 = FMAX;
+//             }
+//             fce1 = (fc1_prim - fc1) * K_antiwindup * antiwindup_pos;
+//
+//        //Fc2 bandstop filter
+//             IN2[0] = fc2;
+//             fc2f = IIR_Filter(IN2,OUT2);
+//             //introducing limit because IIR filter may cause overtaking
+//             if (fc2f <= 0)
+//                 fc2f = 0;
+//             if (fc2f >= FMAX)
+//                 fc2f = FMAX;
+//
+//        // Position control inductor 2
+//             ep2 = Position_c2 - Position2;
+//             xr2 += (ep2 - fce2);
+//             sum_vp2 = v2 * Kddot + Position2 * Kd;
+//             fc2_prim = Kw * Position_c2 + Kr * xr2 * I - sum_vp2 + FP;
+//             fc2 = fc2_prim;
+//
+//             if (fc2_prim <= 0){
+//                fc2 = 0;
+//             }
+//             if (fc2_prim >= FMAX){
+//                fc2 = FMAX;
+//             }
+//             fce2 = (fc2_prim - fc2) * K_antiwindup * antiwindup_pos;
+//
+//          // Position control inductor 2 - PID regulation
+//              // Erreur + composante P
+////              ep2 = (Position_c2 - Position2);
+////              kep2 = ep2 * Kp_pid;
+////              // Composante I
+////              xr2 += Ki_pid * H * (ep2 - (fc2_prim - fc2) * K_antiwindupPID * antiwindup_pos);
+////
+////              // Composante D
+////              dpos2 = v2 * Kd_pid;
+////
+////              // Assemblage des 3 composantes
+////              fc2_prim = (ep2 + xr2 - dpos2);
+////
+////              fc2 = fc2_prim;
+////              if (fc2_prim <= 0){
+////                 fc2 = 0;
+////              }
+////              if (fc2_prim >= FMAX){
+////                 fc2 = FMAX;
+////              }
+//
+//             // Inverse fourier transform
+//             ic1 = (sqrtf(K_FC * fc1f)) * Position1;
+//             ic2 = (sqrtf(K_FC * fc2f)) * Position2;
+//
          }
 
          // end takeoff 1 & 2//
@@ -848,103 +927,103 @@ __interrupt void adcA1ISR(void)
          //                          Take off strategy 2                             //
          //////////////////////////////////////////////////////////////////////////////
 
-         if((takeOff == 0) && (takeOff2 == 1) && (i_store >= i_store_2e_decollage)) // phase 2 for inductors 3,4
-         {
-             if(Position3 < Position_c3_dec) // if inductor starts to move
-               {
-                   takeOff2 = 0;
-                   Position2_c3 = Position3;
-               }
-
-           //current limiting at value necessary to take off inductor at Delta_0
-               else if(ic3 < 7.82f)
-               {
-                   ic3 += TAKEOFF_CURRENT_STEP1; //"infinite" current ramp until inductor starts to move
-               }
-               else
-               {
-                   ic3 = 7.82;
-               }
-               ic4 = ic3;
-         }
-         else if(takeOff2 == 0)
-         {
-
-         //SET POINT GENERATOR FOR INDUCTOR 3 & 4 //
-             if(Position2_c3 > Pos3_to_regul)
-             {
-                 Position2_c3 -= 2.5 * 4e-7; // ramp from 3mm to 2mm (4e-7 [s])
-             }
-             else
-             {
-                 Position2_c3 = Pos3_to_regul;
-             }
-
-             if(Position2_c4 > Pos4_to_regul)
-             {
-                 Position2_c4 -= 2.5 * 4e-7;
-             }
-             else
-             {
-                 Position2_c4 = Pos4_to_regul;
-             }
-
-         //////////////////////////////////////////////////////////////////////////////
-         //                STATE METHOD REGULATION inductor 3 & 4                    //
-         //           With embedded system, all integrators must be removed          //
-         //////////////////////////////////////////////////////////////////////////////
-
-             //Fc3 bandstop filter
-             IN3[0] = fc3;
-             fc3f = IIR_Filter(IN3,OUT3);
-             //introducing limit because IIR filter may cause overtaking
-             if (fc3f <= 0)
-                 fc3f = 0;
-             if (fc3f >= FMAX)
-                 fc3f = FMAX;
-
-             // Position control inductor 3
-             ep3 = Position2_c3 - Position3;
-             xr3 += (ep3 - fce3);
-             sum_vp3 = (v3 * Kddot_sans_int) + (Position3 * Kd_sans_int);
-             fc3_prim = (Kw_sans_int * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
-             //fc3_prim = fc3_prim - fperturb1;
-             fc3 = fc3_prim;
-             if (fc3_prim <= 0){
-                 fc3 = 0;
-             }
-             if (fc3_prim >= FMAX){
-                 fc3 = FMAX;
-             }
-             fce3 = (fc3_prim - fc3) * K_antiwindup * antiwindup_pos;
-
-             // Fc bandstop filter
-             IN4[0] = fc4;
-             fc4f = IIR_Filter(IN4,OUT4);
-             //introducing limit because IIR filter may cause overtaking
-             if (fc4f <= 0)
-                 fc4f = 0;
-             if (fc4f >= FMAX)
-                 fc4f = FMAX;
-
-             // Position control inductor 4
-             ep4 = Position2_c4 - Position4;
-             xr4 += (ep4 - fce4);
-             sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
-             fc4_prim = (Kw * Position2_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
-             fc4 = fc4_prim;
-             if (fc4_prim <= 0){
-                 fc4 = 0;
-             }
-             if (fc4_prim >= FMAX){
-                 fc4 = FMAX;
-             }
-             fce4 = (fc4_prim - fc4) * K_antiwindup * antiwindup_pos;
-
-             // Inverse fourier transform
-             ic3 = sqrtf(K_FC * fc3f) * Position3;
-             ic4 = sqrtf(K_FC * fc4f) * Position4;
-         }
+//         if((takeOff == 0) && (takeOff2 == 1) && (i_store >= i_store_2e_decollage)) // phase 2 for inductors 3,4
+//         {
+//             if(Position3 < Position_c3_dec) // if inductor starts to move
+//               {
+//                   takeOff2 = 0;
+//                   Position2_c3 = Position3;
+//               }
+//
+//           //current limiting at value necessary to take off inductor at Delta_0
+//               else if(ic3 < 7.82f)
+//               {
+//                   ic3 += TAKEOFF_CURRENT_STEP1; //"infinite" current ramp until inductor starts to move
+//               }
+//               else
+//               {
+//                   ic3 = 7.82;
+//               }
+//               ic4 = ic3;
+//         }
+//         else if(takeOff2 == 0)
+//         {
+//
+//         //SET POINT GENERATOR FOR INDUCTOR 3 & 4 //
+//             if(Position2_c3 > Pos3_to_regul)
+//             {
+//                 Position2_c3 -= 2.5 * 4e-7; // ramp from 3mm to 2mm (4e-7 [s])
+//             }
+//             else
+//             {
+//                 Position2_c3 = Pos3_to_regul;
+//             }
+//
+//             if(Position2_c4 > Pos4_to_regul)
+//             {
+//                 Position2_c4 -= 2.5 * 4e-7;
+//             }
+//             else
+//             {
+//                 Position2_c4 = Pos4_to_regul;
+//             }
+//
+//         //////////////////////////////////////////////////////////////////////////////
+//         //                STATE METHOD REGULATION inductor 3 & 4                    //
+//         //           With embedded system, all integrators must be removed          //
+//         //////////////////////////////////////////////////////////////////////////////
+//
+//             //Fc3 bandstop filter
+//             IN3[0] = fc3;
+//             fc3f = IIR_Filter(IN3,OUT3);
+//             //introducing limit because IIR filter may cause overtaking
+//             if (fc3f <= 0)
+//                 fc3f = 0;
+//             if (fc3f >= FMAX)
+//                 fc3f = FMAX;
+//
+//             // Position control inductor 3
+//             ep3 = Position2_c3 - Position3;
+//             xr3 += (ep3 - fce3);
+//             sum_vp3 = (v3 * Kddot_sans_int) + (Position3 * Kd_sans_int);
+//             fc3_prim = (Kw_sans_int * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
+//             //fc3_prim = fc3_prim - fperturb1;
+//             fc3 = fc3_prim;
+//             if (fc3_prim <= 0){
+//                 fc3 = 0;
+//             }
+//             if (fc3_prim >= FMAX){
+//                 fc3 = FMAX;
+//             }
+//             fce3 = (fc3_prim - fc3) * K_antiwindup * antiwindup_pos;
+//
+//             // Fc bandstop filter
+//             IN4[0] = fc4;
+//             fc4f = IIR_Filter(IN4,OUT4);
+//             //introducing limit because IIR filter may cause overtaking
+//             if (fc4f <= 0)
+//                 fc4f = 0;
+//             if (fc4f >= FMAX)
+//                 fc4f = FMAX;
+//
+//             // Position control inductor 4
+//             ep4 = Position2_c4 - Position4;
+//             xr4 += (ep4 - fce4);
+//             sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
+//             fc4_prim = (Kw * Position2_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
+//             fc4 = fc4_prim;
+//             if (fc4_prim <= 0){
+//                 fc4 = 0;
+//             }
+//             if (fc4_prim >= FMAX){
+//                 fc4 = FMAX;
+//             }
+//             fce4 = (fc4_prim - fc4) * K_antiwindup * antiwindup_pos;
+//
+//             // Inverse fourier transform
+//             ic3 = sqrtf(K_FC * fc3f) * Position3;
+//             ic4 = sqrtf(K_FC * fc4f) * Position4;
+//         }
 
 //        Modify Kr of the regulator "without integrator" for stay the position
 //        at 2 mm slowly after 40ms (not immediatly, cause to second take off "agressivity")
@@ -957,17 +1036,20 @@ __interrupt void adcA1ISR(void)
         //                          CURRENT REGULATION                              //
         //////////////////////////////////////////////////////////////////////////////
 
-           // Inductor 1
-           PI_current_regulator(ic1, Current1, &integral_i1, &ue1, &uc1);
-
-           // Inductor 2
-           PI_current_regulator(ic2, Current2, &integral_i2, &ue2, &uc2);
+//           // Inductor 1
+//           PI_current_regulator(ic1, Current1, &integral_i1, &ue1, &uc1);
+//
+//           // Inductor 2
+//           PI_current_regulator(ic2, Current2, &integral_i2, &ue2, &uc2);
 
            // Inductor 3
            PI_current_regulator(ic3, Current3, &integral_i3, &ue3, &uc3);
 
            // Inductor 4
            PI_current_regulator(ic4, Current4, &integral_i4, &ue4, &uc4);
+
+           // Led de debug
+           GPIO_writePin(LED_D5, 0); // Led de debug pour mesurer la frequence de l interruption
 
         //////////////////////////////////////////////////////////////////////////////
         //                           END OF REGULATION                              //
@@ -978,34 +1060,36 @@ __interrupt void adcA1ISR(void)
                 // Convert Uc1,...,Uc3 into dutycycle and add DA (dutycycle correction) as ucx will always be >0 in our application, otherwise
                 // DA would have been subtracted for ucx <0
 
-        dutyCycle1 = 0.5f + (CONV_DUTY_CYCLE * uc1) + DA;
-        dutyCycle2 = 0.5f + (CONV_DUTY_CYCLE * uc2) + DA;
+//        dutyCycle1 = 0.5f + (CONV_DUTY_CYCLE * uc1) + DA;
+//        dutyCycle2 = 0.5f + (CONV_DUTY_CYCLE * uc2) + DA;
         dutyCycle3 = 0.5f + (CONV_DUTY_CYCLE * uc3) + DA;
         dutyCycle4 = 0.5f + (CONV_DUTY_CYCLE * uc4) + DA;
      }
 
     if(start_ISOZ == 1 || state_PIN == 1)
     {
+
+
         //////////////////////////////////////////////////////////////////////////////
         //                           CALCUL DES PWMs                                //
         //////////////////////////////////////////////////////////////////////////////
 
     // Travail avec DC en pourcent, de 0 � 100 [%]
-        duty1 = dutyCycle1 * 100;
-        duty2 = dutyCycle2 * 100;
+//        duty1 = dutyCycle1 * 100;
+//        duty2 = dutyCycle2 * 100;
         duty3 = dutyCycle3 * 100;
         duty4 = dutyCycle4 * 100;
 
     // Limite min et max des rapports cycliques
-        if(duty1 >= LIMITE_MAX_DUTY_FINE)
-            duty1 = LIMITE_MAX_DUTY_FINE;
-        else if(duty1 <= LIMITE_MIN_DUTY_FINE)
-            duty1 = LIMITE_MIN_DUTY_FINE;
-
-        if(duty2 >= LIMITE_MAX_DUTY_FINE)
-            duty2 = LIMITE_MAX_DUTY_FINE;
-        else if(duty2 <= LIMITE_MIN_DUTY_FINE)
-            duty2 = LIMITE_MIN_DUTY_FINE;
+//        if(duty1 >= LIMITE_MAX_DUTY_FINE)
+//            duty1 = LIMITE_MAX_DUTY_FINE;
+//        else if(duty1 <= LIMITE_MIN_DUTY_FINE)
+//            duty1 = LIMITE_MIN_DUTY_FINE;
+//
+//        if(duty2 >= LIMITE_MAX_DUTY_FINE)
+//            duty2 = LIMITE_MAX_DUTY_FINE;
+//        else if(duty2 <= LIMITE_MIN_DUTY_FINE)
+//            duty2 = LIMITE_MIN_DUTY_FINE;
 
         if(duty3 >= LIMITE_MAX_DUTY_FINE)
             duty3 = LIMITE_MAX_DUTY_FINE;
@@ -1020,20 +1104,20 @@ __interrupt void adcA1ISR(void)
          // Affection des compteurs PWM : //
 //             Plus propre de faire une boucle et un tableau de duty[4]
 
-        dutyFine = ((float)(duty1*TIME_BASE_PERIOD) * INV_FACTOR);
-        count = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-        compCount = (count);
-        i = 1;
-        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
-        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
-
-
-        dutyFine = ((float)(duty2*TIME_BASE_PERIOD) * INV_FACTOR);
-        count = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-        compCount = (count);
-        i = 2;
-        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
-        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+//        dutyFine = ((float)(duty1*TIME_BASE_PERIOD) * INV_FACTOR);
+//        count = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
+//        compCount = (count);
+//        i = 1;
+//        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
+//        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+//
+//
+//        dutyFine = ((float)(duty2*TIME_BASE_PERIOD) * INV_FACTOR);
+//        count = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
+//        compCount = (count);
+//        i = 2;
+//        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
+//        HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
 
 
         dutyFine = ((float)(duty3*TIME_BASE_PERIOD) * INV_FACTOR);
@@ -1156,8 +1240,7 @@ __interrupt void adcA1ISR(void)
 //      --->  BOUTON EXTINT
 //************************************//
 
-    // Led de debug
-    GPIO_writePin(LED_D5, 0); // Led de debug pour mesurer la frequence de l interruption
+
 }
 
 __interrupt void INT_Push_Button_Start_XINT_ISR(void)
