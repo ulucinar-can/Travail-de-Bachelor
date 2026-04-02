@@ -114,7 +114,7 @@ float ic4 = 0, ue4 = 0, integral_i4 = 0;
 float fc4 = 0;
 float pos4Buff[FILTWINDOW] = {[0 ... 8] = 0};
 float v4 = 0, ep4 = 0, xr4 = 0, fce4 = 0, sum_vp4 = 0, fc4_prim = 0;
-float Position2_c4 = DELTA_0;
+float Position_c4_dec = 0 ,Position2_c4 = DELTA_0;
 
 // --- PID Variables (Archive for future tests) ---
 //float Kp_pid = 2050;
@@ -287,6 +287,7 @@ __interrupt void adcA1ISR(void)
             Position_c1_dec = Position1 * POS_DETECT;
             Position_c2_dec = Position2 * POS_DETECT;
             Position_c3_dec = Position3 * POS_DETECT;
+            Position_c4_dec = Position4 * POS_DETECT;
         }
     }
 
@@ -371,12 +372,14 @@ __interrupt void adcA1ISR(void)
 
                     if((mean1 <= I_SP105 && mean1 >= I_SP095) && (mean2 <= I_SP105 && mean2 >= I_SP095))
                     {
-                        state = STATE_2;
-
                         // Reset des variables
                         mean1 = 0;
                         mean2 = 0;
                         dt_mean = 0;
+
+                        // Changement d'état
+                        state = STATE_2;
+
                     }
                     else
                     {
@@ -394,12 +397,56 @@ __interrupt void adcA1ISR(void)
             // assez grand pour faire décoller l'avant
             case STATE_2:
 
+                if(Position1 <= Position_c1_dec && Position2 <= Position_c2_dec)
+                {
+                    // Update des variables
+                    Position_c1 = Position1;
+                    Position_c2 = Position2;
+
+                    // Changement d'état
+                    state = STATE_3;
+                }
+                else if(ic1 < 7.82f)
+                {
+                    ic1 += TAKEOFF_CURRENT_STEP1;
+                }
+                else
+                {
+                    // Fixe le courant à une valeur max
+                    ic1 = 7.82f;
+                }
+
+                // Fixe le courant de ic2 à ic1
+                ic2 = ic1;
+
                 break;
 
             // State 3 :
             // Activation de la régulation de position pour atteindre les 2mm
             // à l'avant
             case STATE_3:
+
+                // Activer la régulation d'état
+                if(!PosRegFlag1) PosRegFlag1 = true;
+
+                // Set point generator (Ramp from 3mm to 2mm)
+                if(Position_c1 > DELTA_N)
+                {
+                    Position_c1 -= 2.5 * 4e-7;
+                }
+                else
+                {
+                    Position_c1 = DELTA_N;
+                }
+
+                if(Position_c2 > DELTA_N)
+                {
+                    Position_c2 -= 2.5 * 4e-7;
+                }
+                else
+                {
+                    Position_c2 = DELTA_N;
+                }
 
                 break;
 
@@ -431,12 +478,12 @@ __interrupt void adcA1ISR(void)
 
                     if((mean3 <= I_SP105 && mean3 >= I_SP095) && (mean4 <= I_SP105 && mean4 >= I_SP095))
                     {
-                        state = STATE_5;
-
                         // Reset des variables
                         mean3 = 0;
                         mean4 = 0;
                         dt_mean = 0;
+
+                        state = STATE_5;
                     }
                     else
                     {
@@ -453,6 +500,28 @@ __interrupt void adcA1ISR(void)
             // Rampe de courant "infinie" pour atteindre un courant
             // assez grand pour faire décoller l'arrière
             case STATE_5:
+
+                if(Position3 <= Position_c3_dec && Position4 <= Position_c4_dec)
+                {
+                    // Update des variables
+                    Position2_c3 = Position3;
+                    Position2_c4 = Position4;
+
+                    // Changement d'état
+                    state = STATE_6;
+                }
+                else if(ic3 < 7.82f)
+                {
+                    ic3 += TAKEOFF_CURRENT_STEP1;
+                }
+                else
+                {
+                    // Fixe le courant à une valeur max
+                    ic3 = 7.82f;
+                }
+
+                // Fixe le courant de ic4 à ic3
+                ic4 = ic3;
 
                 break;
 
@@ -481,7 +550,55 @@ __interrupt void adcA1ISR(void)
         // ================================================================= //
 
         // ================================================================= //
-        // B. REGULATION DE COURANT (PI) & RAPPORT CYCLIQUE
+        // B. REGULATION DE POSITION (ESPACE D'ETAT)
+        // ================================================================= //
+
+        if(PosRegFlag1)
+        {
+            // Inductor 1 : Filtre Bandstop + State Regulation
+            IN1[0] = fc1;
+            fc1f = IIR_Filter(IN1, OUT1);
+            if (fc1f <= 0)   fc1f = 0;
+            if (fc1f >= FMAX) fc1f = FMAX;
+
+            ep1 = Position_c1 - Position1;
+            xr1 += (ep1 - fce1);
+            sum_vp1 = v1 * Kddot + Position1 * Kd;
+            fc1_prim = Kw * Position_c1 + Kr * xr1 * I - sum_vp1 + FP;
+
+            fc1 = fc1_prim;
+            if (fc1_prim <= 0)   fc1 = 0;
+            if (fc1_prim >= FMAX) fc1 = FMAX;
+            fce1 = (fc1_prim - fc1) * K_ANTIWINDUP * ANTIWINDUP_EN;
+
+            // Inductor 2 : Filtre Bandstop + State Regulation
+            IN2[0] = fc2;
+            fc2f = IIR_Filter(IN2, OUT2);
+            if (fc2f <= 0)   fc2f = 0;
+            if (fc2f >= FMAX) fc2f = FMAX;
+
+            ep2 = Position_c2 - Position2;
+            xr2 += (ep2 - fce2);
+            sum_vp2 = v2 * Kddot + Position2 * Kd;
+            fc2_prim = Kw * Position_c2 + Kr * xr2 * I - sum_vp2 + FP;
+
+            fc2 = fc2_prim;
+            if (fc2_prim <= 0)   fc2 = 0;
+            if (fc2_prim >= FMAX) fc2 = FMAX;
+            fce2 = (fc2_prim - fc2) * K_ANTIWINDUP * ANTIWINDUP_EN;
+
+            // Transformée inverser pour calculer le courant
+            ic1 = (sqrtf(K_FC * fc1f)) * Position1;
+            ic2 = (sqrtf(K_FC * fc2f)) * Position2;
+        }
+
+        if(PosRegFlag3)
+        {
+
+        }
+
+        // ================================================================= //
+        // C. REGULATION DE COURANT (PI) & RAPPORT CYCLIQUE
         // ================================================================= //
         PI_current_regulator(ic1, Current1, &integral_i1, &ue1, &uc1);
         PI_current_regulator(ic2, Current2, &integral_i2, &ue2, &uc2);
@@ -492,20 +609,6 @@ __interrupt void adcA1ISR(void)
         dutyCycle2 = 0.5f + (CONV_DUTY_CYCLE * uc2) + DA;
         dutyCycle3 = 0.5f + (CONV_DUTY_CYCLE * uc3) + DA;
         dutyCycle4 = 0.5f + (CONV_DUTY_CYCLE * uc4) + DA;
-
-        // ================================================================= //
-        // C. REGULATION DE POSITION (ESPACE D'ETAT)
-        // ================================================================= //
-
-        if(PosRegFlag1)
-        {
-
-        }
-
-        if(PosRegFlag3)
-        {
-
-        }
 
         // ================================================================= //
         // A. INDUCTEURS 1 & 2 : STRATEGIE DE DECOLLAGE
