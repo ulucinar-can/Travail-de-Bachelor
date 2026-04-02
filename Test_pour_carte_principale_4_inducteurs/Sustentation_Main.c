@@ -155,6 +155,8 @@ static uint16_t dataIndex = 0;
 
 // --- State machine variable ---
 uint8_t state = STATE_1;
+bool PosRegFlag1 = false;
+bool PosRegFlag3 = false;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -337,100 +339,173 @@ __interrupt void adcA1ISR(void)
         v4 = savitzky_Filter(pos4Buff);
 
         // ================================================================= //
-        // STATE MACHINE BEGINING
+        // A. STATE MACHINE BEGINING
         // ================================================================= //
-//        switch(state)
-//        {
-//            // State 1 :
-//            // Rampe de courant sur les inducteur 1&2 jusqu'à atteindre les 3A
-//            case STATE_1:
-//
-//                // Rampe vers 3A par pas de 0.04A
-//                if(ic1 < I_SP)
-//                {
-//                    ic1 += TAKEOFF_CURRENT_STEP1;
-//                }
-//                else
-//                {
-//                    ic1 = I_SP;
-//                }
-//
-//                // Fixe le courant de consigne 2 par rapport à ic1
-//                ic2 = ic1;
-//
-//
-//                if(dt_mean == 200) // dt = 8ms
-//                {
-//                    mean1 = mean1 / dt_mean;
-//                    mean2 = mean2 / dt_mean;
-//
-//                    if((mean1 <= I_SP105 && mean1 >= I_SP095) && (mean2 <= I_SP105 && mean2 >= I_SP095))
-//                    {
-//                        state = STATE_1;;
-//                    }
-//                    else
-//                    {
-//                        mean1 = 0;
-//                        mean2 = 0;
-//                    }
-//                }
-//
-//                mean1 += Current1;
-//                mean2 += Current2;
-//                dt_mean++;
-//
-//                break;
-//
-//            // State 2 :
-//            // Rampe de courant "infinie" pour atteindre un courant
-//            // assez grand pour faire décoller l'avant
-//            case STATE_2:
-//
-//                break;
-//
-//            // State 3 :
-//            // Activation de la régulation de position pour atteindre les 2mm
-//            // à l'avant
-//            case STATE_3:
-//
-//                break;
-//
-//            // State 4 :
-//            // Rampe de courant sur les inducteur 3&4 jusqu'à atteindre les 3A
-//            case STATE_4:
-//
-//                break;
-//
-//            // State 5 :
-//            // Rampe de courant "infinie" pour atteindre un courant
-//            // assez grand pour faire décoller l'arrière
-//            case STATE_5:
-//
-//                break;
-//
-//            // State 6 :
-//            // Activation de la régulation de position pour atteindre les 2mm
-//            // à l'arrière
-//            case STATE_6:
-//
-//                break;
-//
-//            // State 7 :
-//            // Régulation de maintien pour tenir la maquette en l'air
-//            case STATE_7:
-//
-//                break;
-//
-//            // Default :
-//            // SOmething went wrong so let's just go to state 9 for an error
-//            default:
-//                state = STATE_9;
-//                break;
-//
-//        }
+        switch(state)
+        {
+            // State 1 :
+            // Rampe de courant sur les inducteur 1&2 jusqu'à atteindre les 3A
+            case STATE_1:
+
+                // Rampe vers 3A par pas de 0.04A
+                if(ic1 < I_SP)
+                {
+                    ic1 += TAKEOFF_CURRENT_STEP1;
+                }
+                else
+                {
+                    ic1 = I_SP;
+                }
+
+                // Fixe le courant de consigne 2 par rapport à ic1
+                ic2 = ic1;
+
+                mean1 += Current1;
+                mean2 += Current2;
+                dt_mean++;
+
+                if(dt_mean >= 200) // dt = 8ms
+                {
+                    mean1 = mean1 / dt_mean;
+                    mean2 = mean2 / dt_mean;
+
+                    if((mean1 <= I_SP105 && mean1 >= I_SP095) && (mean2 <= I_SP105 && mean2 >= I_SP095))
+                    {
+                        state = STATE_2;
+
+                        // Reset des variables
+                        mean1 = 0;
+                        mean2 = 0;
+                        dt_mean = 0;
+                    }
+                    else
+                    {
+                        // Reset des variables pour mesurer à nouveau
+                        mean1 = 0;
+                        mean2 = 0;
+                        dt_mean = 0;
+                    }
+                }
+
+                break;
+
+            // State 2 :
+            // Rampe de courant "infinie" pour atteindre un courant
+            // assez grand pour faire décoller l'avant
+            case STATE_2:
+
+                break;
+
+            // State 3 :
+            // Activation de la régulation de position pour atteindre les 2mm
+            // à l'avant
+            case STATE_3:
+
+                break;
+
+            // State 4 :
+            // Rampe de courant sur les inducteur 3&4 jusqu'à atteindre les 3A
+            case STATE_4:
+
+                // Rampe vers 3A par pas de 0.04A
+                if(ic3 < I_SP)
+                {
+                    ic3 += TAKEOFF_CURRENT_STEP1;
+                }
+                else
+                {
+                    ic3 = I_SP;
+                }
+
+                // Fixe le courant de consigne 4 par rapport à ic3
+                ic4 = ic3;
+
+                mean3 += Current3;
+                mean4 += Current4;
+                dt_mean++;
+
+                if(dt_mean >= 200) // dt = 8ms
+                {
+                    mean3 = mean3 / dt_mean;
+                    mean4 = mean4 / dt_mean;
+
+                    if((mean3 <= I_SP105 && mean3 >= I_SP095) && (mean4 <= I_SP105 && mean4 >= I_SP095))
+                    {
+                        state = STATE_5;
+
+                        // Reset des variables
+                        mean3 = 0;
+                        mean4 = 0;
+                        dt_mean = 0;
+                    }
+                    else
+                    {
+                        // Reset des variables pour mesurer à nouveau
+                        mean3 = 0;
+                        mean4 = 0;
+                        dt_mean = 0;
+                    }
+                }
+
+                break;
+
+            // State 5 :
+            // Rampe de courant "infinie" pour atteindre un courant
+            // assez grand pour faire décoller l'arrière
+            case STATE_5:
+
+                break;
+
+            // State 6 :
+            // Activation de la régulation de position pour atteindre les 2mm
+            // à l'arrière
+            case STATE_6:
+
+                break;
+
+            // State 7 :
+            // Régulation de maintien pour tenir la maquette en l'air
+            case STATE_7:
+
+                break;
+
+            // Default :
+            // SOmething went wrong so let's just go to state 9 for an error
+            default:
+                state = STATE_9;
+                break;
+
+        }
         // ================================================================= //
         // STATE MACHINE END
         // ================================================================= //
+
+        // ================================================================= //
+        // B. REGULATION DE COURANT (PI) & RAPPORT CYCLIQUE
+        // ================================================================= //
+        PI_current_regulator(ic1, Current1, &integral_i1, &ue1, &uc1);
+        PI_current_regulator(ic2, Current2, &integral_i2, &ue2, &uc2);
+        PI_current_regulator(ic3, Current3, &integral_i3, &ue3, &uc3);
+        PI_current_regulator(ic4, Current4, &integral_i4, &ue4, &uc4);
+
+        dutyCycle1 = 0.5f + (CONV_DUTY_CYCLE * uc1) + DA;
+        dutyCycle2 = 0.5f + (CONV_DUTY_CYCLE * uc2) + DA;
+        dutyCycle3 = 0.5f + (CONV_DUTY_CYCLE * uc3) + DA;
+        dutyCycle4 = 0.5f + (CONV_DUTY_CYCLE * uc4) + DA;
+
+        // ================================================================= //
+        // C. REGULATION DE POSITION (ESPACE D'ETAT)
+        // ================================================================= //
+
+        if(PosRegFlag1)
+        {
+
+        }
+
+        if(PosRegFlag3)
+        {
+
+        }
 
         // ================================================================= //
         // A. INDUCTEURS 1 & 2 : STRATEGIE DE DECOLLAGE
