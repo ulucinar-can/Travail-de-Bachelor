@@ -739,8 +739,16 @@ __interrupt void adcA1ISR(void)
     {
         GPIO_writePin(LED_D2, 1); // Eteindre LED
 
-        // Reset de l'état
+        // Reset de la machine d'état
         state = STATE_1;
+        PosRegFlag1 = false;
+        PosRegFlag3 = false;
+
+        Kw = KW;
+        Kd = KD;
+        Kddot = KDDOT;
+        Kr = KR;
+        Kr_sans_int = KR_SANS_INT;
 
         // Forcer les PWM à 50%
         for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
