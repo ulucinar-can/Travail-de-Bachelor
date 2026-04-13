@@ -56,7 +56,8 @@
 #define STATE_6                     6
 #define STATE_7                     7
 #define STATE_8                     8
-#define STATE_9                     9
+
+#define SKIP_BACK                   0
 
 
 /* ========================================================================= *
@@ -457,8 +458,14 @@ __interrupt void adcA1ISR(void)
                     // Reset de la varibale
                     i_store = 0;
 
-                    // Changement d'état
-                    state = STATE_4;
+                    if(SKIP_BACK)
+                    {
+                        state = STATE_7;
+                    }
+                    else
+                    {
+                        state = STATE_4;
+                    }
                 }
 
                 break;
@@ -599,7 +606,6 @@ __interrupt void adcA1ISR(void)
             // Default :
             // Something went wrong so let's just go to state 9 for an error
             default:
-                state = STATE_9;
                 break;
 
         }
@@ -739,6 +745,15 @@ __interrupt void adcA1ISR(void)
     {
         GPIO_writePin(LED_D2, 1); // Eteindre LED
 
+        // Forcer les PWM à 50%
+        for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
+        {
+            dutyFine = ((float)(duty_cycle_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
+            compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
+            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
+            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+        }
+
         // Reset de la machine d'état
         state = STATE_1;
         PosRegFlag1 = false;
@@ -750,16 +765,8 @@ __interrupt void adcA1ISR(void)
         Kr = KR;
         Kr_sans_int = KR_SANS_INT;
 
-        // Forcer les PWM à 50%
-        for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
-        {
-            dutyFine = ((float)(duty_cycle_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
-            compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
-            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
-        }
-
         i_store = 0;
+
         status = SFO();
         if (status == SFO_ERROR) error();
 
