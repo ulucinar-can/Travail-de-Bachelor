@@ -636,14 +636,48 @@ __interrupt void adcA1ISR(void)
             if (fc2_prim >= FMAX) fc2 = FMAX;
             fce2 = (fc2_prim - fc2) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
-            // Transformée inverser pour calculer le courant
+            // Transformée inverse pour calculer le courant à partir de la force
             ic1 = (sqrtf(K_FC * fc1f)) * Position1;
             ic2 = (sqrtf(K_FC * fc2f)) * Position2;
         }
 
         if(PosRegFlag3)
         {
+            // Inductor 3 : Filtre Bandstop + State Regulation
+            IN3[0] = fc3;
+            fc3f = IIR_Filter(IN3, OUT3);
+            if (fc3f <= 0)   fc3f = 0;
+            if (fc3f >= FMAX) fc3f = FMAX;
 
+            ep3 = Position2_c3 - Position3;
+            xr3 += (ep3 - fce3);
+            sum_vp3 = (v3 * KDDOT_SANS_INT) + (Position3 * KD_SANS_INT);
+            fc3_prim = (KW_SANS_INT * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
+
+            fc3 = fc3_prim;
+            if (fc3_prim <= 0)   fc3 = 0;
+            if (fc3_prim >= FMAX) fc3 = FMAX;
+            fce3 = (fc3_prim - fc3) * K_ANTIWINDUP * ANTIWINDUP_EN;
+
+            // Inductor 4 : Filtre Bandstop + State Regulation
+            IN4[0] = fc4;
+            fc4f = IIR_Filter(IN4, OUT4);
+            if (fc4f <= 0)   fc4f = 0;
+            if (fc4f >= FMAX) fc4f = FMAX;
+
+            ep4 = Position2_c4 - Position4;
+            xr4 += (ep4 - fce4);
+            sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
+            fc4_prim = (Kw * Position2_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
+
+            fc4 = fc4_prim;
+            if (fc4_prim <= 0)   fc4 = 0;
+            if (fc4_prim >= FMAX) fc4 = FMAX;
+            fce4 = (fc4_prim - fc4) * K_ANTIWINDUP * ANTIWINDUP_EN;
+
+            // Transformée inverse pour calculer le courant à partir de la force
+            ic3 = sqrtf(K_FC * fc3f) * Position3;
+            ic4 = sqrtf(K_FC * fc4f) * Position4;
         }
 
         // ================================================================= //
