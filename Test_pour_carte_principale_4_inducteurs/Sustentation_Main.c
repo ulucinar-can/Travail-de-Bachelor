@@ -591,6 +591,9 @@ __interrupt void adcA1ISR(void)
                 Kd = KD_CHANGE;
                 Kddot = KDDOT_CHANGE;
 
+                // Changement du gain statique de l'inducteur 3
+                Kr_sans_int = -1.0;
+
                 break;
 
             // Default :
