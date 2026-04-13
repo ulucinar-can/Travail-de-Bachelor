@@ -458,7 +458,7 @@ __interrupt void adcA1ISR(void)
                     i_store = 0;
 
                     // Changement d'état
-                    state = STATE_4
+                    state = STATE_4;
                 }
 
                 break;
@@ -548,22 +548,22 @@ __interrupt void adcA1ISR(void)
                 if(!PosRegFlag3) PosRegFlag3 = true;
 
                 // Set point generator (Ramp from 3mm to 2mm)
-                if(Position_c3 > DELTA_N)
+                if(Position2_c3 > DELTA_N)
                 {
-                    Position_c3 -= 2.5 * 4e-7;
+                    Position2_c3 -= 2.5 * 4e-7;
                 }
                 else
                 {
-                    Position_c3 = DELTA_N;
+                    Position2_c3 = DELTA_N;
                 }
 
-                if(Position_c4 > DELTA_N)
+                if(Position2_c4 > DELTA_N)
                 {
-                    Position_c4 -= 2.5 * 4e-7;
+                    Position2_c4 -= 2.5 * 4e-7;
                 }
                 else
                 {
-                    Position_c4 = DELTA_N;
+                    Position2_c4 = DELTA_N;
                 }
 
                 // Incrémentation du timer
@@ -576,7 +576,7 @@ __interrupt void adcA1ISR(void)
                     i_store = 0;
 
                     // Changement d'état
-                    state = STATE_7
+                    state = STATE_7;
                 }
 
                 break;
@@ -738,6 +738,9 @@ __interrupt void adcA1ISR(void)
     else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
     {
         GPIO_writePin(LED_D2, 1); // Eteindre LED
+
+        // Reset de l'état
+        state = STATE_1;
 
         // Forcer les PWM à 50%
         for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
