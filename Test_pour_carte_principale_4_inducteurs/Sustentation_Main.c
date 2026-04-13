@@ -523,6 +523,8 @@ __interrupt void adcA1ISR(void)
                 // Fixe le courant de ic4 à ic3
                 ic4 = ic3;
 
+
+
                 break;
 
             // State 6 :
@@ -638,8 +640,6 @@ __interrupt void adcA1ISR(void)
             HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
             HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
         }
-
-        if(!takeOff) i_store++;
 
         // SFO Calibration
         status = SFO();
