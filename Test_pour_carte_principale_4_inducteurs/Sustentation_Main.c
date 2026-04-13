@@ -31,8 +31,8 @@
 #define INV_FACTOR                  0.01f
 #define OFFSET_COUNT_INV            0.001f
 
-#define POS_CORRECTION_1            1.07f
-#define POS_CORRECTION_2            1.06f
+#define POS_CORRECTION_1            1.143f
+#define POS_CORRECTION_2            1.131f
 #define POS_CORRECTION_3            1.187f
 #define POS_CORRECTION_4            1.159f
 #define TAKEOFF_CURRENT_STEP1       0.04f
