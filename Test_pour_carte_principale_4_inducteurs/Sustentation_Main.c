@@ -448,6 +448,19 @@ __interrupt void adcA1ISR(void)
                     Position_c2 = DELTA_N;
                 }
 
+                // Incrémentation du timer
+                i_store++;
+
+                // Timer pour attendre un peu pour être sur que le système à bien décoller
+                if(i_store == I_STORE_2E_DECOLLAGE)
+                {
+                    // Reset de la varibale
+                    i_store = 0;
+
+                    // Changement d'état
+                    state = STATE_4
+                }
+
                 break;
 
             // State 4 :
@@ -524,13 +537,47 @@ __interrupt void adcA1ISR(void)
                 ic4 = ic3;
 
 
-
                 break;
 
             // State 6 :
             // Activation de la régulation de position pour atteindre les 2mm
             // à l'arrière
             case STATE_6:
+
+                // Activer la régulation d'état
+                if(!PosRegFlag3) PosRegFlag3 = true;
+
+                // Set point generator (Ramp from 3mm to 2mm)
+                if(Position_c3 > DELTA_N)
+                {
+                    Position_c3 -= 2.5 * 4e-7;
+                }
+                else
+                {
+                    Position_c3 = DELTA_N;
+                }
+
+                if(Position_c4 > DELTA_N)
+                {
+                    Position_c4 -= 2.5 * 4e-7;
+                }
+                else
+                {
+                    Position_c4 = DELTA_N;
+                }
+
+                // Incrémentation du timer
+                i_store++;
+
+                // Timer pour attendre un peu pour être sur que le système à bien décoller
+                if(i_store == I_STORE_2E_DECOLLAGE)
+                {
+                    // Reset de la varibale
+                    i_store = 0;
+
+                    // Changement d'état
+                    state = STATE_7
+                }
 
                 break;
 
@@ -611,8 +658,6 @@ __interrupt void adcA1ISR(void)
         dutyCycle2 = 0.5f + (CONV_DUTY_CYCLE * uc2) + DA;
         dutyCycle3 = 0.5f + (CONV_DUTY_CYCLE * uc3) + DA;
         dutyCycle4 = 0.5f + (CONV_DUTY_CYCLE * uc4) + DA;
-
-
 
         /* --------------------------------------------------------------------- *
          * 5. MISE A JOUR DES PWM & CALIBRATION SFO
