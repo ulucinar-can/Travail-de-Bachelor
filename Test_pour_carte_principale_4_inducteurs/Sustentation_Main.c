@@ -585,10 +585,16 @@ __interrupt void adcA1ISR(void)
             // Régulation de maintien pour tenir la maquette en l'air
             case STATE_7:
 
+                // Changement des variables pour une régulation plus douce
+                Kr = KR_CHANGE;
+                Kw = KW_CHANGE;
+                Kd = KD_CHANGE;
+                Kddot = KDDOT_CHANGE;
+
                 break;
 
             // Default :
-            // SOmething went wrong so let's just go to state 9 for an error
+            // Something went wrong so let's just go to state 9 for an error
             default:
                 state = STATE_9;
                 break;
