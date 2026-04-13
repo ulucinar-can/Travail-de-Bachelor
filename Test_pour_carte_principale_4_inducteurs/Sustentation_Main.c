@@ -58,7 +58,7 @@
 #define STATE_8                     8
 
 #define SKIP_BACK                   0
-#define SKIP_FRONT                  0
+#define SKIP_FRONT                  1
 
 /* ========================================================================= *
  * GLOBAL VARIABLES
@@ -327,7 +327,8 @@ __interrupt void adcA1ISR(void)
     {
         GPIO_writePin(LED_D2, 0); // Allumage LED2 (Indicateur sustentation)
 
-        if(SKIP_FRONT) state = STATE_4;
+        // Vérife pour passer le devant ou non
+        if(SKIP_FRONT && state == STATE_1) state = STATE_4;
 
         // --- Filtres de vitesse Savitzky-Golay ---
         pos1Buff[FILTWINDOW-1] = Position1;
