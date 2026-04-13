@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker Unix v22.6.1                   
 ******************************************************************************
->> Linked Mon Apr 13 16:48:43 2026
+>> Linked Mon Apr 13 17:03:55 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -21,7 +21,7 @@ MEMORY CONFIGURATION
   RAMLS3                00009800   00000800  00000657  000001a9  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
   RAMLS5                0000a800   00000800  0000059e  00000262  RWIX
-  RAMLS6_7              0000b000   00001000  000008d0  00000730  RWIX
+  RAMLS6_7              0000b000   00001000  000008e6  0000071a  RWIX
   RAMGS0                0000c000   00001000  00000000  00001000  RWIX
   RAMGS1                0000d000   00001000  00000000  00001000  RWIX
   RAMGS2                0000e000   00001000  00000000  00001000  RWIX
@@ -270,18 +270,18 @@ codestart
                   00009e51    00000003     Sustentation_Main.obj (.text:error)
                   00009e54    00000003     Sustentation_Main.obj (.text:main)
 
-.text.5    0    0000b000    000008d0     
-                  0000b000    000008d0     Sustentation_Main.obj (.text:adcA1ISR)
+.text.5    0    0000b000    000008e6     
+                  0000b000    000008e6     Sustentation_Main.obj (.text:adcA1ISR)
 
 MODULE SUMMARY
 
        Module                                   code    ro data   rw data
        ------                                   ----    -------   -------
     ./
-       Sustentation_Main.obj                    2736    86        450    
+       Sustentation_Main.obj                    2758    86        450    
        FunctionHeader2.obj                      469     18        10     
     +--+----------------------------------------+-------+---------+---------+
-       Total:                                   3205    104       460    
+       Total:                                   3227    104       460    
                                                                          
     ./device/
        device.obj                               305     0         0      
@@ -334,7 +334,7 @@ MODULE SUMMARY
        Stack:                                   0       0         512    
        Linker Generated:                        0       78        0      
     +--+----------------------------------------+-------+---------+---------+
-       Grand Total:                             10029   1027      998    
+       Grand Total:                             10051   1027      998    
 
 
 LINKER GENERATED COPY TABLES

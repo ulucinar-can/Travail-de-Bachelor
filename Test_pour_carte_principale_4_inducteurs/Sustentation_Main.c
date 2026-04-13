@@ -31,10 +31,8 @@
 #define INV_FACTOR                  0.01f
 #define OFFSET_COUNT_INV            0.001f
 
-#define POS_CORRECTION_1            1.143f
-#define POS_CORRECTION_2            1.131f
-#define POS_CORRECTION_3            1.187f
-#define POS_CORRECTION_4            1.159f
+#define POS_CORRECTION_1            1.07f
+#define POS_CORRECTION_2            1.06f
 #define TAKEOFF_CURRENT_STEP1       0.04f
 #define TAKEOFF_CURRENT_STEP2       0.004f
 #define POS_DETECT                  0.99f
@@ -300,8 +298,8 @@ __interrupt void adcA1ISR(void)
     // --- Conversion 12 bits -> Position (Ecart intégré) ---
     Position1 = (float)(ADC_pos_1) * CONV_POS2 * POS_CORRECTION_1;
     Position2 = (float)(ADC_pos_2) * CONV_POS2 * POS_CORRECTION_2;
-    Position3 = (float)(ADC_pos_3) * CONV_POS2 * POS_CORRECTION_3;
-    Position4 = (float)(ADC_pos_4) * CONV_POS2 * POS_CORRECTION_4;
+    Position3 = (float)(ADC_pos_3) * CONV_POS2 * POS_CORRECTION_1;
+    Position4 = (float)(ADC_pos_4) * CONV_POS2 * POS_CORRECTION_2;
 
     // --- Conversion 12 bits -> Courant (TFE 2025) ---
     Current1  = (((float)(ADC_cur_1) - ADC_ZERO_CURRENT - Offset_ADC1) / (ADC_ZERO_CURRENT + Offset_ADC1)) * I_MAX;
