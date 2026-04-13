@@ -58,7 +58,7 @@
 #define STATE_8                     8
 
 #define SKIP_BACK                   0
-
+#define SKIP_FRONT                  0
 
 /* ========================================================================= *
  * GLOBAL VARIABLES
@@ -327,6 +327,8 @@ __interrupt void adcA1ISR(void)
     {
         GPIO_writePin(LED_D2, 0); // Allumage LED2 (Indicateur sustentation)
 
+        if(SKIP_FRONT) state = STATE_4;
+
         // --- Filtres de vitesse Savitzky-Golay ---
         pos1Buff[FILTWINDOW-1] = Position1;
         v1 = savitzky_Filter(pos1Buff);
@@ -582,6 +584,9 @@ __interrupt void adcA1ISR(void)
                     // Reset de la varibale
                     i_store = 0;
 
+                    // Changement du gain statique de l'inducteur 3
+                    Kr_sans_int = -1.0;
+
                     // Changement d'état
                     state = STATE_7;
                 }
@@ -597,9 +602,6 @@ __interrupt void adcA1ISR(void)
                 Kw = KW_CHANGE;
                 Kd = KD_CHANGE;
                 Kddot = KDDOT_CHANGE;
-
-                // Changement du gain statique de l'inducteur 3
-                Kr_sans_int = -1.0;
 
                 break;
 
