@@ -670,7 +670,8 @@ __interrupt void adcA1ISR(void)
             ep3 = Position2_c3 - Position3;
             xr3 += (ep3 - fce3);
             sum_vp3 = (v3 * KDDOT_SANS_INT) + (Position3 * KD_SANS_INT);
-            fc3_prim = (KW_SANS_INT * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
+            //fc3_prim = (KW_SANS_INT * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
+            fc3_prim = (Kw * Position2_c3) + (Kr * xr3 * I) - sum_vp3 + FP;
 
             fc3 = fc3_prim;
             if (fc3_prim <= 0)   fc3 = 0;
