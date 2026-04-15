@@ -48,6 +48,9 @@
 
 #define RX_BUF_LEN                  64
 
+#define ALPHA                       0.001f
+#define ALPHA_INV                   0.999f
+
 #define STATE_1                     1
 #define STATE_2                     2
 #define STATE_3                     3
@@ -58,7 +61,7 @@
 #define STATE_8                     8
 
 #define SKIP_BACK                   0
-#define SKIP_FRONT                  0
+#define SKIP_FRONT                  1
 
 /* ========================================================================= *
  * GLOBAL VARIABLES
@@ -158,6 +161,12 @@ static uint16_t dataIndex = 0;
 uint8_t state = STATE_1;
 bool PosRegFlag1 = false;
 bool PosRegFlag3 = false;
+
+// --- State machine variable ---
+float Pos1_filt = DELTA_0;
+float Pos2_filt = DELTA_0;
+float Pos3_filt = DELTA_0;
+float Pos4_filt = DELTA_0;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -301,6 +310,12 @@ __interrupt void adcA1ISR(void)
     Position3 = (float)(ADC_pos_3) * CONV_POS2 * POS_CORRECTION_1;
     Position4 = (float)(ADC_pos_4) * CONV_POS2 * POS_CORRECTION_2;
 
+    // --- Position filtré pour l'envoie ---
+    Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
+    Pos2_filt = (ALPHA * Position2) + (ALPHA_INV * Pos2_filt);
+    Pos3_filt = (ALPHA * Position3) + (ALPHA_INV * Pos3_filt);
+    Pos4_filt = (ALPHA * Position4) + (ALPHA_INV * Pos4_filt);
+
     // --- Conversion 12 bits -> Courant (TFE 2025) ---
     Current1  = (((float)(ADC_cur_1) - ADC_ZERO_CURRENT - Offset_ADC1) / (ADC_ZERO_CURRENT + Offset_ADC1)) * I_MAX;
     Current2  = (((float)(ADC_cur_2) - ADC_ZERO_CURRENT - Offset_ADC2) / (ADC_ZERO_CURRENT + Offset_ADC2)) * I_MAX;
@@ -314,7 +329,7 @@ __interrupt void adcA1ISR(void)
     if (UartCounter >= 25000)
     {
         UartCounter = 0; // Reset du compteur (~1s)
-        SendFloatAsText(Position1*1000.0f, Position2*1000.0f, Position3*1000.0f, Position4*1000.0f);
+        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f);
     }
 
     /* --------------------------------------------------------------------- *
