@@ -162,11 +162,16 @@ uint8_t state = STATE_1;
 bool PosRegFlag1 = false;
 bool PosRegFlag3 = false;
 
-// --- State machine variable ---
+// --- Variable for value sending ---
 float Pos1_filt = DELTA_0;
 float Pos2_filt = DELTA_0;
 float Pos3_filt = DELTA_0;
 float Pos4_filt = DELTA_0;
+
+float Cur1_filt = 0;
+float Cur2_filt = 0;
+float Cur3_filt = 0;
+float Cur4_filt = 0;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -322,6 +327,12 @@ __interrupt void adcA1ISR(void)
     Current3  = (((float)(ADC_cur_3) - ADC_ZERO_CURRENT - Offset_ADC3) / (ADC_ZERO_CURRENT + Offset_ADC3)) * I_MAX;
     Current4  = (((float)(ADC_cur_4) - ADC_ZERO_CURRENT - Offset_ADC4) / (ADC_ZERO_CURRENT + Offset_ADC4)) * I_MAX;
 
+    // --- Courant filtré pour l'envoie ---
+    Cur1_filt = (0.0001f * Current1) + (0.9999f * Cur1_filt);
+    Cur2_filt = (0.0001f * Current2) + (0.9999f * Cur2_filt);
+    Cur3_filt = (0.0001f * Current3) + (0.9999f * Cur3_filt);
+    Cur4_filt = (0.0001f * Current4) + (0.9999f * Cur4_filt);
+
     /* --------------------------------------------------------------------- *
      * 3. COMMUNICATION (TELEMETRIE)
      * --------------------------------------------------------------------- */
@@ -329,7 +340,12 @@ __interrupt void adcA1ISR(void)
     if (UartCounter >= 25000)
     {
         UartCounter = 0; // Reset du compteur (~1s)
-        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f);
+
+        //Envoie des positions
+        //SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f);
+
+        //Envoie des courrants
+        SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
     }
 
     /* --------------------------------------------------------------------- *
