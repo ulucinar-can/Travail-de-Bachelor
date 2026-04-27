@@ -63,6 +63,15 @@
 #define SKIP_BACK                   0
 #define SKIP_FRONT                  1
 
+#define GAIN_COR_1                  1.0871f
+#define OFFSET_COR_1                -0.0965f
+#define GAIN_COR_2                  1.0581f
+#define OFFSET_COR_2                -0.0109f
+#define GAIN_COR_3                  1.0058f
+#define OFFSET_COR_3                0.0916f
+#define GAIN_COR_4                  1.0289f
+#define OFFSET_COR_4                0.0182f
+
 /* ========================================================================= *
  * GLOBAL VARIABLES
  * ========================================================================= */
@@ -314,6 +323,11 @@ __interrupt void adcA1ISR(void)
     Position2 = (float)(ADC_pos_2) * CONV_POS2 * POS_CORRECTION_2;
     Position3 = (float)(ADC_pos_3) * CONV_POS2 * POS_CORRECTION_1;
     Position4 = (float)(ADC_pos_4) * CONV_POS2 * POS_CORRECTION_2;
+
+    Position1 = Position1 * GAIN_COR_1 + OFFSET_COR_1;
+    Position2 = Position2 * GAIN_COR_2 + OFFSET_COR_2;
+    Position3 = Position3 * GAIN_COR_3 + OFFSET_COR_3;
+    Position4 = Position4 * GAIN_COR_4 + OFFSET_COR_4;
 
     // --- Position filtré pour l'envoie ---
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
