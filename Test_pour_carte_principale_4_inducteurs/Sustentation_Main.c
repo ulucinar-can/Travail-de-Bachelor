@@ -61,16 +61,19 @@
 #define STATE_8                     8
 
 #define SKIP_BACK                   0
-#define SKIP_FRONT                  1
+#define SKIP_FRONT                  0
 
-#define GAIN_COR_1                  1.0871f
-#define OFFSET_COR_1                -0.0965f
-#define GAIN_COR_2                  1.0581f
-#define OFFSET_COR_2                -0.0109f
-#define GAIN_COR_3                  1.0058f
-#define OFFSET_COR_3                0.0916f
-#define GAIN_COR_4                  1.0289f
-#define OFFSET_COR_4                0.0182f
+#define GAIN_COR_1                  1.1723f
+#define OFFSET_COR_1                (-0.2212f / 1000.0f)
+
+#define GAIN_COR_2                  1.1285f
+#define OFFSET_COR_2                (-0.0796f / 1000.0f)
+
+#define GAIN_COR_3                  1.0794f
+#define OFFSET_COR_3                (0.0852f / 1000.0f)
+
+#define GAIN_COR_4                  1.1162f
+#define OFFSET_COR_4                (-0.0819f / 1000.0f)
 
 /* ========================================================================= *
  * GLOBAL VARIABLES
@@ -319,15 +322,15 @@ __interrupt void adcA1ISR(void)
      * 2. CONVERSIONS PHYSIQUES
      * --------------------------------------------------------------------- */
     // --- Conversion 12 bits -> Position (Ecart intégré) ---
-    Position1 = (float)(ADC_pos_1) * CONV_POS2 * POS_CORRECTION_1;
-    Position2 = (float)(ADC_pos_2) * CONV_POS2 * POS_CORRECTION_2;
-    Position3 = (float)(ADC_pos_3) * CONV_POS2 * POS_CORRECTION_1;
-    Position4 = (float)(ADC_pos_4) * CONV_POS2 * POS_CORRECTION_2;
+//    Position1 = ((float)(ADC_pos_1) * CONV_POS2);
+//    Position2 = (float)(ADC_pos_2) * CONV_POS2;
+//    Position3 = (float)(ADC_pos_3) * CONV_POS2;
+//    Position4 = (float)(ADC_pos_4) * CONV_POS2;
 
-    Position1 = Position1 * GAIN_COR_1 + OFFSET_COR_1;
-    Position2 = Position2 * GAIN_COR_2 + OFFSET_COR_2;
-    Position3 = Position3 * GAIN_COR_3 + OFFSET_COR_3;
-    Position4 = Position4 * GAIN_COR_4 + OFFSET_COR_4;
+    Position1 = ((float)(ADC_pos_1) * CONV_POS2) * GAIN_COR_1 + OFFSET_COR_1;
+    Position2 = ((float)(ADC_pos_2) * CONV_POS2) * GAIN_COR_2 + OFFSET_COR_2;
+    Position3 = ((float)(ADC_pos_3) * CONV_POS2) * GAIN_COR_3 + OFFSET_COR_3;
+    Position4 = ((float)(ADC_pos_4) * CONV_POS2) * GAIN_COR_4 + OFFSET_COR_4;
 
     // --- Position filtré pour l'envoie ---
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
@@ -356,10 +359,10 @@ __interrupt void adcA1ISR(void)
         UartCounter = 0; // Reset du compteur (~1s)
 
         //Envoie des positions
-        //SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f);
+        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f);
 
         //Envoie des courrants
-        SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+        //SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
     }
 
     /* --------------------------------------------------------------------- *
