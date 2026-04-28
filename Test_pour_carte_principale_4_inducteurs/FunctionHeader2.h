@@ -96,11 +96,53 @@
 #define K_ANTIWINDUP    ((float)(1.0/KW))
 
 /* ========================================================================= *
- * FILTER COEFFICIENTS
+ * IIR FILTER COEFFICIENTS
  * ========================================================================= */
+//Define of the coefficients filters bandstop (10 differents)
+//bandstop Filter 56Hz 2nd order bande coup�e de 47Hz � 90Hz (0) (test)
 #define A1_B1_0         -1.980143772501098
 #define A2_0            0.980339665209542
 #define B0_B2_0         0.9901698326047711
+//bandstop Filter 65Hz 2nd order bande coup�e de 47Hz � 90Hz (1)
+#define A1_B1_1         -1.98898514926503589
+#define A2_1            0.9892508998390186
+#define B0_B2_1         0.9946254499195093
+//bandstop Filter 65Hz 2nd order bande coup�e de 34Hz � 119Hz (2)
+#define A1_B1_2         -1.97860927758394145
+#define A2_2            0.97886214822594597
+#define B0_B2_2         0.989431074112973
+//bandstop Filter 70Hz 2nd order bande coup�e de 50Hz � 100Hz (3)
+#define A1_B1_3         -1.98719807873359366468
+#define A2_3            0.98751192990729475
+#define B0_B2_3         0.9937559649536473749265
+//bandstop Filter 70Hz 2nd order bande coup�e de 37Hz � 128Hz (4)
+#define A1_B1_4         -1.9770910357912317
+#define A2_4            0.97738681058138155
+#define B0_B2_4         0.98869340529069083
+//bandstop Filter 75Hz 2nd order bande coup�e de 57Hz � 95Hz (5)
+#define A1_B1_5         -1.9896496113551767
+#define A2_5            0.98999709932613533
+#define B0_B2_5         0.99499854966306767
+//bandstop Filter 75Hz 2nd order bande coup�e de 40Hz � 130Hz (6)
+#define A1_B1_6         -1.977307757140243538
+#define A2_6            0.97763254912161579
+#define B0_B2_6         0.98881627456080789517756
+//bandstop Filter 80Hz 2nd order bande coup�e de 60Hz � 108Hz (7)
+#define A1_B1_7         -1.987853700192099483
+#define A2_7            0.9882568325036572565
+#define B0_B2_7         0.99412841625182868377
+//bandstop Filter 80Hz 2nd order bande coup�e de 46Hz � 136Hz (8)
+#define A1_B1_8         -1.9772418015560622
+#define A2_8            0.97763254912162
+#define B0_B2_8         0.98881627456081
+//bandstop Filter 85Hz 2nd order bande coup�e de 65Hz � 111Hz (9)
+#define A1_B1_9         -1.988052149327327544
+#define A2_9            0.9885052567179366534
+#define B0_B2_9         0.9942526283589683267
+//bandstop Filter 85Hz 2nd order bande coup�e de 51Hz � 142Hz (10)
+#define A1_B1_10        -1.988052149327327544
+#define A2_10           0.9885052567179366534
+#define B0_B2_10        0.9942526283589683267
 
 // --- Filters configurations ---
 #define FILTWINDOW      9

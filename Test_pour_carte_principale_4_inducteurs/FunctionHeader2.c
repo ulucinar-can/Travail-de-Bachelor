@@ -19,8 +19,8 @@
 const float SAVITZKY[FILTWINDOW] = {-0.0667, -0.05, -0.0333, -0.0167, 0.0, 0.0167, 0.0333, 0.05, 0.0667};
 
 // bandstop Filter (initialise to the 75Hz large bandstop filter design)
-float a[Na] = {A1_B1_0, A2_0};
-float b[Nb] = {B0_B2_0, A1_B1_0, B0_B2_0};
+float a[Na] = {A1_B1_6, A2_6};
+float b[Nb] = {B0_B2_6, A1_B1_6, B0_B2_6};
 
 /* ========================================================================= *
  * CONTROL & REGULATION
