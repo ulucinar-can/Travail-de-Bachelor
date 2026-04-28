@@ -21,7 +21,7 @@
 #define DELTA_0         ((float)3.0e-3)
 #define L_N             ((float)4.9e-3)
 #define I_N             5.218f
-#define M               13.6f
+#define M               3.4f
 #define G               9.81f
 #define d               ((float)26e-3)
 
