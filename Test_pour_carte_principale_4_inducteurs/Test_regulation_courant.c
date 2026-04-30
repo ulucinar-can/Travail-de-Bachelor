@@ -368,10 +368,7 @@ __interrupt void adcA1ISR(void)
     {
         GPIO_writePin(LED_D2, 0); // Allumage LED2 (Indicateur sustentation)
 
-        // VÃ©rife pour passer le devant ou non
-        if(SKIP_FRONT && state == STATE_1) state = STATE_4;
-
-        // 2. Consigne fixe (Exit la machine d'état)
+        // 2. Consigne fixe
         ic1 = 2.0f;
         ic2 = 2.0f;
         ic3 = 2.0f;
