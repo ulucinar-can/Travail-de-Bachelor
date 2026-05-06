@@ -21,7 +21,7 @@
 #define DELTA_0         ((float)3.0e-3)
 #define L_N             ((float)4.9e-3)
 #define I_N             5.218f
-#define M               3.4f
+#define M               4.513f
 #define G               9.81f
 #define d               ((float)26e-3)
 
@@ -73,20 +73,20 @@
 // --- State method regulation ---
 #define FP              M*G
 
-#define KW_SANS_INT      ((float)-2.8742e4)
-#define KDDOT_SANS_INT   -541.5f
-#define KD_SANS_INT      ((float)-2.8742e4)
+#define KW_SANS_INT      ((float)-3.6392e4)
+#define KDDOT_SANS_INT   -701.93f
+#define KD_SANS_INT      ((float)-3.6392e4)
 #define KR_SANS_INT      0.0f
 
-#define KW               ((float)-1.2082e4)
-#define KDDOT            -458.3f
-#define KD               ((float)-3.0413e4)
-#define KR               -28.92f
+#define KW               ((float)-1.4866e4)
+#define KDDOT            -603.43f
+#define KD               ((float)-3.9003e4)
+#define KR               -35.64f
 
-#define KW_CHANGE        ((float)-6.6658e3)
-#define KDDOT_CHANGE     -499.8f
-#define KD_CHANGE        ((float)-2.9989e4)
-#define KR_CHANGE        -18.64f
+#define KW_CHANGE        ((float)-8.8478e3)
+#define KDDOT_CHANGE     -663.38f
+#define KD_CHANGE        ((float)-3.9805e4)
+#define KR_CHANGE        -24.74f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000
