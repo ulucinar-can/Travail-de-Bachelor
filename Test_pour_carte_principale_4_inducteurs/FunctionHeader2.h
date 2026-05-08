@@ -60,8 +60,8 @@
 #define I_SP            3.0f
 #define I_SP105         3.15f
 #define I_SP095         2.85f
-#define KP_I            1.853095f
-#define TI_I            ((float)4.6366198e-4)
+#define KP_I            90.964f
+#define TI_I            ((float)4.636619772367582e-4)
 #define GI_I            (1.0/TI_I)
 #define UMAX            VDC_BUS
 #define ANTIWINDUP_EN   1
@@ -73,20 +73,20 @@
 // --- State method regulation ---
 #define FP              M*G
 
-#define KW_SANS_INT      ((float)-3.6392e4)
-#define KDDOT_SANS_INT   -701.93f
-#define KD_SANS_INT      ((float)-3.6392e4)
+#define KW_SANS_INT      ((float)-3.639e4)
+#define KDDOT_SANS_INT   -701.9f
+#define KD_SANS_INT      ((float)-3.639e4)
 #define KR_SANS_INT      0.0f
 
-#define KW               ((float)-1.4866e4)
-#define KDDOT            -603.43f
-#define KD               ((float)-3.9003e4)
-#define KR               -35.64f
+#define KW               ((float)-1.486e4)
+#define KDDOT            -603.4f
+#define KD               ((float)-3.900e4)
+#define KR               -35.63f
 
-#define KW_CHANGE        ((float)-8.8478e3)
-#define KDDOT_CHANGE     -663.38f
-#define KD_CHANGE        ((float)-3.9805e4)
-#define KR_CHANGE        -24.74f
+#define KW_CHANGE        ((float)-8.8418e3)
+#define KDDOT_CHANGE     -663.3f
+#define KD_CHANGE        ((float)-3.980e4)
+#define KR_CHANGE        -24.72f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000
