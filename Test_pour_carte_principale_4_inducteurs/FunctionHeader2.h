@@ -17,13 +17,13 @@
 /* ========================================================================= *
  * PHYSICAL & SYSTEM PARAMETERS
  * ========================================================================= */
-#define DELTA_N         ((float)2e-3)
-#define DELTA_0         ((float)3.0e-3)
-#define L_N             ((float)4.9e-3)
-#define I_N             5.218f
-#define M               4.513f
-#define G               9.81f
-#define d               ((float)26e-3)
+#define DELTA_N         ((float)2e-3)           // Position nominal de l'entrefer
+#define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
+#define L_N             ((float)4.9e-3)         // Inductance nominal au point nominal
+#define I_N             6.01f                   // Courant nominal par méthode inverse au point nominal
+#define M               4.513f                  // Masse pour un seul inducteur
+#define G               9.81f                   // Gravity
+#define d               ((float)26e-3)          // Distance between inductor 1 and 2
 
 /* ========================================================================= *
  * HARDWARE CONFIGURATION
@@ -42,6 +42,7 @@
 
 // --- Current ---
 #define I_MAX           30.0f
+#define I_MIN           -30.0f
 
 // --- PWM ---
 #define F_PWM           ((float)25e3)
@@ -73,19 +74,19 @@
 // --- State method regulation ---
 #define FP              M*G
 
-#define KW_SANS_INT      ((float)-3.639e4)
+#define KW_SANS_INT      ((float) 8.065e4)
 #define KDDOT_SANS_INT   -701.9f
-#define KD_SANS_INT      ((float)-3.639e4)
+#define KD_SANS_INT      ((float)8.065e4)
 #define KR_SANS_INT      0.0f
 
 #define KW               ((float)-1.486e4)
 #define KDDOT            -603.4f
-#define KD               ((float)-3.900e4)
+#define KD               ((float)5.274e3)
 #define KR               -35.63f
 
 #define KW_CHANGE        ((float)-8.8418e3)
 #define KDDOT_CHANGE     -663.3f
-#define KD_CHANGE        ((float)-3.980e4)
+#define KD_CHANGE        ((float)4.474e3)
 #define KR_CHANGE        -24.72f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
