@@ -132,7 +132,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="MesurePosition.c|Fichier_de_test/Test_regulation_position.c|Fichier_de_test/Test_regulation_courant.c|Ancien_code/Fichier_de_test/Sans_UART/hrpwm_ex1_duty_sfo_sans_uart.c|Ancien_code/Fichier_de_test/Sans_UART/Inducteur_3_4_sans_uart.c|Ancien_code/Fichier_de_test/Sans_UART/Inducteur_1_2_sans_uart.c|Ancien_code/Fichier_de_test/Avec_UART/Inducteur_3_4.c|Ancien_code/Fichier_de_test/Avec_UART/Inducteur_1_2.c|Ancien_code/hrpwm_ex1_duty_sfo.c|device/driverlib|28003x_generic_flash_lnk.cmd|targetConfigs/TMS320F280039C_LaunchPad.ccxml" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Ancien_code/hrpwm_ex1_duty_sfo.c|MesurePosition.c|Fichier_de_test/Test_regulation_position.c|Fichier_de_test/Test_regulation_courant.c|Ancien_code/Fichier_de_test/Sans_UART/hrpwm_ex1_duty_sfo_sans_uart.c|Ancien_code/Fichier_de_test/Sans_UART/Inducteur_3_4_sans_uart.c|Ancien_code/Fichier_de_test/Sans_UART/Inducteur_1_2_sans_uart.c|Ancien_code/Fichier_de_test/Avec_UART/Inducteur_3_4.c|Ancien_code/Fichier_de_test/Avec_UART/Inducteur_1_2.c|device/driverlib|28003x_generic_flash_lnk.cmd|targetConfigs/TMS320F280039C_LaunchPad.ccxml" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

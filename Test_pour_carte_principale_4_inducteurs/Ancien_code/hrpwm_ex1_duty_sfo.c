@@ -268,6 +268,17 @@ volatile uint16_t rxIndex = 0;
 volatile bool frameReady = false;
 static uint16_t dataIndex = 0;
 
+// --- Variable for value sending ---
+float Pos1_filt = DELTA_0;
+float Pos2_filt = DELTA_0;
+float Pos3_filt = DELTA_0;
+float Pos4_filt = DELTA_0;
+
+float Cur1_filt = 0;
+float Cur2_filt = 0;
+float Cur3_filt = 0;
+float Cur4_filt = 0;
+
 // buffer pour la lecture des adc de courant et position
 uint16_t ADC_pos_1,ADC_pos_2,ADC_pos_3,ADC_pos_4,ADC_cur_1,ADC_cur_2,ADC_cur_3,ADC_cur_4;
 
@@ -603,6 +614,12 @@ __interrupt void adcA1ISR(void)
      Position3 = (float)(ADC_pos_3) * CONV_POS2 * POS_CORRECTION_1;
      Position4 = (float)(ADC_pos_4) * CONV_POS2 * POS_CORRECTION_2;
 
+     // --- Position filtré pour l'envoie ---
+     Pos1_filt = (0.999 * Position1) + (0.001 * Pos1_filt);
+     Pos2_filt = (0.999 * Position2) + (0.001 * Pos2_filt);
+     Pos3_filt = (0.999 * Position3) + (0.001 * Pos3_filt);
+     Pos4_filt = (0.999 * Position4) + (0.001 * Pos4_filt);
+
 
      /////////////////////////////////////////////
      // Conversion 12 bits -> courant           //
@@ -614,15 +631,25 @@ __interrupt void adcA1ISR(void)
       Current3     = (((float)(ADC_cur_3) - ADC_ZERO_CURRENT - Offset_ADC3) / (ADC_ZERO_CURRENT + Offset_ADC3)) * I_MAX;
       Current4     = (((float)(ADC_cur_4) - ADC_ZERO_CURRENT - Offset_ADC4) / (ADC_ZERO_CURRENT + Offset_ADC4)) * I_MAX;
 
+      // --- Courant filtré pour l'envoie ---
+      Cur1_filt = (0.0001f * Current1) + (0.9999f * Cur1_filt);
+      Cur2_filt = (0.0001f * Current2) + (0.9999f * Cur2_filt);
+      Cur3_filt = (0.0001f * Current3) + (0.9999f * Cur3_filt);
+      Cur4_filt = (0.0001f * Current4) + (0.9999f * Cur4_filt);
+
       // Envoi des donn�es UART toute les 40*10e-6 * 25000 = 1 s
       UartCounter++;
 
       if (UartCounter >= 25000) {
           UartCounter = 0; // Reset du compteur
-          SendFloatAsText(Position1*1000.0f,Position2*1000.0f,Position3*1000.0f,Position4*1000.0f);
+//          SendFloatAsText(Position1*1000.0f,Position2*1000.0f,Position3*1000.0f,Position4*1000.0f);
 
 //          SendFloatAsText(1.234f,2.567f,3.891,4.234f); // Trame de test envoy�e : "\x02float1,float2,float3float4\x03" avec les float sous cette forme x.xxx
 //          sendString("\x02Hello World!\r\x03");
+
+          //Envoie des courrants
+          SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+
       }
 
 //--------------------------------------------------------------------------------------------------------------------------
