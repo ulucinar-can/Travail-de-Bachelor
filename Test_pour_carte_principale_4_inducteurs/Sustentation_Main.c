@@ -634,7 +634,7 @@ __interrupt void adcA1ISR(void)
                     i_store = 0;
 
                     // Changement du gain statique de l'inducteur 3
-                    Kr_sans_int = 0;//-1.0;
+                    Kr_sans_int = 0; //-1.0;
 
                     // Changement d'état
                     state = STATE_7;
