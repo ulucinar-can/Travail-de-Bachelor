@@ -63,18 +63,6 @@
 #define SKIP_BACK                   0
 #define SKIP_FRONT                  0
 
-#define GAIN_COR_1                  1.1092f
-#define OFFSET_COR_1                (-0.0407f / 1000.0f)
-
-#define GAIN_COR_2                  1.08f
-#define OFFSET_COR_2                (-0.0244f / 1000.0f)
-
-#define GAIN_COR_3                  1.062f
-#define OFFSET_COR_3                (0.1138f / 1000.0f)
-
-#define GAIN_COR_4                  1.078f
-#define OFFSET_COR_4                (0.0402f / 1000.0f)
-
 /* ========================================================================= *
  * GLOBAL VARIABLES
  * ========================================================================= */
@@ -184,6 +172,44 @@ float Cur1_filt = 0;
 float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
+
+// --- Position correction ---
+const float POS_COR_1[6] = {
+    -2.1257f,       // a0
+     1.0372e-2f,    // a1
+    -1.2079e-5f,    // a2
+     6.7876e-9f,    // a3
+    -1.7440e-12f,   // a4
+     1.6659e-16f    // a5
+};
+
+const float POS_COR_2[6] = {
+    -1.1884f,       // a0
+     7.2505e-3f,    // a1
+    -8.4558e-6f,    // a2
+     4.9023e-9f,    // a3
+    -1.2879e-12f,   // a4
+     1.2463e-16f    // a5
+};
+
+const float POS_COR_3[6] = {
+    -6.8056e-1f,    // a0
+     7.5109e-3f,    // a1
+    -1.0516e-5f,    // a2
+     7.0023e-9f,    // a3
+    -2.0725e-12f,   // a4
+     2.2283e-16f    // a5
+};
+
+const float POS_COR_4[6] = {
+    -1.7846e-1f,       // a0
+     4.2678e-3f,    // a1
+    -4.9474e-6f,   // a2
+     3.0248e-9f,   // a3
+    -8.1730e-13f,   // a4
+     7.9628e-17f    // a5
+};
+
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
