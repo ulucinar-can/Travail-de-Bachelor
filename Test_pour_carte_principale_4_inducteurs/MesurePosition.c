@@ -63,17 +63,14 @@
 #define SKIP_BACK                   0
 #define SKIP_FRONT                  0
 
-#define GAIN_COR_1                  1.1092f
-#define OFFSET_COR_1                (-0.0407f / 1000.0f)
+// Correction de la position 1
+#define POS_COR_1                  {}
 
 #define GAIN_COR_2                  1.08f
-#define OFFSET_COR_2                (-0.0244f / 1000.0f)
 
 #define GAIN_COR_3                  1.062f
-#define OFFSET_COR_3                (0.1138f / 1000.0f)
 
 #define GAIN_COR_4                  1.078f
-#define OFFSET_COR_4                (0.0402f / 1000.0f)
 
 /* ========================================================================= *
  * GLOBAL VARIABLES

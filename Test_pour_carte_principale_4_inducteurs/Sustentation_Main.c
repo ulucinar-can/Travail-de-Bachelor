@@ -37,7 +37,7 @@
 #define TAKEOFF_CURRENT_STEP2       0.004f
 #define POS_DETECT                  0.99f
 
-#define COUNT_TO_REACH              10000
+#define COUNT_TO_REACH              500
 
 #define DUTY_CYCLE_1                50
 #define DUTY_CYCLE_2                50
@@ -841,17 +841,21 @@ __interrupt void adcA1ISR(void)
      * --------------------------------------------------------------------- */
     if(Ext_Int_Flag) // Détection flanc montant
     {
-        count_ext_int = 0;
-        // ATTENTION : Ce 'while' crée un délai bloquant dans l'ISR !
-        while(count_ext_int < COUNT_TO_REACH)
-            count_ext_int++;
 
-        if(GPIO_readPin(Push_Button_Start) == 0)
+        count_ext_int++;
+
+        if(count_ext_int >= COUNT_TO_REACH)
         {
-            // Toggle button state
-            ButtonS2 = !ButtonS2;
+            if(GPIO_readPin(Push_Button_Start) == 0)
+            {
+                // Toggle button state
+                ButtonS2 = !ButtonS2;
+            }
+
+            Ext_Int_Flag = false;
+            count_ext_int = 0;
         }
-        Ext_Int_Flag = false;
+
     }
 
     // Eteindre LED de debug (fin de boucle de régulation)
