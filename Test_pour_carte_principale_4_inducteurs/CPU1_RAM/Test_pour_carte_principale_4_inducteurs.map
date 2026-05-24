@@ -1,7 +1,7 @@
 ******************************************************************************
-             TMS320C2000 Linker Unix v22.6.1                   
+             TMS320C2000 Linker PC v22.6.1                     
 ******************************************************************************
->> Linked Wed May 20 11:03:55 2026
+>> Linked Fri May 22 12:58:19 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -20,7 +20,7 @@ MEMORY CONFIGURATION
   RAMLS2                00009000   00000800  00000800  00000000  RWIX
   RAMLS3                00009800   00000800  00000800  00000000  RWIX
   RAMLS4                0000a000   00000800  0000002f  000007d1  RWIX
-  RAMLS5                0000a800   00000800  0000051a  000002e6  RWIX
+  RAMLS5                0000a800   00000800  00000518  000002e8  RWIX
   RAMLS6_7              0000b000   00001000  00000000  00001000  RWIX
   RAMGS0                0000c000   00001000  00000000  00001000  RWIX
   RAMGS1                0000d000   00001000  00000000  00001000  RWIX
@@ -122,7 +122,7 @@ codestart
                   0000a8da    00000001     SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib : SFO_v8_fpu_lib_build_c28_driverlib.obj (.data)
                   0000a8db    00000001     rts2800_fpu32_eabi.lib : errno.c.obj (.data)
 
-.const     0    0000a974    000003a6     
+.const     0    0000a974    000003a4     
                   0000a974    0000009a     driverlib.lib : sysctl.obj (.const:.string)
                   0000aa0e    00000098                   : epwm.obj (.const:.string)
                   0000aaa6    00000098                   : gpio.obj (.const:.string)
@@ -131,14 +131,14 @@ codestart
                   0000abd6    00000050                   : cputimer.obj (.const:.string)
                   0000ac26    0000004b                   : adc.obj (.const:.string)
                   0000ac71    00000001     --HOLE-- [fill = 0]
-                  0000ac72    00000046     MesurePosition.obj (.const:.string)
-                  0000acb8    00000045     board.obj (.const:.string)
-                  0000acfd    00000001     --HOLE-- [fill = 0]
-                  0000acfe    00000008     MesurePosition.obj (.const:duty_cycle_table)
-                  0000ad06    00000008     MesurePosition.obj (.const:ePWM)
-                  0000ad0e    00000004     rts2800_fpu32_eabi.lib : e_powf.c.obj (.const:bp)
-                  0000ad12    00000004                            : e_powf.c.obj (.const:dp_h)
-                  0000ad16    00000004                            : e_powf.c.obj (.const:dp_l)
+                  0000ac72    00000045     MesurePosition.obj (.const:.string)
+                  0000acb7    00000001     --HOLE-- [fill = 0]
+                  0000acb8    00000044     board.obj (.const:.string)
+                  0000acfc    00000008     MesurePosition.obj (.const:duty_cycle_table)
+                  0000ad04    00000008     MesurePosition.obj (.const:ePWM)
+                  0000ad0c    00000004     rts2800_fpu32_eabi.lib : e_powf.c.obj (.const:bp)
+                  0000ad10    00000004                            : e_powf.c.obj (.const:dp_h)
+                  0000ad14    00000004                            : e_powf.c.obj (.const:dp_l)
 
 .text.1    0    00008000    00000800     
                   00008000    0000038c     rts2800_fpu32_eabi.lib : e_powf.c.obj (.text)
@@ -259,24 +259,24 @@ MODULE SUMMARY
 
        Module                                   code   ro data   rw data
        ------                                   ----   -------   -------
-    ./
-       MesurePosition.obj                       1102   86        346    
+    .\
+       MesurePosition.obj                       1102   85        346    
        FunctionHeader2.obj                      319    0         0      
     +--+----------------------------------------+------+---------+---------+
-       Total:                                   1421   86        346    
+       Total:                                   1421   85        346    
                                                                         
-    ./device/
+    .\device\
        device.obj                               305    0         0      
        f28003x_codestartbranch.obj              10     0         0      
     +--+----------------------------------------+------+---------+---------+
        Total:                                   315    0         0      
                                                                         
-    ./syscfg/
-       board.obj                                1924   69        0      
+    .\syscfg\
+       board.obj                                1924   68        0      
     +--+----------------------------------------+------+---------+---------+
-       Total:                                   1924   69        0      
+       Total:                                   1924   68        0      
                                                                         
-    /home/can/ti/C2000Ware_5_02_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib
+    C:/ti/c2000/C2000Ware_5_02_00_00/driverlib/f28003x/driverlib/ccs/Debug/driverlib.lib
        sysctl.obj                               1348   154       0      
        gpio.obj                                 546    152       0      
        sci.obj                                  354    151       0      
@@ -287,12 +287,12 @@ MODULE SUMMARY
     +--+----------------------------------------+------+---------+---------+
        Total:                                   2671   764       0      
                                                                         
-    /home/can/ti/C2000Ware_5_02_00_00/libraries/calibration/hrpwm/f28003x/lib/SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib
+    C:\ti\c2000\C2000Ware_5_02_00_00\libraries\calibration\hrpwm\f28003x\lib\SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib
        SFO_v8_fpu_lib_build_c28_driverlib.obj   497    0         15     
     +--+----------------------------------------+------+---------+---------+
        Total:                                   497    0         15     
                                                                         
-    /home/can/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib/rts2800_fpu32_eabi.lib
+    C:\ti\ccs1260\ccs\tools\compiler\ti-cgt-c2000_22.6.1.LTS\lib\rts2800_fpu32_eabi.lib
        e_powf.c.obj                             908    12        0      
        fs_div28.asm.obj                         136    0         0      
        s_scalbnf.c.obj                          88     0         0      
@@ -316,7 +316,7 @@ MODULE SUMMARY
        Stack:                                   0      0         512    
        Linker Generated:                        0      61        0      
     +--+----------------------------------------+------+---------+---------+
-       Grand Total:                             8245   992       884    
+       Grand Total:                             8245   990       884    
 
 
 LINKER GENERATED COPY TABLES
@@ -478,9 +478,9 @@ address     data page           name
 0000a966     2a5 (0000a940)     MEP_SF
 0000a96f     2a5 (0000a940)     SFO_CAL
 
-0000acfe     2b3 (0000acc0)     duty_cycle_table
+0000acfc     2b3 (0000acc0)     duty_cycle_table
 
-0000ad06     2b4 (0000ad00)     ePWM
+0000ad04     2b4 (0000ad00)     ePWM
 
 
 GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
@@ -632,8 +632,8 @@ n/a   UNDEFED   __c_args__
 0     0000a830  dutyCycle3                       
 0     0000a832  dutyCycle4                       
 0     0000a8ba  dutyFine                         
-0     0000acfe  duty_cycle_table                 
-0     0000ad06  ePWM                             
+0     0000acfc  duty_cycle_table                 
+0     0000ad04  ePWM                             
 0     0000a85c  ep1                              
 0     0000a874  ep2                              
 0     0000a88c  ep3                              
@@ -948,8 +948,8 @@ page  address   name
 0     0000a965  status                           
 0     0000a966  MEP_SF                           
 0     0000a96f  SFO_CAL                          
-0     0000acfe  duty_cycle_table                 
-0     0000ad06  ePWM                             
+0     0000acfc  duty_cycle_table                 
+0     0000ad04  ePWM                             
 abs   00000200  __TI_STACK_SIZE                  
 abs   ffffffff  __TI_pprof_out_hndl              
 abs   ffffffff  __TI_prof_data_size              
