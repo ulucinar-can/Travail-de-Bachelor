@@ -23,6 +23,45 @@ float a[Na] = {A1_B1_6, A2_6};
 float b[Nb] = {B0_B2_6, A1_B1_6, B0_B2_6};
 
 /* ========================================================================= *
+ * FILTER COEFFICIENTS
+ * ========================================================================= */
+const float POS_COR_1[6] = {
+    -2.1257f,       // a0
+     1.0372e-2f,    // a1
+    -1.2079e-5f,    // a2
+     6.7876e-9f,    // a3
+    -1.7440e-12f,   // a4
+     1.6659e-16f    // a5
+};
+
+const float POS_COR_2[6] = {
+    -1.1884f,       // a0
+     7.2505e-3f,    // a1
+    -8.4558e-6f,    // a2
+     4.9023e-9f,    // a3
+    -1.2879e-12f,   // a4
+     1.2463e-16f    // a5
+};
+
+const float POS_COR_3[6] = {
+    -6.8056e-1f,    // a0
+     7.5109e-3f,    // a1
+    -1.0516e-5f,    // a2
+     7.0023e-9f,    // a3
+    -2.0725e-12f,   // a4
+     2.2283e-16f    // a5
+};
+
+const float POS_COR_4[6] = {
+    -1.7846e-1f,       // a0
+     4.2678e-3f,    // a1
+    -4.9474e-6f,   // a2
+     3.0248e-9f,   // a3
+    -8.1730e-13f,   // a4
+     7.9628e-17f    // a5
+};
+
+/* ========================================================================= *
  * CONTROL & REGULATION
  * ========================================================================= */
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc)
@@ -166,4 +205,17 @@ void SendFloatAsText(float f0, float f1, float f2, float f3)
 
     // Envoi de la trame
     SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
+}
+
+float apply_poly5(float x, const float* coeffs)
+{
+    // Calcul hyper rapide (1 cycle par multiplication/addition)
+    float result = ((((coeffs[5] * x + coeffs[4]) * x + coeffs[3]) * x + coeffs[2]) * x + coeffs[1]) * x + coeffs[0];
+
+    // Sécurité : empêche l'entrefer de devenir mathématiquement négatif
+    if (result < 0.0f) {
+        result = 0.0f;
+    }
+
+    return result;
 }

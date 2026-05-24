@@ -158,6 +158,11 @@ extern volatile char txBuffer[TX_BUF_LEN];
 extern volatile uint16_t txIndex;
 extern volatile uint16_t txLength;
 
+extern const float POS_COR_1[6];
+extern const float POS_COR_2[6];
+extern const float POS_COR_3[6];
+extern const float POS_COR_4[6];
+
 /* ========================================================================= *
  * FUNCTION PROTOTYPES
  * ========================================================================= */
@@ -168,5 +173,6 @@ void SendFloatAsText(float f0, float f1, float f2, float f3);
 float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);
+float apply_poly5(float x, const float* coeffs);
 
 #endif /* FUNCTIONHEADER_H_ */

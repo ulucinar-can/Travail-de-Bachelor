@@ -173,43 +173,6 @@ float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
 
-// --- Position correction ---
-const float POS_COR_1[6] = {
-    -2.1257f,       // a0
-     1.0372e-2f,    // a1
-    -1.2079e-5f,    // a2
-     6.7876e-9f,    // a3
-    -1.7440e-12f,   // a4
-     1.6659e-16f    // a5
-};
-
-const float POS_COR_2[6] = {
-    -1.1884f,       // a0
-     7.2505e-3f,    // a1
-    -8.4558e-6f,    // a2
-     4.9023e-9f,    // a3
-    -1.2879e-12f,   // a4
-     1.2463e-16f    // a5
-};
-
-const float POS_COR_3[6] = {
-    -6.8056e-1f,    // a0
-     7.5109e-3f,    // a1
-    -1.0516e-5f,    // a2
-     7.0023e-9f,    // a3
-    -2.0725e-12f,   // a4
-     2.2283e-16f    // a5
-};
-
-const float POS_COR_4[6] = {
-    -1.7846e-1f,       // a0
-     4.2678e-3f,    // a1
-    -4.9474e-6f,   // a2
-     3.0248e-9f,   // a3
-    -8.1730e-13f,   // a4
-     7.9628e-17f    // a5
-};
-
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -348,10 +311,10 @@ __interrupt void adcA1ISR(void)
      * 2. CONVERSIONS PHYSIQUES
      * --------------------------------------------------------------------- */
     // --- Conversion 12 bits -> Position (Ecart intégré) ---
-    Position1 = (float)(ADC_pos_1) * CONV_POS2;
-    Position2 = (float)(ADC_pos_2) * CONV_POS2;
-    Position3 = (float)(ADC_pos_3) * CONV_POS2;
-    Position4 = (float)(ADC_pos_4) * CONV_POS2;
+    Position1 = apply_poly5((float)(ADC_pos_1), POS_COR_1);
+    Position2 = apply_poly5((float)(ADC_pos_2), POS_COR_2);
+    Position3 = apply_poly5((float)(ADC_pos_3), POS_COR_3);
+    Position4 = apply_poly5((float)(ADC_pos_4), POS_COR_4);
 
 //    Position1 = ((float)(ADC_pos_1) * CONV_POS2) * GAIN_COR_1 + OFFSET_COR_1;
 //    Position2 = ((float)(ADC_pos_2) * CONV_POS2) * GAIN_COR_2 + OFFSET_COR_2;
