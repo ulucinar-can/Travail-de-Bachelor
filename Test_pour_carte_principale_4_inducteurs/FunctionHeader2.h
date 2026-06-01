@@ -74,20 +74,20 @@
 // --- State method regulation ---
 #define FP              M*G
 
-#define KW_SANS_INT      ((float)-3.639e4)
+#define KW_SANS_INT      ((float)8.0659e4)
 #define KDDOT_SANS_INT   -701.9f
-#define KD_SANS_INT      ((float)-3.639e4)
+#define KD_SANS_INT      ((float)8.0659e4)
 #define KR_SANS_INT      0.0f
 
-#define KW               ((float)-1.486e4)
-#define KDDOT            -603.4f
-#define KD               ((float)-3.900e4)
-#define KR               -35.63f
+#define KW               ((float)-9.9849e3)
+#define KDDOT            -353.94f
+#define KD               ((float)2.7209ee4)
+#define KR               -11.97f
 
-#define KW_CHANGE        ((float)-8.8418e3)
-#define KDDOT_CHANGE     -663.3f
-#define KD_CHANGE        ((float)-3.980e4)
-#define KR_CHANGE        -24.72f
+#define KW_CHANGE        ((float)-9.9849e3)
+#define KDDOT_CHANGE     -353.94f
+#define KD_CHANGE        ((float)2.7209ee4)
+#define KR_CHANGE        -11.97f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000

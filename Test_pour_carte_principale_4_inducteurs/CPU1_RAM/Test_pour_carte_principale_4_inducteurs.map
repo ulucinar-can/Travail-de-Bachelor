@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v22.6.1                     
 ******************************************************************************
->> Linked Mon Jun  1 12:30:32 2026
+>> Linked Mon Jun  1 12:52:35 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -18,10 +18,10 @@ MEMORY CONFIGURATION
   RAMLS0                00008000   00000800  00000800  00000000  RWIX
   RAMLS1                00008800   00000800  00000800  00000000  RWIX
   RAMLS2                00009000   00000800  00000800  00000000  RWIX
-  RAMLS3                00009800   00000800  00000682  0000017e  RWIX
+  RAMLS3                00009800   00000800  00000657  000001a9  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
-  RAMLS5                0000a800   00000800  000005dc  00000224  RWIX
-  RAMLS6_7              0000b000   00001000  00000954  000006ac  RWIX
+  RAMLS5                0000a800   00000800  000005ac  00000254  RWIX
+  RAMLS6_7              0000b000   00001000  000009c3  0000063d  RWIX
   RAMGS0                0000c000   00001000  00000000  00001000  RWIX
   RAMGS1                0000d000   00001000  00000000  00001000  RWIX
   RAMGS2                0000e000   00001000  00000000  00001000  RWIX
@@ -136,7 +136,7 @@ codestart
                   0000a95c    00000001     SFO_v8_fpu_lib_build_c28_driverlib_eabi.lib : SFO_v8_fpu_lib_build_c28_driverlib.obj (.data)
                   0000a95d    00000001     rts2800_fpu32_eabi.lib : errno.c.obj (.data)
 
-.const     0    0000a9f6    000003e6     
+.const     0    0000a9f6    000003b6     
                   0000a9f6    0000009a     driverlib.lib : sysctl.obj (.const:.string)
                   0000aa90    00000098                   : epwm.obj (.const:.string)
                   0000ab28    00000098                   : gpio.obj (.const:.string)
@@ -149,15 +149,11 @@ codestart
                   0000ad39    00000001     --HOLE-- [fill = 0]
                   0000ad3a    00000044     board.obj (.const:.string)
                   0000ad7e    00000012     FunctionHeader2.obj (.const:SAVITZKY)
-                  0000ad90    0000000c     FunctionHeader2.obj (.const:POS_COR_1)
-                  0000ad9c    0000000c     FunctionHeader2.obj (.const:POS_COR_2)
-                  0000ada8    0000000c     FunctionHeader2.obj (.const:POS_COR_3)
-                  0000adb4    0000000c     FunctionHeader2.obj (.const:POS_COR_4)
-                  0000adc0    00000008     Sustentation_Main.obj (.const:duty_cycle_table)
-                  0000adc8    00000008     Sustentation_Main.obj (.const:ePWM)
-                  0000add0    00000004     rts2800_fpu32_eabi.lib : e_powf.c.obj (.const:bp)
-                  0000add4    00000004                            : e_powf.c.obj (.const:dp_h)
-                  0000add8    00000004                            : e_powf.c.obj (.const:dp_l)
+                  0000ad90    00000008     Sustentation_Main.obj (.const:duty_cycle_table)
+                  0000ad98    00000008     Sustentation_Main.obj (.const:ePWM)
+                  0000ada0    00000004     rts2800_fpu32_eabi.lib : e_powf.c.obj (.const:bp)
+                  0000ada4    00000004                            : e_powf.c.obj (.const:dp_h)
+                  0000ada8    00000004                            : e_powf.c.obj (.const:dp_l)
 
 .text.1    0    00008000    00000800     
                   00008000    0000038c     rts2800_fpu32_eabi.lib : e_powf.c.obj (.text)
@@ -204,7 +200,7 @@ codestart
                   000097c7    00000037                   : gpio.obj (.text:GPIO_setPinConfig)
                   000097fe    00000002     rts2800_fpu32_eabi.lib : pre_init.c.obj (.text)
 
-.text.4    0    00009800    00000682     
+.text.4    0    00009800    00000657     
                   00009800    00000037     driverlib.lib : gpio.obj (.text:GPIO_setQualificationMode)
                   00009837    00000037                   : interrupt.obj (.text:Interrupt_enable)
                   0000986e    00000034     board.obj (.text:myCPUTIMER0_init)
@@ -214,79 +210,78 @@ codestart
                   00009936    0000002d     board.obj (.text:INTERRUPT_init)
                   00009963    0000002b     driverlib.lib : epwm.obj (.text:EPWM_isBaseValid)
                   0000998e    0000002b     rts2800_fpu32_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
-                  000099b9    0000002b     FunctionHeader2.obj (.text:apply_poly5)
-                  000099e4    0000002a     driverlib.lib : gpio.obj (.text:XBAR_setInputPin)
-                  00009a0e    00000029     rts2800_fpu32_eabi.lib : exit.c.obj (.text)
-                  00009a37    00000028     driverlib.lib : adc.obj (.text:ADC_setOffsetTrimAll)
-                  00009a5f    00000027                   : adc.obj (.text:ADC_setVREF)
-                  00009a86    00000027     rts2800_fpu32_eabi.lib : e_sqrtf.c.obj (.text)
-                  00009aad    00000025     driverlib.lib : sysctl.obj (.text:SysCtl_selectXTALSingleEnded)
-                  00009ad2    00000024                   : sysctl.obj (.text:DCC_enableSingleShotMode)
-                  00009af6    00000022     FunctionHeader2.obj (.text:savitzky_Filter)
-                  00009b18    0000001f     board.obj (.text:Board_init)
-                  00009b37    0000001e     driverlib.lib : sysctl.obj (.text:DCC_setCounter0ClkSource)
-                  00009b55    0000001e                   : sysctl.obj (.text:DCC_setCounter1ClkSource)
-                  00009b73    0000001e                   : interrupt.obj (.text:Interrupt_initVectorTable)
-                  00009b91    0000001d     rts2800_fpu32_eabi.lib : memcpy.c.obj (.text)
-                  00009bae    0000001b     driverlib.lib : gpio.obj (.text:XBAR_isBaseValid)
-                  00009bc9    00000019                   : sysctl.obj (.text:SysCtl_setPLLSysClk)
-                  00009be2    00000018                   : sci.obj (.text:SCI_disableModule)
-                  00009bfa    00000018                   : sci.obj (.text:SCI_performSoftwareReset)
-                  00009c12    00000017                   : adc.obj (.text:ADC_isBaseValid)
-                  00009c29    00000017                   : cputimer.obj (.text:CPUTimer_isBaseValid)
-                  00009c40    00000017                   : sysctl.obj (.text:SysCtl_enablePeripheral)
-                  00009c57    00000017     rts2800_fpu32_eabi.lib : boot28.asm.obj (.text)
-                  00009c6e    00000016     driverlib.lib : sysctl.obj (.text:DCC_disableDoneSignal)
-                  00009c84    00000016                   : epwm.obj (.text:EPWM_setEmulationMode)
-                  00009c9a    00000016                   : interrupt.obj (.text:Interrupt_defaultHandler)
-                  00009cb0    00000015                   : sysctl.obj (.text:DCC_clearDoneFlag)
-                  00009cc5    00000015                   : sysctl.obj (.text:DCC_clearErrorFlag)
-                  00009cda    00000015                   : sysctl.obj (.text:DCC_disableErrorSignal)
-                  00009cef    00000015                   : sysctl.obj (.text:DCC_isBaseValid)
-                  00009d04    00000015     FunctionHeader2.obj (.text:reverse)
-                  00009d19    00000014     driverlib.lib : sysctl.obj (.text:DCC_disableModule)
-                  00009d2d    00000014                   : sysctl.obj (.text:DCC_enableModule)
-                  00009d41    00000014                   : gpio.obj (.text:GPIO_isPinValid)
-                  00009d55    00000014     Sustentation_Main.obj (.text:INT_Push_Button_Start_XINT_ISR)
-                  00009d69    00000013     driverlib.lib : cputimer.obj (.text:CPUTimer_setEmulationMode)
-                  00009d7c    00000013                   : sci.obj (.text:SCI_enableModule)
-                  00009d8f    00000013                   : sci.obj (.text:SCI_isBaseValid)
-                  00009da2    00000011     board.obj (.text:SYNC_init)
-                  00009db3    00000011     rts2800_fpu32_eabi.lib : s_copysignf.c.obj (.text)
-                  00009dc4    00000010     device.obj (.text:Device_initGPIO)
-                  00009dd4    00000010     board.obj (.text:Push_Button_Start_XINT_init)
-                  00009de4    0000000d     board.obj (.text:ASYSCTL_init)
-                  00009df1    0000000d     driverlib.lib : interrupt.obj (.text:Interrupt_disableGlobal)
-                  00009dfe    0000000d                   : interrupt.obj (.text:Interrupt_enableGlobal)
-                  00009e0b    0000000d     rts2800_fpu32_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset)
-                  00009e18    0000000c                            : args_main.c.obj (.text)
-                  00009e24    0000000b     driverlib.lib : sysctl.obj (.text:SysCtl_isMCDClockFailureDetected)
-                  00009e2f    0000000a                   : interrupt.obj (.text:Interrupt_illegalOperationHandler)
-                  00009e39    0000000a                   : interrupt.obj (.text:Interrupt_nmiHandler)
-                  00009e43    00000009     board.obj (.text:myINPUTXBARINPUT2_init)
-                  00009e4c    00000009     rts2800_fpu32_eabi.lib : _lock.c.obj (.text)
-                  00009e55    00000008                            : copy_decompress_none.c.obj (.text:decompress:none)
-                  00009e5d    00000008     f28003x_codestartbranch.obj (.text)
-                  00009e65    00000007     driverlib.lib : sysctl.obj (.text:SysCtl_resetMCD)
-                  00009e6c    00000006     board.obj (.text:myINPUTXBARINPUT0_init)
-                  00009e72    00000006     board.obj (.text:myINPUTXBARINPUT1_init)
-                  00009e78    00000003     device.obj (.text:__error__)
-                  00009e7b    00000003     Sustentation_Main.obj (.text:error)
-                  00009e7e    00000003     Sustentation_Main.obj (.text:main)
-                  00009e81    00000001     rts2800_fpu32_eabi.lib : startup.c.obj (.text)
+                  000099b9    0000002a     driverlib.lib : gpio.obj (.text:XBAR_setInputPin)
+                  000099e3    00000029     rts2800_fpu32_eabi.lib : exit.c.obj (.text)
+                  00009a0c    00000028     driverlib.lib : adc.obj (.text:ADC_setOffsetTrimAll)
+                  00009a34    00000027                   : adc.obj (.text:ADC_setVREF)
+                  00009a5b    00000001     rts2800_fpu32_eabi.lib : startup.c.obj (.text)
+                  00009a5c    00000027                            : e_sqrtf.c.obj (.text)
+                  00009a83    00000025     driverlib.lib : sysctl.obj (.text:SysCtl_selectXTALSingleEnded)
+                  00009aa8    00000024                   : sysctl.obj (.text:DCC_enableSingleShotMode)
+                  00009acc    00000022     FunctionHeader2.obj (.text:savitzky_Filter)
+                  00009aee    0000001f     board.obj (.text:Board_init)
+                  00009b0d    0000001e     driverlib.lib : sysctl.obj (.text:DCC_setCounter0ClkSource)
+                  00009b2b    0000001e                   : sysctl.obj (.text:DCC_setCounter1ClkSource)
+                  00009b49    0000001e                   : interrupt.obj (.text:Interrupt_initVectorTable)
+                  00009b67    0000001d     rts2800_fpu32_eabi.lib : memcpy.c.obj (.text)
+                  00009b84    0000001b     driverlib.lib : gpio.obj (.text:XBAR_isBaseValid)
+                  00009b9f    00000019                   : sysctl.obj (.text:SysCtl_setPLLSysClk)
+                  00009bb8    00000018                   : sci.obj (.text:SCI_disableModule)
+                  00009bd0    00000018                   : sci.obj (.text:SCI_performSoftwareReset)
+                  00009be8    00000017                   : adc.obj (.text:ADC_isBaseValid)
+                  00009bff    00000017                   : cputimer.obj (.text:CPUTimer_isBaseValid)
+                  00009c16    00000017                   : sysctl.obj (.text:SysCtl_enablePeripheral)
+                  00009c2d    00000017     rts2800_fpu32_eabi.lib : boot28.asm.obj (.text)
+                  00009c44    00000016     driverlib.lib : sysctl.obj (.text:DCC_disableDoneSignal)
+                  00009c5a    00000016                   : epwm.obj (.text:EPWM_setEmulationMode)
+                  00009c70    00000016                   : interrupt.obj (.text:Interrupt_defaultHandler)
+                  00009c86    00000015                   : sysctl.obj (.text:DCC_clearDoneFlag)
+                  00009c9b    00000015                   : sysctl.obj (.text:DCC_clearErrorFlag)
+                  00009cb0    00000015                   : sysctl.obj (.text:DCC_disableErrorSignal)
+                  00009cc5    00000015                   : sysctl.obj (.text:DCC_isBaseValid)
+                  00009cda    00000015     FunctionHeader2.obj (.text:reverse)
+                  00009cef    00000014     driverlib.lib : sysctl.obj (.text:DCC_disableModule)
+                  00009d03    00000014                   : sysctl.obj (.text:DCC_enableModule)
+                  00009d17    00000014                   : gpio.obj (.text:GPIO_isPinValid)
+                  00009d2b    00000014     Sustentation_Main.obj (.text:INT_Push_Button_Start_XINT_ISR)
+                  00009d3f    00000013     driverlib.lib : cputimer.obj (.text:CPUTimer_setEmulationMode)
+                  00009d52    00000013                   : sci.obj (.text:SCI_enableModule)
+                  00009d65    00000013                   : sci.obj (.text:SCI_isBaseValid)
+                  00009d78    00000011     board.obj (.text:SYNC_init)
+                  00009d89    00000011     rts2800_fpu32_eabi.lib : s_copysignf.c.obj (.text)
+                  00009d9a    00000010     device.obj (.text:Device_initGPIO)
+                  00009daa    00000010     board.obj (.text:Push_Button_Start_XINT_init)
+                  00009dba    0000000d     board.obj (.text:ASYSCTL_init)
+                  00009dc7    0000000d     driverlib.lib : interrupt.obj (.text:Interrupt_disableGlobal)
+                  00009dd4    0000000d                   : interrupt.obj (.text:Interrupt_enableGlobal)
+                  00009de1    0000000d     rts2800_fpu32_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset)
+                  00009dee    0000000c                            : args_main.c.obj (.text)
+                  00009dfa    0000000b     driverlib.lib : sysctl.obj (.text:SysCtl_isMCDClockFailureDetected)
+                  00009e05    0000000a                   : interrupt.obj (.text:Interrupt_illegalOperationHandler)
+                  00009e0f    0000000a                   : interrupt.obj (.text:Interrupt_nmiHandler)
+                  00009e19    00000009     board.obj (.text:myINPUTXBARINPUT2_init)
+                  00009e22    00000009     rts2800_fpu32_eabi.lib : _lock.c.obj (.text)
+                  00009e2b    00000008                            : copy_decompress_none.c.obj (.text:decompress:none)
+                  00009e33    00000008     f28003x_codestartbranch.obj (.text)
+                  00009e3b    00000007     driverlib.lib : sysctl.obj (.text:SysCtl_resetMCD)
+                  00009e42    00000006     board.obj (.text:myINPUTXBARINPUT0_init)
+                  00009e48    00000006     board.obj (.text:myINPUTXBARINPUT1_init)
+                  00009e4e    00000003     device.obj (.text:__error__)
+                  00009e51    00000003     Sustentation_Main.obj (.text:error)
+                  00009e54    00000003     Sustentation_Main.obj (.text:main)
 
-.text.5    0    0000b000    00000954     
-                  0000b000    00000954     Sustentation_Main.obj (.text:adcA1ISR)
+.text.5    0    0000b000    000009c3     
+                  0000b000    000009c3     Sustentation_Main.obj (.text:adcA1ISR)
 
 MODULE SUMMARY
 
        Module                                   code    ro data   rw data
        ------                                   ----    -------   -------
     .\
-       Sustentation_Main.obj                    2868    85        466    
-       FunctionHeader2.obj                      512     66        10     
+       Sustentation_Main.obj                    2979    85        466    
+       FunctionHeader2.obj                      469     18        10     
     +--+----------------------------------------+-------+---------+---------+
-       Total:                                   3380    151       476    
+       Total:                                   3448    103       476    
                                                                          
     .\device\
        device.obj                               305     0         0      
@@ -339,7 +334,7 @@ MODULE SUMMARY
        Stack:                                   0       0         512    
        Linker Generated:                        0       76        0      
     +--+----------------------------------------+-------+---------+---------+
-       Grand Total:                             10204   1071      1014   
+       Grand Total:                             10272   1023      1014   
 
 
 LINKER GENERATED COPY TABLES
@@ -520,13 +515,8 @@ address     data page           name
 
 0000ad7e     2b5 (0000ad40)     SAVITZKY
 
-0000ad90     2b6 (0000ad80)     POS_COR_1
-0000ad9c     2b6 (0000ad80)     POS_COR_2
-0000ada8     2b6 (0000ad80)     POS_COR_3
-0000adb4     2b6 (0000ad80)     POS_COR_4
-
-0000adc0     2b7 (0000adc0)     duty_cycle_table
-0000adc8     2b7 (0000adc0)     ePWM
+0000ad90     2b6 (0000ad80)     duty_cycle_table
+0000ad98     2b6 (0000ad80)     ePWM
 
 
 GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
@@ -541,14 +531,14 @@ page  address   name
 0     0000a9e0  ADC_pos_2                        
 0     0000a9e1  ADC_pos_3                        
 0     0000a9e2  ADC_pos_4                        
-0     00009a37  ADC_setOffsetTrimAll             
-0     00009a5f  ADC_setVREF                      
-0     00009de4  ASYSCTL_init                     
-0     00009b18  Board_init                       
+0     00009a0c  ADC_setOffsetTrimAll             
+0     00009a34  ADC_setVREF                      
+0     00009dba  ASYSCTL_init                     
+0     00009aee  Board_init                       
 0     0000a806  ButtonS2                         
-0     00009a0e  C$$EXIT                          
+0     000099e3  C$$EXIT                          
 0     0000986e  CPUTIMER_init                    
-0     00009d69  CPUTimer_setEmulationMode        
+0     00009d3f  CPUTimer_setEmulationMode        
 0     00008fc8  ConvertIntToStr                  
 0     0000a8c8  Cur1_filt                        
 0     0000a8ca  Cur2_filt                        
@@ -560,9 +550,9 @@ page  address   name
 0     0000a82a  Current4                         
 0     00008d53  Device_enableAllPeripherals      
 0     0000947d  Device_init                      
-0     00009dc4  Device_initGPIO                  
+0     00009d9a  Device_initGPIO                  
 0     0000838c  EPWM_init                        
-0     00009c84  EPWM_setEmulationMode            
+0     00009c5a  EPWM_setEmulationMode            
 0     0000a807  Ext_Int_Flag                     
 0     0000937b  GPIO_init                        
 0     000091e8  GPIO_setAnalogMode               
@@ -579,15 +569,15 @@ page  address   name
 0     0000a92c  IN3                              
 0     0000a932  IN4                              
 0     00009936  INTERRUPT_init                   
-0     00009d55  INT_Push_Button_Start_XINT_ISR   
+0     00009d2b  INT_Push_Button_Start_XINT_ISR   
 0     00009081  INT_mySCI0_RX_ISR                
 0     00009252  INT_mySCI0_TX_ISR                
-0     00009c9a  Interrupt_defaultHandler         
+0     00009c70  Interrupt_defaultHandler         
 0     00009837  Interrupt_enable                 
-0     00009e2f  Interrupt_illegalOperationHandler
+0     00009e05  Interrupt_illegalOperationHandler
 0     000096a8  Interrupt_initModule             
-0     00009b73  Interrupt_initVectorTable        
-0     00009e39  Interrupt_nmiHandler             
+0     00009b49  Interrupt_initVectorTable        
+0     00009e0f  Interrupt_nmiHandler             
 0     0000a848  Kd                               
 0     0000a84a  Kddot                            
 0     0000a84c  Kr                               
@@ -606,10 +596,6 @@ page  address   name
 0     0000a812  Offset_count                     
 0     0000a800  Offset_stop                      
 0     00009720  PI_current_regulator             
-0     0000ad90  POS_COR_1                        
-0     0000ad9c  POS_COR_2                        
-0     0000ada8  POS_COR_3                        
-0     0000adb4  POS_COR_4                        
 0     000089f1  PinMux_init                      
 0     0000a8c0  Pos1_filt                        
 0     0000a8c2  Pos2_filt                        
@@ -629,7 +615,7 @@ page  address   name
 0     0000a880  Position_c2_dec                  
 0     0000a896  Position_c3_dec                  
 0     0000a8ae  Position_c4_dec                  
-0     00009dd4  Push_Button_Start_XINT_init      
+0     00009daa  Push_Button_Start_XINT_init      
 0     0000ad7e  SAVITZKY                         
 0     00009557  SCI_clearInterruptStatus         
 0     0000959c  SCI_disableInterrupt             
@@ -638,7 +624,7 @@ page  address   name
 0     0000966a  SCI_setConfig                    
 0     00008800  SFO                              
 0     0000a9f1  SFO_CAL                          
-0     00009da2  SYNC_init                        
+0     00009d78  SYNC_init                        
 0     00008e26  SendFloatAsText                  
 0     00000128  SysCtl_delay                     
 0     000092b9  SysCtl_getClock                  
@@ -646,10 +632,10 @@ page  address   name
 0     00008b74  SysCtl_isPLLValid                
 0     000094c8  SysCtl_selectOscSource           
 0     00009511  SysCtl_selectXTAL                
-0     00009aad  SysCtl_selectXTALSingleEnded     
+0     00009a83  SysCtl_selectXTALSingleEnded     
 0     000086c3  SysCtl_setClock                  
 0     0000a80a  UartCounter                      
-0     00009dd4  XINT_init                        
+0     00009daa  XINT_init                        
 0     00000170  __TI_CINIT_Base                  
 0     00000178  __TI_CINIT_Limit                 
 0     00000178  __TI_CINIT_Warm                  
@@ -660,34 +646,33 @@ abs   00000200  __TI_STACK_SIZE
 0     0000998e  __TI_auto_init_nobinit_nopinit   
 0     0000a942  __TI_cleanup_ptr                 
 0     00009906  __TI_decompress_lzss             
-0     00009e55  __TI_decompress_none             
+0     00009e2b  __TI_decompress_none             
 0     0000a944  __TI_dtors_ptr                   
 0     0000a940  __TI_enable_exit_profile_output  
 abs   ffffffff  __TI_pprof_out_hndl              
 abs   ffffffff  __TI_prof_data_size              
 abs   ffffffff  __TI_prof_data_start             
-0     00009e0b  __TI_zero_init_nomemset          
+0     00009de1  __TI_zero_init_nomemset          
 0     00008ebb  __c28xabi_divf                   
 n/a   UNDEFED   __c_args__                       
-0     00009e78  __error__                        
+0     00009e4e  __error__                        
 0     00000400  __stack                          
-0     00009e18  _args_main                       
-0     00009c57  _c_int00                         
+0     00009dee  _args_main                       
+0     00009c2d  _c_int00                         
 0     0000a93e  _lock                            
-0     00009e54  _nop                             
-0     00009e50  _register_lock                   
-0     00009e4c  _register_unlock                 
-0     00009e81  _system_post_cinit               
+0     00009e2a  _nop                             
+0     00009e26  _register_lock                   
+0     00009e22  _register_unlock                 
+0     00009a5b  _system_post_cinit               
 0     000097fe  _system_pre_init                 
 0     0000a95a  _unlock                          
 0     0000a956  a                                
-0     00009a0e  abort                            
+0     000099e3  abort                            
 0     0000b000  adcA1ISR                         
-0     000099b9  apply_poly5                      
 0     0000a938  b                                
 0     00000000  code_start                       
 0     0000a8be  compCount                        
-0     00009db3  copysignf                        
+0     00009d89  copysignf                        
 0     0000a8bc  count                            
 0     0000a809  count_ext_int                    
 0     0000a801  dt_mean                          
@@ -696,16 +681,16 @@ n/a   UNDEFED   __c_args__
 0     0000a830  dutyCycle3                       
 0     0000a832  dutyCycle4                       
 0     0000a8ba  dutyFine                         
-0     0000adc0  duty_cycle_table                 
+0     0000ad90  duty_cycle_table                 
 0     0000a918  duty_table                       
-0     0000adc8  ePWM                             
+0     0000ad98  ePWM                             
 0     0000a85c  ep1                              
 0     0000a874  ep2                              
 0     0000a88c  ep3                              
 0     0000a8a4  ep4                              
 0     0000a95d  errno                            
-0     00009e7b  error                            
-0     00009a10  exit                             
+0     00009e51  error                            
+0     000099e5  exit                             
 0     0000a858  fc1                              
 0     0000a864  fc1_prim                         
 0     0000a8b2  fc1f                             
@@ -735,18 +720,18 @@ n/a   UNDEFED   __c_args__
 0     0000a886  integral_i3                      
 0     0000a89e  integral_i4                      
 0     000093d3  ldexpf                           
-0     00009e7e  main                             
+0     00009e54  main                             
 0     0000a83c  mean1                            
 0     0000a83e  mean2                            
 0     0000a840  mean3                            
 0     0000a842  mean4                            
-0     00009b91  memcpy                           
+0     00009b67  memcpy                           
 0     00008f43  myADC0_init                      
 0     00009000  myADC1_init                      
 0     0000986e  myCPUTIMER0_init                 
-0     00009e6c  myINPUTXBARINPUT0_init           
-0     00009e72  myINPUTXBARINPUT1_init           
-0     00009e43  myINPUTXBARINPUT2_init           
+0     00009e42  myINPUTXBARINPUT0_init           
+0     00009e48  myINPUTXBARINPUT1_init           
+0     00009e19  myINPUTXBARINPUT2_init           
 0     000090ff  mySCI0_init                      
 0     0000a804  phase1                           
 0     0000a8d0  pos1Buff                         
@@ -754,12 +739,12 @@ n/a   UNDEFED   __c_args__
 0     0000a8f4  pos3Buff                         
 0     0000a906  pos4Buff                         
 0     00008000  powf                             
-0     00009d04  reverse                          
+0     00009cda  reverse                          
 0     0000a95e  rxBuffer                         
 0     0000a80d  rxIndex                          
-0     00009af6  savitzky_Filter                  
+0     00009acc  savitzky_Filter                  
 0     000093d3  scalbnf                          
-0     00009a86  sqrtf                            
+0     00009a5c  sqrtf                            
 0     0000a80f  state                            
 0     0000a808  state_PIN                        
 0     0000a9e7  status                           
@@ -850,45 +835,44 @@ page  address   name
 0     00009906  __TI_decompress_lzss             
 0     00009936  INTERRUPT_init                   
 0     0000998e  __TI_auto_init_nobinit_nopinit   
-0     000099b9  apply_poly5                      
-0     00009a0e  C$$EXIT                          
-0     00009a0e  abort                            
-0     00009a10  exit                             
-0     00009a37  ADC_setOffsetTrimAll             
-0     00009a5f  ADC_setVREF                      
-0     00009a86  sqrtf                            
-0     00009aad  SysCtl_selectXTALSingleEnded     
-0     00009af6  savitzky_Filter                  
-0     00009b18  Board_init                       
-0     00009b73  Interrupt_initVectorTable        
-0     00009b91  memcpy                           
-0     00009c57  _c_int00                         
-0     00009c84  EPWM_setEmulationMode            
-0     00009c9a  Interrupt_defaultHandler         
-0     00009d04  reverse                          
-0     00009d55  INT_Push_Button_Start_XINT_ISR   
-0     00009d69  CPUTimer_setEmulationMode        
-0     00009da2  SYNC_init                        
-0     00009db3  copysignf                        
-0     00009dc4  Device_initGPIO                  
-0     00009dd4  Push_Button_Start_XINT_init      
-0     00009dd4  XINT_init                        
-0     00009de4  ASYSCTL_init                     
-0     00009e0b  __TI_zero_init_nomemset          
-0     00009e18  _args_main                       
-0     00009e2f  Interrupt_illegalOperationHandler
-0     00009e39  Interrupt_nmiHandler             
-0     00009e43  myINPUTXBARINPUT2_init           
-0     00009e4c  _register_unlock                 
-0     00009e50  _register_lock                   
-0     00009e54  _nop                             
-0     00009e55  __TI_decompress_none             
-0     00009e6c  myINPUTXBARINPUT0_init           
-0     00009e72  myINPUTXBARINPUT1_init           
-0     00009e78  __error__                        
-0     00009e7b  error                            
-0     00009e7e  main                             
-0     00009e81  _system_post_cinit               
+0     000099e3  C$$EXIT                          
+0     000099e3  abort                            
+0     000099e5  exit                             
+0     00009a0c  ADC_setOffsetTrimAll             
+0     00009a34  ADC_setVREF                      
+0     00009a5b  _system_post_cinit               
+0     00009a5c  sqrtf                            
+0     00009a83  SysCtl_selectXTALSingleEnded     
+0     00009acc  savitzky_Filter                  
+0     00009aee  Board_init                       
+0     00009b49  Interrupt_initVectorTable        
+0     00009b67  memcpy                           
+0     00009c2d  _c_int00                         
+0     00009c5a  EPWM_setEmulationMode            
+0     00009c70  Interrupt_defaultHandler         
+0     00009cda  reverse                          
+0     00009d2b  INT_Push_Button_Start_XINT_ISR   
+0     00009d3f  CPUTimer_setEmulationMode        
+0     00009d78  SYNC_init                        
+0     00009d89  copysignf                        
+0     00009d9a  Device_initGPIO                  
+0     00009daa  Push_Button_Start_XINT_init      
+0     00009daa  XINT_init                        
+0     00009dba  ASYSCTL_init                     
+0     00009de1  __TI_zero_init_nomemset          
+0     00009dee  _args_main                       
+0     00009e05  Interrupt_illegalOperationHandler
+0     00009e0f  Interrupt_nmiHandler             
+0     00009e19  myINPUTXBARINPUT2_init           
+0     00009e22  _register_unlock                 
+0     00009e26  _register_lock                   
+0     00009e2a  _nop                             
+0     00009e2b  __TI_decompress_none             
+0     00009e42  myINPUTXBARINPUT0_init           
+0     00009e48  myINPUTXBARINPUT1_init           
+0     00009e4e  __error__                        
+0     00009e51  error                            
+0     00009e54  main                             
 0     0000a800  Offset_stop                      
 0     0000a801  dt_mean                          
 0     0000a802  takeOff                          
@@ -1037,12 +1021,8 @@ page  address   name
 0     0000a9e8  MEP_SF                           
 0     0000a9f1  SFO_CAL                          
 0     0000ad7e  SAVITZKY                         
-0     0000ad90  POS_COR_1                        
-0     0000ad9c  POS_COR_2                        
-0     0000ada8  POS_COR_3                        
-0     0000adb4  POS_COR_4                        
-0     0000adc0  duty_cycle_table                 
-0     0000adc8  ePWM                             
+0     0000ad90  duty_cycle_table                 
+0     0000ad98  ePWM                             
 0     0000b000  adcA1ISR                         
 abs   00000200  __TI_STACK_SIZE                  
 abs   ffffffff  __TI_pprof_out_hndl              
@@ -1050,4 +1030,4 @@ abs   ffffffff  __TI_prof_data_size
 abs   ffffffff  __TI_prof_data_start             
 n/a   UNDEFED   __c_args__                       
 
-[255 symbols]
+[250 symbols]
