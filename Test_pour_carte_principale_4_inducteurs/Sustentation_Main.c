@@ -279,6 +279,7 @@ __interrupt void adcA1ISR(void)
     ADC_cur_2 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER1);
     ADC_cur_3 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER2);
     ADC_cur_4 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER3);
+.
 
     // --- Calibration de l'offset initial (0A = 1.5V = ~1861.36) ---
     if(Offset_count <= 999 && !Offset_stop)
@@ -311,6 +312,12 @@ __interrupt void adcA1ISR(void)
      * 2. CONVERSIONS PHYSIQUES
      * --------------------------------------------------------------------- */
     // --- Conversion 12 bits -> Position (Ecart intégré) ---
+//    Position1 = ((float)(ADC_pos_1) * CONV_POS2);
+//    Position2 = ((float)(ADC_pos_2) * CONV_POS2);
+//    Position3 = ((float)(ADC_pos_3) * CONV_POS2);
+//    Position4 = ((float)(ADC_pos_4) * CONV_POS2);
+
+
     Position1 = apply_poly5((float)(ADC_pos_1), POS_COR_1);
     Position2 = apply_poly5((float)(ADC_pos_2), POS_COR_2);
     Position3 = apply_poly5((float)(ADC_pos_3), POS_COR_3);
