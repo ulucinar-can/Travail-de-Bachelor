@@ -63,14 +63,6 @@
 #define SKIP_BACK                   0
 #define SKIP_FRONT                  0
 
-#define POS_COR_1                  {}
-
-#define GAIN_COR_2                  1.08f
-
-#define GAIN_COR_3                  1.062f
-
-#define GAIN_COR_4                  1.078f
-
 /* ========================================================================= *
  * GLOBAL VARIABLES
  * ========================================================================= */

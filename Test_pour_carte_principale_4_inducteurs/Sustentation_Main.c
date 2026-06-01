@@ -63,6 +63,18 @@
 #define SKIP_BACK                   0
 #define SKIP_FRONT                  0
 
+#define GAIN_COR_1                  8.6659e-7f
+#define OFFSET_COR_1                2.0069e-4f
+
+#define GAIN_COR_2                  8.5282e-7f
+#define OFFSET_COR_2                2.5155e-4f
+
+#define GAIN_COR_3                  8.1712e-7f
+#define OFFSET_COR_3                4.2764e-4f
+
+#define GAIN_COR_4                  8.3439e-7f
+#define OFFSET_COR_4                3.9979e-4f
+
 /* ========================================================================= *
  * GLOBAL VARIABLES
  * ========================================================================= */
@@ -279,7 +291,7 @@ __interrupt void adcA1ISR(void)
     ADC_cur_2 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER1);
     ADC_cur_3 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER2);
     ADC_cur_4 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER3);
-.
+
 
     // --- Calibration de l'offset initial (0A = 1.5V = ~1861.36) ---
     if(Offset_count <= 999 && !Offset_stop)
@@ -318,15 +330,15 @@ __interrupt void adcA1ISR(void)
 //    Position4 = ((float)(ADC_pos_4) * CONV_POS2);
 
 
-    Position1 = apply_poly5((float)(ADC_pos_1), POS_COR_1);
-    Position2 = apply_poly5((float)(ADC_pos_2), POS_COR_2);
-    Position3 = apply_poly5((float)(ADC_pos_3), POS_COR_3);
-    Position4 = apply_poly5((float)(ADC_pos_4), POS_COR_4);
+//    Position1 = apply_poly5((float)(ADC_pos_1), POS_COR_1);
+//    Position2 = apply_poly5((float)(ADC_pos_2), POS_COR_2);
+//    Position3 = apply_poly5((float)(ADC_pos_3), POS_COR_3);
+//    Position4 = apply_poly5((float)(ADC_pos_4), POS_COR_4);
 
-//    Position1 = ((float)(ADC_pos_1) * CONV_POS2) * GAIN_COR_1 + OFFSET_COR_1;
-//    Position2 = ((float)(ADC_pos_2) * CONV_POS2) * GAIN_COR_2 + OFFSET_COR_2;
-//    Position3 = ((float)(ADC_pos_3) * CONV_POS2) * GAIN_COR_3 + OFFSET_COR_3;
-//    Position4 = ((float)(ADC_pos_4) * CONV_POS2) * GAIN_COR_4 + OFFSET_COR_4;
+    Position1 = ((float)(ADC_pos_1)) * GAIN_COR_1 + OFFSET_COR_1;
+    Position2 = ((float)(ADC_pos_2)) * GAIN_COR_2 + OFFSET_COR_2;
+    Position3 = ((float)(ADC_pos_3)) * GAIN_COR_3 + OFFSET_COR_3;
+    Position4 = ((float)(ADC_pos_4)) * GAIN_COR_4 + OFFSET_COR_4;
 
     // --- Position filtré pour l'envoie ---
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
