@@ -324,10 +324,10 @@ __interrupt void adcA1ISR(void)
      * 2. CONVERSIONS PHYSIQUES
      * --------------------------------------------------------------------- */
     // --- Conversion 12 bits -> Position (Ecart intégré) ---
-//    Position1 = ((float)(ADC_pos_1) * CONV_POS2);
-//    Position2 = ((float)(ADC_pos_2) * CONV_POS2);
-//    Position3 = ((float)(ADC_pos_3) * CONV_POS2);
-//    Position4 = ((float)(ADC_pos_4) * CONV_POS2);
+    Position1 = ((float)(ADC_pos_1) * CONV_POS2);
+    Position2 = ((float)(ADC_pos_2) * CONV_POS2);
+    Position3 = ((float)(ADC_pos_3) * CONV_POS2);
+    Position4 = ((float)(ADC_pos_4) * CONV_POS2);
 
 
 //    Position1 = apply_poly5((float)(ADC_pos_1), POS_COR_1);
@@ -335,10 +335,10 @@ __interrupt void adcA1ISR(void)
 //    Position3 = apply_poly5((float)(ADC_pos_3), POS_COR_3);
 //    Position4 = apply_poly5((float)(ADC_pos_4), POS_COR_4);
 
-    Position1 = ((float)(ADC_pos_1)) * GAIN_COR_1 + OFFSET_COR_1;
-    Position2 = ((float)(ADC_pos_2)) * GAIN_COR_2 + OFFSET_COR_2;
-    Position3 = ((float)(ADC_pos_3)) * GAIN_COR_3 + OFFSET_COR_3;
-    Position4 = ((float)(ADC_pos_4)) * GAIN_COR_4 + OFFSET_COR_4;
+//    Position1 = ((float)(ADC_pos_1)) * GAIN_COR_1 + OFFSET_COR_1;
+//    Position2 = ((float)(ADC_pos_2)) * GAIN_COR_2 + OFFSET_COR_2;
+//    Position3 = ((float)(ADC_pos_3)) * GAIN_COR_3 + OFFSET_COR_3;
+//    Position4 = ((float)(ADC_pos_4)) * GAIN_COR_4 + OFFSET_COR_4;
 
     // --- Position filtré pour l'envoie ---
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);

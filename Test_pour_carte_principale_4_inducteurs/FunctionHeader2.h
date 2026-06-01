@@ -81,12 +81,12 @@
 
 #define KW               ((float)-9.9849e3)
 #define KDDOT            -353.94f
-#define KD               ((float)2.7209ee4)
+#define KD               ((float)2.7209e4)
 #define KR               -11.97f
 
 #define KW_CHANGE        ((float)-9.9849e3)
 #define KDDOT_CHANGE     -353.94f
-#define KD_CHANGE        ((float)2.7209ee4)
+#define KD_CHANGE        ((float)2.7209e4)
 #define KR_CHANGE        -11.97f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
