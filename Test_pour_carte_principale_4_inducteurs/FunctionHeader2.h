@@ -61,7 +61,7 @@
 #define I_SP            3.0f
 #define I_SP105         3.15f
 #define I_SP095         2.85f
-#define KP_I            1.88f // Nouvelle valeur avec Kui : 90.964f
+#define KP_I            0.5f // Avec Kui à -45° : Kpi = 90.964f et sans kui : Kpi = 1.88
 #define TI_I            ((float)4.636619772367582e-4)
 #define GI_I            (1.0/TI_I)
 #define UMAX            VDC_BUS
@@ -74,20 +74,20 @@
 // --- State method regulation ---
 #define FP              M*G
 
-#define KW_SANS_INT      ((float)8.0659e4)
+#define KW_SANS_INT      ((float)-3.6386e4)
 #define KDDOT_SANS_INT   -701.9f
-#define KD_SANS_INT      ((float)8.0659e4)
+#define KD_SANS_INT      ((float)-3.6386e4)
 #define KR_SANS_INT      0.0f
 
-#define KW               ((float)-9.9849e3)
-#define KDDOT            -353.94f
-#define KD               ((float)2.7209e4)
-#define KR               -11.97f
+#define KW               ((float)-1.4862e4)
+#define KDDOT            -603.41f
+#define KD               ((float)-3.8998e4)
+#define KR               -35.63f
 
-#define KW_CHANGE        ((float)-9.9849e3)
-#define KDDOT_CHANGE     -353.94f
-#define KD_CHANGE        ((float)2.7209e4)
-#define KR_CHANGE        -11.97f
+#define KW_CHANGE        ((float)-8.8418e3)
+#define KDDOT_CHANGE     -663.35f
+#define KD_CHANGE        ((float)-3.9798e4)
+#define KR_CHANGE        -24.72f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000
