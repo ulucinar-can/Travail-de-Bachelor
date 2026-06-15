@@ -178,6 +178,13 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
           <div class="valeur" id="valInd3">0.000</div>
           <div class="valeur" id="valInd4">0.000</div>
         </div>
+		<div class="bloc-colonne">
+		<div class="entete">Courant [A]</div>
+		  <div class="valeur" id="curInd1">0.000</div>
+		  <div class="valeur" id="curInd2">0.000</div>
+		  <div class="valeur" id="curInd3">0.000</div>
+		  <div class="valeur" id="curInd4">0.000</div>
+		</div>
       </div>
 
       <br>
@@ -293,48 +300,83 @@ window.onload = function() {
     }
 
     // function to handle the response from the ESP
-    function response(){
-      var message;
-      var xmlResponse;
-      var xmldoc;
-     
-      // get the xml stream
-      xmlResponse=xmlHttp.responseXML;
-  
-      // Mise à jour des 4 inducteurs
-      // Inducteur 1
-      xmldoc = xmlResponse.getElementsByTagName("valInd1");
-      if (xmldoc.length > 0) {
-        message = xmldoc[0].firstChild.nodeValue;
-        // Remplace la virgule par un point pour parseFloat
-        message = message.replace(',', '.');
-        document.getElementById("valInd1").innerHTML = parseFloat(message).toFixed(3);
-      }
-      
-      // Inducteur 2
-      xmldoc = xmlResponse.getElementsByTagName("valInd2");
-      if (xmldoc.length > 0) {
-        message = xmldoc[0].firstChild.nodeValue;
-        message = message.replace(',', '.');
-        document.getElementById("valInd2").innerHTML = parseFloat(message).toFixed(3);
-      }
-  
-      // Inducteur 3
-      xmldoc = xmlResponse.getElementsByTagName("valInd3");
-      if (xmldoc.length > 0) {
-        message = xmldoc[0].firstChild.nodeValue;
-        message = message.replace(',', '.');
-        document.getElementById("valInd3").innerHTML = parseFloat(message).toFixed(3);
-      }
-      
-      // Inducteur 4
-      xmldoc = xmlResponse.getElementsByTagName("valInd4");
-      if (xmldoc.length > 0) {
-        message = xmldoc[0].firstChild.nodeValue;
-        message = message.replace(',', '.');
-        document.getElementById("valInd4").innerHTML = parseFloat(message).toFixed(3);
-      }
-     }
+    function response()
+	{
+		  var message;
+		  var xmlResponse;
+		  var xmldoc;
+		 
+		  // get the xml stream
+		  xmlResponse=xmlHttp.responseXML;
+	  
+		  // Mise à jour des 4 inducteurs
+		  // Inducteur 1
+		  xmldoc = xmlResponse.getElementsByTagName("valInd1");
+		  if (xmldoc.length > 0) {
+			message = xmldoc[0].firstChild.nodeValue;
+			// Remplace la virgule par un point pour parseFloat
+			message = message.replace(',', '.');
+			document.getElementById("valInd1").innerHTML = parseFloat(message).toFixed(3);
+		  }
+		  
+		  // Inducteur 2
+		  xmldoc = xmlResponse.getElementsByTagName("valInd2");
+		  if (xmldoc.length > 0) {
+			message = xmldoc[0].firstChild.nodeValue;
+			message = message.replace(',', '.');
+			document.getElementById("valInd2").innerHTML = parseFloat(message).toFixed(3);
+		  }
+	  
+		  // Inducteur 3
+		  xmldoc = xmlResponse.getElementsByTagName("valInd3");
+		  if (xmldoc.length > 0) {
+			message = xmldoc[0].firstChild.nodeValue;
+			message = message.replace(',', '.');
+			document.getElementById("valInd3").innerHTML = parseFloat(message).toFixed(3);
+		  }
+		  
+		// Inducteur 4
+		xmldoc = xmlResponse.getElementsByTagName("valInd4");
+		if (xmldoc.length > 0)
+		{
+			message = xmldoc[0].firstChild.nodeValue;
+			message = message.replace(',', '.');
+			document.getElementById("valInd4").innerHTML = parseFloat(message).toFixed(3);
+		}
+	  
+		// Extraction pour le Courant 1
+		xmldoc = xmlResponse.getElementsByTagName("curInd1");
+		if (xmldoc.length > 0) {
+		  message = xmldoc[0].firstChild.nodeValue;
+		  message = message.replace(',', '.');
+		  document.getElementById("curInd1").innerHTML = parseFloat(message).toFixed(3);
+		}
+
+		// Extraction pour le Courant 2
+		xmldoc = xmlResponse.getElementsByTagName("curInd2");
+		if (xmldoc.length > 0) {
+		  message = xmldoc[0].firstChild.nodeValue;
+		  message = message.replace(',', '.');
+		  document.getElementById("curInd2").innerHTML = parseFloat(message).toFixed(3);
+		}
+
+		// Extraction pour le Courant 3
+		xmldoc = xmlResponse.getElementsByTagName("curInd3");
+		if (xmldoc.length > 0) {
+		  message = xmldoc[0].firstChild.nodeValue;
+		  message = message.replace(',', '.');
+		  document.getElementById("curInd3").innerHTML = parseFloat(message).toFixed(3);
+		}
+
+		// Extraction pour le Courant 4
+		xmldoc = xmlResponse.getElementsByTagName("curInd4");
+		if (xmldoc.length > 0) {
+		  message = xmldoc[0].firstChild.nodeValue;
+		  message = message.replace(',', '.');
+		  document.getElementById("curInd4").innerHTML = parseFloat(message).toFixed(3);
+		}
+	  
+    }
   
     // general processing code for the web page to ask for an XML steam
     function process(){

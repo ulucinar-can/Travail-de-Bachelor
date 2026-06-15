@@ -7,7 +7,7 @@
  - Gérer la communication UART entre l'ESP32S2 et le DSP dans les deux sens ainsi qu'au traitement des données reçues.
 
   Options de compilation Arduino
-  1. esp32 dev module
+  1. esp32s2 dev module
   2. USB CDC On Boot Enable
   3. Erase All Flash Before Sketch Upload Enable
   upload speed 115200
@@ -43,7 +43,7 @@ HardwareSerial MySerial(1);
 #define BAUDRATE 115200
 #define TX1 17
 #define RX1 18
-#define UART_BUFFER 64 
+#define UART_BUFFER 128 
 
 // Variable globale
 int count_once = 1;
@@ -51,6 +51,7 @@ uint16_t RxIndex = 0;
 uint32_t SensorUpdate = 0;
 bool btn_state = 0; 
 float pos_ind1 = 0.0, pos_ind2 = 0.0, pos_ind3 = 0.0, pos_ind4 = 0.0;
+float cur_ind1 = 0.0, cur_ind2 = 0.0, cur_ind3 = 0.0, cur_ind4 = 0.0;
 
 // Declare our FastLED strip object:
 CRGB leds[NUM_LEDS];
@@ -62,7 +63,7 @@ char buf[32];
 
 // Uart Receive
 char buffer[UART_BUFFER] = {0};
-float floatValues[4];  
+float floatValues[8];  
 
 // Adresse IP du point d'accès
 IPAddress Actual_IP;
@@ -123,6 +124,7 @@ void setup() {
   delay(100);
   WiFi.softAPConfig(PageIP, gateway, subnet);
   delay(100);
+  WiFi.setSleep(false);
   Actual_IP = WiFi.softAPIP();
   Serial.print("IP address: "); Serial.println(Actual_IP);
   
@@ -209,9 +211,9 @@ void loop() {
       int i = 0;
 
       // Conversion des token en floats
-      while (token != NULL && i < 4) {
-        floatValues[i++] = atof(token);  
-        token = strtok(NULL, ",");  
+      while (token != NULL && i < 8) {
+      floatValues[i++] = atof(token);
+      token = strtok(NULL, ",");  
       }
 
       // Afficher les floats reçus (facultatif)
@@ -253,11 +255,17 @@ void updateValues() {
   // pos_ind4 += 0.1;
   // if (pos_ind4 >= 10.0) pos_ind4 = 0.0;
 
-// Mise à jour via l'uart
+// Mise à jour des position via l'uart
   pos_ind1 = floatValues[0];
   pos_ind2 = floatValues[1];
   pos_ind3 = floatValues[2];
   pos_ind4 = floatValues[3];
+
+// Mise à jour des courants via l'uart
+  cur_ind1 = floatValues[4];
+  cur_ind2 = floatValues[5];
+  cur_ind3 = floatValues[6];
+  cur_ind4 = floatValues[7];
 }
 
 // Fonction de status pour le démarrage de la sustentation
@@ -283,7 +291,7 @@ void ProcessButton_START() {
   // here i don't need to send and immediate status, any status
   // like the illumination status will be send in the main XML page update
   // code
-  server.send(250, "text/plain", ""); //Send web page
+  server.send(200, "text/plain", ""); //Send web page
 }
 
 // Fonction de status pour l'arrêt de la sustentation 
@@ -301,7 +309,7 @@ void ProcessButton_STOP() {
   taskYIELD(); // Permet au WiFi de reprendre la main
 
   // Keep the page live by sending something back
-  server.send(250, "text/plain", ""); //Send web page
+  server.send(200, "text/plain", ""); //Send web page
 }
 
 void SendXML() {
@@ -326,6 +334,16 @@ void SendXML() {
   sprintf(buf, "<valInd4>%f</valInd4>\n", pos_ind4);
   strcat(XML, buf);
 
+  // send the inductor currents
+  sprintf(buf, "<curInd1>%f</curInd1>\n", cur_ind1);
+  strcat(XML, buf);
+  sprintf(buf, "<curInd2>%f</curInd2>\n", cur_ind2);
+  strcat(XML, buf);
+  sprintf(buf, "<curInd3>%f</curInd3>\n", cur_ind3);
+  strcat(XML, buf);
+  sprintf(buf, "<curInd4>%f</curInd4>\n", cur_ind4);
+  strcat(XML, buf);
+
   strcat(XML, "</Data>\n");
 
   // wanna see what the XML code looks like?
@@ -334,7 +352,7 @@ void SendXML() {
   // Serial.println(XML);
 
   // Keep the page live 
-  server.send(250, "text/xml", XML);
+  server.send(200, "text/xml", XML);
 }
 
 // code to send the main web page
@@ -344,5 +362,5 @@ void SendWebsite() {
   Serial.println("sending web page");
 
   // Keep the page live 
-  server.send(250, "text/html", PAGE_MAIN);
+  server.send(200, "text/html", PAGE_MAIN);
 }

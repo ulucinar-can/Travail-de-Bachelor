@@ -366,8 +366,9 @@ __interrupt void adcA1ISR(void)
     {
         UartCounter = 0; // Reset du compteur (~1s)
 
-        //Envoie des positions
-        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f);
+        //Envoie des positions et des courants
+        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
+                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
 
         //Envoie des courrants
         //SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);

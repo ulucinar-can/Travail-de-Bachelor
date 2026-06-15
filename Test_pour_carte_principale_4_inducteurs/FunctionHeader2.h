@@ -61,7 +61,7 @@
 #define I_SP            3.0f
 #define I_SP105         3.15f
 #define I_SP095         2.85f
-#define KP_I            0.5f // Avec Kui à -45° : Kpi = 90.964f et sans kui : Kpi = 1.88
+#define KP_I            5.0f // Avec Kui à -45° : Kpi = 90.964f et sans kui : Kpi = 1.88
 #define TI_I            ((float)4.636619772367582e-4)
 #define GI_I            (1.0/TI_I)
 #define UMAX            VDC_BUS
@@ -153,7 +153,7 @@
 /* ========================================================================= *
  * SHARED GLOBALS & COMMUNICATION
  * ========================================================================= */
-#define TX_BUF_LEN 64
+#define TX_BUF_LEN 128
 extern volatile char txBuffer[TX_BUF_LEN];
 extern volatile uint16_t txIndex;
 extern volatile uint16_t txLength;
@@ -169,7 +169,7 @@ extern const float POS_COR_4[6];
 void reverse(char* str, int len);
 int ConvertIntToStr(int x, char str[], int p);
 int ftoa(float n, char* res, int afterpoint);
-void SendFloatAsText(float f0, float f1, float f2, float f3);
+void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7);
 float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);

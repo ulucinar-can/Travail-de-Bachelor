@@ -175,35 +175,30 @@ int ftoa(float n, char* res, int afterpoint)
     return i;
 }
 
-void SendFloatAsText(float f0, float f1, float f2, float f3)
+void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7)
 {
     char str[TX_BUF_LEN];
     int i = 0, j = 0;
 
-    // Mise en forme de la trame envoyée
     str[i++] = '\x02'; // start bit
 
-    i += ftoa(f0, &str[i], 3);
-    str[i++] = ',';
-
-    i += ftoa(f1, &str[i], 3);
-    str[i++] = ',';
-
-    i += ftoa(f2, &str[i], 3);
-    str[i++] = ',';
-
-    i += ftoa(f3, &str[i], 3);
+    i += ftoa(f0, &str[i], 3); str[i++] = ',';
+    i += ftoa(f1, &str[i], 3); str[i++] = ',';
+    i += ftoa(f2, &str[i], 3); str[i++] = ',';
+    i += ftoa(f3, &str[i], 3); str[i++] = ',';
+    i += ftoa(f4, &str[i], 3); str[i++] = ',';
+    i += ftoa(f5, &str[i], 3); str[i++] = ',';
+    i += ftoa(f6, &str[i], 3); str[i++] = ',';
+    i += ftoa(f7, &str[i], 3);
 
     str[i++] = '\x03'; // stop bit
 
     for (j = 0; j < i && j < TX_BUF_LEN; j++) {
         txBuffer[j] = (uint8_t)str[j];
     }
-
     txLength = i;
     txIndex = 0;
 
-    // Envoi de la trame
     SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
 }
 
