@@ -75,42 +75,9 @@
 #define GAIN_COR_4                  8.3439e-7f
 #define OFFSET_COR_4                3.9979e-4f
 
-#define LOG_SIZE 2500       // Taille des tableaux (2500 points = ~25s à 100Hz)
-#define DOWNSAMPLE_LIMIT 250 // Enregistre 1 tick sur 250 (25kHz -> 100Hz)
-
-// Tableaux de stockage
-// On utilise #pragma pour forcer le stockage en RAM globale si le compilateur a du mal
-#pragma DATA_SECTION(log_Pos1, "ramgs0");
-#pragma DATA_SECTION(log_Pos2, "ramgs0");
-#pragma DATA_SECTION(log_Pos3, "ramgs0");
-#pragma DATA_SECTION(log_Pos4, "ramgs0");
-#pragma DATA_SECTION(log_Cur1, "ramgs0");
-#pragma DATA_SECTION(log_Cur2, "ramgs0");
-#pragma DATA_SECTION(log_Cur3, "ramgs0");
-#pragma DATA_SECTION(log_Cur4, "ramgs0");
-#pragma DATA_SECTION(log_Duty, "ramgs0");
-#pragma DATA_SECTION(log_State, "ramgs0");
-
 /* ========================================================================= *
  * GLOBAL VARIABLES
  * ========================================================================= */
-// --- Variables de mesure du courant et de position ---
-float log_Pos1[LOG_SIZE];
-float log_Pos2[LOG_SIZE];
-float log_Pos3[LOG_SIZE];
-float log_Pos4[LOG_SIZE];
-float log_Cur1[LOG_SIZE];
-float log_Cur2[LOG_SIZE];
-float log_Cur3[LOG_SIZE];
-float log_Cur4[LOG_SIZE];
-float log_Duty[LOG_SIZE];
-uint8_t log_State[LOG_SIZE];
-
-uint32_t log_index = 0;
-uint16_t downsample_counter = 0;
-bool is_logging = false;
-bool previous_button_state = false;
-
 // --- SFO Library ---
 int MEP_ScaleFactor;
 
@@ -904,57 +871,6 @@ __interrupt void adcA1ISR(void)
 
     // Eteindre LED de debug (fin de boucle de rÃ©gulation)
     GPIO_writePin(LED_D5, 0);
-
-    /* --------------------------------------------------------------------- *
-     * 8. DATA LOGGING (Enregistrement en RAM)
-     * --------------------------------------------------------------------- */
-
-    // Détection d'un appui sur le bouton (flanc montant de ButtonS2)
-    if (ButtonS2 && !previous_button_state) {
-        // Le bouton vient d'être activé : On démarre ou on réinitialise l'enregistrement
-        is_logging = true;
-        log_index = 0;           // On recommence depuis le début du tableau
-        downsample_counter = 0;
-    }
-    // Détection d'un deuxième appui (flanc descendant de ButtonS2)
-    else if (!ButtonS2 && previous_button_state) {
-        // Le bouton vient d'être désactivé : On arrête l'enregistrement
-        is_logging = false;
-    }
-
-    previous_button_state = ButtonS2; // Mise à jour de l'état pour le prochain tick
-
-    // Si on est en train d'enregistrer ET qu'il reste de la place
-    if (is_logging && (log_index < LOG_SIZE)) {
-
-        downsample_counter++;
-
-        if (downsample_counter >= DOWNSAMPLE_LIMIT) {
-            downsample_counter = 0; // Reset du sous-échantillonneur
-
-            // --- Enregistrement des données ---
-            log_Pos1[log_index]  = Position1;
-            log_Pos2[log_index]  = Position2;
-            log_Pos3[log_index]  = Position3;
-            log_Pos4[log_index]  = Position4;
-
-            log_Cur1[log_index]  = Current1;
-            log_Cur2[log_index]  = Current2;
-            log_Cur3[log_index]  = Current3;
-            log_Cur4[log_index]  = Current4;
-
-            log_Duty[log_index]  = duty_table[0]; // Ou dutyCycle1 si tu préfères
-            log_State[log_index] = state;
-
-            // Tu peux rajouter tes autres variables ici (erreur, vitesses, etc.)
-
-            log_index++; // On passe à la case suivante pour le prochain coup
-        }
-    }
-    else if (log_index >= LOG_SIZE) {
-        // Sécurité : si le tableau est plein, on arrête automatiquement d'enregistrer
-        is_logging = false;
-    }
 }
 
 /* ========================================================================= *
