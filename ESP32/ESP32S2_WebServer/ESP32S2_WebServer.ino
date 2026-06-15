@@ -7,7 +7,7 @@
  - Gérer la communication UART entre l'ESP32S2 et le DSP dans les deux sens ainsi qu'au traitement des données reçues.
 
   Options de compilation Arduino
-  1. esp32s2 dev module
+  1. esp32 dev module
   2. USB CDC On Boot Enable
   3. Erase All Flash Before Sketch Upload Enable
   upload speed 115200

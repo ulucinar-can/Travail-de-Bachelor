@@ -93,14 +93,15 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
 	  color: white;
 	}
 
-/*Tableau de position sur chaque inducteur*/
+	/* Tableau de position sur chaque inducteur */
 	.inducteurs-colonnes {
 	  display: flex;
 	  justify-content: center;
-	  gap: 60px;
-	  margin: 30px auto;
+	  gap: 30px; /* Réduit l'espacement global entre les colonnes */
+	  margin: 20px auto;
 	  font-family: Verdana, sans-serif;
 	  color: white;
+	  flex-wrap: wrap; /* Permet un retour à la ligne si vraiment trop petit */
 	}
 
 	.bloc-colonne {
@@ -111,19 +112,35 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
 
 	.entete {
 	  font-weight: bold;
-	  font-size: 20px;
+	  font-size: 18px; /* Légèrement réduit */
 	  margin-bottom: 10px;
+	  text-align: center;
 	}
 
 	.valeur {
-	  font-size: 18px;
+	  font-size: 16px; /* Réduit pour éviter le débordement */
 	  background-color: rgba(255, 255, 255, 0.1);
 	  border: 1px solid white;
 	  border-radius: 6px;
-	  padding: 6px 16px;
+	  padding: 4px 8px; /* Marges intérieures réduites */
 	  margin: 4px 0;
-	  width: 80px;
+	  width: 65px; /* Largeur réduite */
 	  text-align: center;
+	}
+
+	/* Adaptation spécifique pour les smartphones */
+	@media (max-width: 600px) {
+	  .inducteurs-colonnes {
+		gap: 10px; /* Espacement minime sur mobile */
+	  }
+	  .entete {
+		font-size: 14px;
+	  }
+	  .valeur {
+		font-size: 14px;
+		width: 55px; /* Cellules plus fines */
+		padding: 2px 4px;
+	  }
 	}
 /*Pour l'affichage des différentes pages*/    
     .page {
@@ -188,6 +205,21 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
       </div>
 
       <br>
+      <h3 style="color: white; margin-bottom: 15px; font-size: 18px; text-align: center;">Positions des inducteurs en temps réel</h3>
+      
+      <div style="width: 100%; max-width: 800px; margin: auto; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 20px; box-sizing: border-box;">
+        
+        <canvas id="posGraph" width="800" height="400" style="width: 100%; height: auto; display: block;"></canvas>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 14px; color: white; flex-wrap: wrap;">
+           <div><span style="display: inline-block; width: 25px; height: 3px; background-color: #ff4d4d; vertical-align: middle; margin-right: 8px;"></span>Inducteur 1</div>
+           <div><span style="display: inline-block; width: 25px; height: 3px; background-color: #00e5ff; vertical-align: middle; margin-right: 8px;"></span>Inducteur 2</div>
+           <div><span style="display: inline-block; width: 25px; height: 3px; background-color: #2962ff; vertical-align: middle; margin-right: 8px;"></span>Inducteur 3</div>
+           <div><span style="display: inline-block; width: 25px; height: 3px; background-color: #ff9100; vertical-align: middle; margin-right: 8px;"></span>Inducteur 4</div>
+        </div>
+        
+      </div>
+      <br>
 
       <!-- Bouton interactif pour lancer / stopper la sustentation -->
       <div style="text-align:center;">
@@ -226,36 +258,152 @@ function afficherPage(id) {
 </script>
 
 <script type="text/javascript">
+// Doit être hors de window.onload !
+function afficherPage(id) {
+  const pages = document.querySelectorAll('.page');
+  pages.forEach(p => p.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+}
+
 window.onload = function() {
-	// global variable visible to all java functions	
-    var xmlHttp=createXmlHttpObject();
-    var processInterval = null; // Variable pour contrôler la mise à jour
+    var xmlHttp = createXmlHttpObject();
+    var processInterval = null;
 
     var mixBut = document.getElementById("mixBut");
-    var etatSpan = document.getElementById("etatBouton"); // 0 = à l'arrêt, 1 = en lévitation
+    var etatSpan = document.getElementById("etatBouton");
 
     mixBut.addEventListener("click", Start);
-	
-  	function afficherPage(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-    
-    // function to create XML object
+
     function createXmlHttpObject(){
-      if(window.XMLHttpRequest){
-        xmlHttp=new XMLHttpRequest();
-      }
-      else{
-        xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
-      }
-      return xmlHttp;
+      if(window.XMLHttpRequest) return new XMLHttpRequest();
+      else return new ActiveXObject("Microsoft.XMLHTTP");
     }
 
     function updateEtatText(etat) {
-    etatSpan.textContent = etat === "1" ? "En mouvement" : "À l'arrêt";
-	}
-    
+      etatSpan.textContent = etat === "1" ? "En mouvement" : "À l'arrêt";
+    }
+
+    // ==========================================
+    // GESTION DU GRAPHIQUE (CANVAS)
+    // ==========================================
+    var histP1 = [], histP2 = [], histP3 = [], histP4 = [], timeData = [];
+    var startTime = Date.now();
+    var windowSize = 10.0; // Fenêtre temporelle fixe de 10 secondes
+
+    function renderGraph() {
+        var canvas = document.getElementById("posGraph");
+        if(!canvas) return;
+        var ctx = canvas.getContext("2d");
+        var w = canvas.width;
+        var h = canvas.height;
+
+        // Effacer entièrement la zone de dessin
+        ctx.clearRect(0, 0, w, h);
+
+        var padL = 70, padB = 60, padT = 20, padR = 20;
+        var plotW = w - padL - padR;
+        var plotH = h - padT - padB;
+        var maxY = 3.0; // Échelle max fixée à 3.0 mm
+
+        // 1. Grille Y (Amplitude Position)
+        ctx.fillStyle = "white";
+        ctx.font = "14px Verdana";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+
+        for(var i=0; i<=5; i++) {
+            var val = i * (maxY / 5.0);
+            var y = padT + plotH - (i/5.0)*plotH;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w-padR, y); ctx.stroke();
+            ctx.fillText(val.toFixed(1), padL - 10, y);
+        }
+
+        // 2. Logique de l'axe X (Temps réel)
+        var tStart = 0;
+        var tEnd = windowSize;
+
+        if (timeData.length > 0) {
+            var currentMaxTime = timeData[timeData.length - 1];
+            if (currentMaxTime > windowSize) {
+                tEnd = currentMaxTime;
+                tStart = currentMaxTime - windowSize;
+            }
+        }
+
+        var tSpan = tEnd - tStart;
+        if (tSpan <= 0) tSpan = 1; // Sécurité mathématique
+
+        // 3. Grille X (Ecoulement du temps)
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        var numXLabels = 5;
+
+        for(var j=0; j<=numXLabels; j++) {
+            var x = padL + (j/numXLabels)*plotW;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+            ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, h-padB); ctx.stroke();
+
+            var tVal = tStart + (j/numXLabels)*tSpan;
+            ctx.fillText(tVal.toFixed(1) + "s", x, h - padB + 10);
+        }
+
+        // 4. Mots (Labels) des axes
+        ctx.save();
+        ctx.translate(padL - 50, padT + plotH/2);
+        ctx.rotate(-Math.PI/2);
+        ctx.textAlign = "center";
+        ctx.fillText("Position [mm]", 0, 0);
+        ctx.restore();
+        ctx.fillText("Temps [s]", padL + plotW/2, h - padB + 35);
+
+        // 5. Zone de masque (pour empêcher les lignes de sortir du cadre)
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(padL, padT, plotW, plotH);
+        ctx.clip(); 
+
+        // 6. Tracé des courbes lié au timestamp réel
+        function traceCurve(data, color) {
+            if (data.length === 0) return;
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.lineJoin = "round";
+            for(var k=0; k<data.length; k++) {
+                // L'espacement en X dépend directement de l'heure à laquelle la donnée a été reçue !
+                var px = padL + ((timeData[k] - tStart) / tSpan) * plotW;
+                var valY = Math.min(Math.max(data[k], 0), maxY);
+                var py = padT + plotH - (valY / maxY) * plotH;
+                
+                if(k===0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+        }
+
+        traceCurve(histP1, "#ff4d4d");
+        traceCurve(histP2, "#00e5ff");
+        traceCurve(histP3, "#2962ff");
+        traceCurve(histP4, "#ff9100");
+
+        ctx.restore(); // Fin de la zone masque
+    }
+
+    // On efface les données et on reset l'heure au clic sur Start
+    function resetGraph() {
+        histP1 = []; histP2 = []; histP3 = []; histP4 = []; timeData = [];
+        startTime = Date.now();
+        renderGraph();
+    }
+
+    // Appel initial pour dessiner l'interface au chargement de la page
+    renderGraph();
+
+    // ==========================================
+    // GESTION DU BOUTON START/STOP
+    // ==========================================
     function Start(){
       console.log("Started");
       var xhttp = new XMLHttpRequest();
@@ -264,15 +412,16 @@ window.onload = function() {
       mixBut.addEventListener("click", Stop);
       mixBut.value = "Stop";
       mixBut.classList.remove("start-btn");
-    	mixBut.classList.add("stop-btn");
-    	mixBut.title = "Arrêter la sustentation"; // Stop's tooltip 
-    	mixBut.dataset.state = "1";  // état = stop
+      mixBut.classList.add("stop-btn");
+      mixBut.title = "Arrêter la sustentation"; 
+      mixBut.dataset.state = "1";  
       updateEtatText("1");
 
+      resetGraph(); // Le chrono et les tracés repartent à 0
+      
       xhttp.open("PUT", "BUTTON_START", false);
       xhttp.send();
       
-      // Démarrer la mise à jour des données toutes les 1 seconde
       processInterval = setInterval(process, 100);
     }
 
@@ -284,112 +433,110 @@ window.onload = function() {
       mixBut.addEventListener("click", Start);
       mixBut.value = "Start";
       mixBut.classList.remove("stop-btn");
-    	mixBut.classList.add("start-btn");
-    	mixBut.title = "Lancer la sustentation"; // Stop's tooltip 
-    	mixBut.dataset.state = "0";  // état = start
+      mixBut.classList.add("start-btn");
+      mixBut.title = "Lancer la sustentation"; 
+      mixBut.dataset.state = "0";  
       updateEtatText("0");
 
       xhttp.open("PUT", "BUTTON_STOP", false);
       xhttp.send();
       
-      // Arrêter la mise à jour des données
       if (processInterval) {
         clearInterval(processInterval);
         processInterval = null;
       }
     }
 
-    // function to handle the response from the ESP
-    function response()
-	{
-		  var message;
-		  var xmlResponse;
-		  var xmldoc;
-		 
-		  // get the xml stream
-		  xmlResponse=xmlHttp.responseXML;
-	  
-		  // Mise à jour des 4 inducteurs
-		  // Inducteur 1
-		  xmldoc = xmlResponse.getElementsByTagName("valInd1");
-		  if (xmldoc.length > 0) {
-			message = xmldoc[0].firstChild.nodeValue;
-			// Remplace la virgule par un point pour parseFloat
-			message = message.replace(',', '.');
-			document.getElementById("valInd1").innerHTML = parseFloat(message).toFixed(3);
-		  }
-		  
-		  // Inducteur 2
-		  xmldoc = xmlResponse.getElementsByTagName("valInd2");
-		  if (xmldoc.length > 0) {
-			message = xmldoc[0].firstChild.nodeValue;
-			message = message.replace(',', '.');
-			document.getElementById("valInd2").innerHTML = parseFloat(message).toFixed(3);
-		  }
-	  
-		  // Inducteur 3
-		  xmldoc = xmlResponse.getElementsByTagName("valInd3");
-		  if (xmldoc.length > 0) {
-			message = xmldoc[0].firstChild.nodeValue;
-			message = message.replace(',', '.');
-			document.getElementById("valInd3").innerHTML = parseFloat(message).toFixed(3);
-		  }
-		  
-		// Inducteur 4
-		xmldoc = xmlResponse.getElementsByTagName("valInd4");
-		if (xmldoc.length > 0)
-		{
-			message = xmldoc[0].firstChild.nodeValue;
-			message = message.replace(',', '.');
-			document.getElementById("valInd4").innerHTML = parseFloat(message).toFixed(3);
-		}
-	  
-		// Extraction pour le Courant 1
-		xmldoc = xmlResponse.getElementsByTagName("curInd1");
-		if (xmldoc.length > 0) {
-		  message = xmldoc[0].firstChild.nodeValue;
-		  message = message.replace(',', '.');
-		  document.getElementById("curInd1").innerHTML = parseFloat(message).toFixed(3);
-		}
+    // ==========================================
+    // RECEPTION DES DONNEES (AJAX)
+    // ==========================================
+    function response() {
+      // Sécurité anti-crash pour éviter les erreurs de lecture
+      if (xmlHttp.readyState != 4) return;
 
-		// Extraction pour le Courant 2
-		xmldoc = xmlResponse.getElementsByTagName("curInd2");
-		if (xmldoc.length > 0) {
-		  message = xmldoc[0].firstChild.nodeValue;
-		  message = message.replace(',', '.');
-		  document.getElementById("curInd2").innerHTML = parseFloat(message).toFixed(3);
-		}
+      var xmlResponse = xmlHttp.responseXML;
+      if(!xmlResponse) return;
 
-		// Extraction pour le Courant 3
-		xmldoc = xmlResponse.getElementsByTagName("curInd3");
-		if (xmldoc.length > 0) {
-		  message = xmldoc[0].firstChild.nodeValue;
-		  message = message.replace(',', '.');
-		  document.getElementById("curInd3").innerHTML = parseFloat(message).toFixed(3);
-		}
+      var message, xmldoc;
+      
+      // -- Extraction des positions --
+      xmldoc = xmlResponse.getElementsByTagName("valInd1");
+      if (xmldoc.length > 0) {
+        message = xmldoc[0].firstChild.nodeValue.replace(',', '.');
+        document.getElementById("valInd1").innerHTML = parseFloat(message).toFixed(3);
+      }
+      xmldoc = xmlResponse.getElementsByTagName("valInd2");
+      if (xmldoc.length > 0) {
+        message = xmldoc[0].firstChild.nodeValue.replace(',', '.');
+        document.getElementById("valInd2").innerHTML = parseFloat(message).toFixed(3);
+      }
+      xmldoc = xmlResponse.getElementsByTagName("valInd3");
+      if (xmldoc.length > 0) {
+        message = xmldoc[0].firstChild.nodeValue.replace(',', '.');
+        document.getElementById("valInd3").innerHTML = parseFloat(message).toFixed(3);
+      }
+      xmldoc = xmlResponse.getElementsByTagName("valInd4");
+      if (xmldoc.length > 0) {
+        message = xmldoc[0].firstChild.nodeValue.replace(',', '.');
+        document.getElementById("valInd4").innerHTML = parseFloat(message).toFixed(3);
+      }
 
-		// Extraction pour le Courant 4
-		xmldoc = xmlResponse.getElementsByTagName("curInd4");
-		if (xmldoc.length > 0) {
-		  message = xmldoc[0].firstChild.nodeValue;
-		  message = message.replace(',', '.');
-		  document.getElementById("curInd4").innerHTML = parseFloat(message).toFixed(3);
-		}
-	  
+      // -- Extraction des courants --
+      xmldoc = xmlResponse.getElementsByTagName("curInd1");
+      if (xmldoc.length > 0) {
+        message = xmldoc[0].firstChild.nodeValue.replace(',', '.');
+        document.getElementById("curInd1").innerHTML = parseFloat(message).toFixed(3);
+      }
+      xmldoc = xmlResponse.getElementsByTagName("curInd2");
+      if (xmldoc.length > 0) {
+        message = xmldoc[0].firstChild.nodeValue.replace(',', '.');
+        document.getElementById("curInd2").innerHTML = parseFloat(message).toFixed(3);
+      }
+      xmldoc = xmlResponse.getElementsByTagName("curInd3");
+      if (xmldoc.length > 0) {
+        message = xmldoc[0].firstChild.nodeValue.replace(',', '.');
+        document.getElementById("curInd3").innerHTML = parseFloat(message).toFixed(3);
+      }
+      xmldoc = xmlResponse.getElementsByTagName("curInd4");
+      if (xmldoc.length > 0) {
+        message = xmldoc[0].firstChild.nodeValue.replace(',', '.');
+        document.getElementById("curInd4").innerHTML = parseFloat(message).toFixed(3);
+      }
+
+      // -- Ajout des données au graphique en temps réel --
+      var p1 = parseFloat(document.getElementById("valInd1").innerHTML);
+      var p2 = parseFloat(document.getElementById("valInd2").innerHTML);
+      var p3 = parseFloat(document.getElementById("valInd3").innerHTML);
+      var p4 = parseFloat(document.getElementById("valInd4").innerHTML);
+
+      var currentTime = (Date.now() - startTime) / 1000.0;
+      timeData.push(currentTime);
+      histP1.push(p1);
+      histP2.push(p2);
+      histP3.push(p3);
+      histP4.push(p4);
+
+      // Le script supprime les points qui sont plus vieux que la fenêtre de 10 secondes
+      while(timeData.length > 0 && (currentTime - timeData[0] > windowSize)) {
+          timeData.shift();
+          histP1.shift();
+          histP2.shift();
+          histP3.shift();
+          histP4.shift();
+      }
+
+      renderGraph();
     }
-  
-    // general processing code for the web page to ask for an XML steam
-    function process(){
+
+    function process() {
      if(xmlHttp.readyState==0 || xmlHttp.readyState==4) {
-        xmlHttp.open("PUT","xml",true);
-        xmlHttp.onreadystatechange=response;
+        xmlHttp.open("PUT", "xml", true);
+        xmlHttp.onreadystatechange = response;
         xmlHttp.send(null);
       }       
     }
-
 };
 </script>
-
 </body>
 </html>
 

@@ -61,7 +61,7 @@
 #define I_SP            3.0f
 #define I_SP105         3.15f
 #define I_SP095         2.85f
-#define KP_I            5.0f // Avec Kui à -45° : Kpi = 90.964f et sans kui : Kpi = 1.88
+#define KP_I            1.88f // Avec Kui à -45° : Kpi = 90.964f et sans kui : Kpi = 1.88
 #define TI_I            ((float)4.636619772367582e-4)
 #define GI_I            (1.0/TI_I)
 #define UMAX            VDC_BUS
