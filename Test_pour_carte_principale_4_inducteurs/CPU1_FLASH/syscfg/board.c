@@ -228,13 +228,13 @@ void PinMux_init()
 	GPIO_setPadConfig(myEPWM4_EPWMB_GPIO, GPIO_PIN_TYPE_STD);
 	GPIO_setQualificationMode(myEPWM4_EPWMB_GPIO, GPIO_QUAL_SYNC);
 
-	// GPIO31 -> myLED_D1 Pinmux
+	// GPIO31 -> LED_D1 Pinmux
 	GPIO_setPinConfig(GPIO_31_GPIO31);
-	// GPIO34 -> myLED_D2 Pinmux
+	// GPIO34 -> LED_D2 Pinmux
 	GPIO_setPinConfig(GPIO_34_GPIO34);
-	// GPIO40 -> LED_D5_carte_principale Pinmux
+	// GPIO40 -> LED_D5 Pinmux
 	GPIO_setPinConfig(GPIO_40_GPIO40);
-	// GPIO41 -> LED_D6_carte_principale Pinmux
+	// GPIO41 -> LED_D6 Pinmux
 	GPIO_setPinConfig(GPIO_41_GPIO41);
 	// GPIO59 -> Push_Button_Start Pinmux
 	GPIO_setPinConfig(GPIO_59_GPIO59);
@@ -648,36 +648,36 @@ void EPWM_init(){
 //
 //*****************************************************************************
 void GPIO_init(){
-	myLED_D1_init();
-	myLED_D2_init();
-	LED_D5_carte_principale_init();
-	LED_D6_carte_principale_init();
+	LED_D1_init();
+	LED_D2_init();
+	LED_D5_init();
+	LED_D6_init();
 	Push_Button_Start_init();
 }
 
-void myLED_D1_init(){
-	GPIO_setPadConfig(myLED_D1, GPIO_PIN_TYPE_STD);
-	GPIO_setQualificationMode(myLED_D1, GPIO_QUAL_SYNC);
-	GPIO_setDirectionMode(myLED_D1, GPIO_DIR_MODE_OUT);
-	GPIO_setControllerCore(myLED_D1, GPIO_CORE_CPU1);
+void LED_D1_init(){
+	GPIO_setPadConfig(LED_D1, GPIO_PIN_TYPE_STD);
+	GPIO_setQualificationMode(LED_D1, GPIO_QUAL_SYNC);
+	GPIO_setDirectionMode(LED_D1, GPIO_DIR_MODE_OUT);
+	GPIO_setControllerCore(LED_D1, GPIO_CORE_CPU1);
 }
-void myLED_D2_init(){
-	GPIO_setPadConfig(myLED_D2, GPIO_PIN_TYPE_STD);
-	GPIO_setQualificationMode(myLED_D2, GPIO_QUAL_SYNC);
-	GPIO_setDirectionMode(myLED_D2, GPIO_DIR_MODE_OUT);
-	GPIO_setControllerCore(myLED_D2, GPIO_CORE_CPU1);
+void LED_D2_init(){
+	GPIO_setPadConfig(LED_D2, GPIO_PIN_TYPE_STD);
+	GPIO_setQualificationMode(LED_D2, GPIO_QUAL_SYNC);
+	GPIO_setDirectionMode(LED_D2, GPIO_DIR_MODE_OUT);
+	GPIO_setControllerCore(LED_D2, GPIO_CORE_CPU1);
 }
-void LED_D5_carte_principale_init(){
-	GPIO_setPadConfig(LED_D5_carte_principale, GPIO_PIN_TYPE_STD);
-	GPIO_setQualificationMode(LED_D5_carte_principale, GPIO_QUAL_SYNC);
-	GPIO_setDirectionMode(LED_D5_carte_principale, GPIO_DIR_MODE_OUT);
-	GPIO_setControllerCore(LED_D5_carte_principale, GPIO_CORE_CPU1);
+void LED_D5_init(){
+	GPIO_setPadConfig(LED_D5, GPIO_PIN_TYPE_STD);
+	GPIO_setQualificationMode(LED_D5, GPIO_QUAL_SYNC);
+	GPIO_setDirectionMode(LED_D5, GPIO_DIR_MODE_OUT);
+	GPIO_setControllerCore(LED_D5, GPIO_CORE_CPU1);
 }
-void LED_D6_carte_principale_init(){
-	GPIO_setPadConfig(LED_D6_carte_principale, GPIO_PIN_TYPE_STD);
-	GPIO_setQualificationMode(LED_D6_carte_principale, GPIO_QUAL_SYNC);
-	GPIO_setDirectionMode(LED_D6_carte_principale, GPIO_DIR_MODE_OUT);
-	GPIO_setControllerCore(LED_D6_carte_principale, GPIO_CORE_CPU1);
+void LED_D6_init(){
+	GPIO_setPadConfig(LED_D6, GPIO_PIN_TYPE_STD);
+	GPIO_setQualificationMode(LED_D6, GPIO_QUAL_SYNC);
+	GPIO_setDirectionMode(LED_D6, GPIO_DIR_MODE_OUT);
+	GPIO_setControllerCore(LED_D6, GPIO_CORE_CPU1);
 }
 void Push_Button_Start_init(){
 	GPIO_setPadConfig(Push_Button_Start, GPIO_PIN_TYPE_STD | GPIO_PIN_TYPE_PULLUP);

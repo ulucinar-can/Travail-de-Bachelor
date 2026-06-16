@@ -1,4 +1,12 @@
 eclipse.preferences.version=1
+encoding//CPU1_FLASH/Ancien_code/Fichier_de_test/Avec_UART/subdir_rules.mk=UTF-8
+encoding//CPU1_FLASH/Ancien_code/Fichier_de_test/Avec_UART/subdir_vars.mk=UTF-8
+encoding//CPU1_FLASH/Ancien_code/Fichier_de_test/Sans_UART/subdir_rules.mk=UTF-8
+encoding//CPU1_FLASH/Ancien_code/Fichier_de_test/Sans_UART/subdir_vars.mk=UTF-8
+encoding//CPU1_FLASH/Ancien_code/subdir_rules.mk=UTF-8
+encoding//CPU1_FLASH/Ancien_code/subdir_vars.mk=UTF-8
+encoding//CPU1_FLASH/Fichier_de_test/subdir_rules.mk=UTF-8
+encoding//CPU1_FLASH/Fichier_de_test/subdir_vars.mk=UTF-8
 encoding//CPU1_FLASH/device/subdir_rules.mk=UTF-8
 encoding//CPU1_FLASH/device/subdir_vars.mk=UTF-8
 encoding//CPU1_FLASH/makefile=UTF-8

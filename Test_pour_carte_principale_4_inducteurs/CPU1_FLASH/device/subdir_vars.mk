@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
+SHELL = cmd.exe
+
 # Add inputs and outputs from these tool invocations to the build variables 
 ASM_SRCS += \
 ../device/f28003x_codestartbranch.asm 
@@ -20,14 +22,14 @@ ASM_DEPS += \
 ./device/f28003x_codestartbranch.d 
 
 OBJS__QUOTED += \
-"device/device.obj" \
-"device/f28003x_codestartbranch.obj" 
+"device\device.obj" \
+"device\f28003x_codestartbranch.obj" 
 
 C_DEPS__QUOTED += \
-"device/device.d" 
+"device\device.d" 
 
 ASM_DEPS__QUOTED += \
-"device/f28003x_codestartbranch.d" 
+"device\f28003x_codestartbranch.d" 
 
 C_SRCS__QUOTED += \
 "../device/device.c" 

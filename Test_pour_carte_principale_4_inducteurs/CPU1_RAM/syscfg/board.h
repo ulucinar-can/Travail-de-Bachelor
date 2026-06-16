@@ -351,7 +351,7 @@ extern __interrupt void INT_mySCI0_TX_ISR(void);
 //
 //*****************************************************************************
 #define mySCI0_BASE SCIA_BASE
-#define mySCI0_BAUDRATE 115200
+#define mySCI0_BAUDRATE 921600
 #define mySCI0_CONFIG_WLEN SCI_CONFIG_WLEN_8
 #define mySCI0_CONFIG_STOP SCI_CONFIG_STOP_ONE
 #define mySCI0_CONFIG_PAR SCI_CONFIG_PAR_NONE

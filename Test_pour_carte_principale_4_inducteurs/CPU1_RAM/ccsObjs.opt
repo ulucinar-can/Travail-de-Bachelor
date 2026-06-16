@@ -1,5 +1,5 @@
 "./FunctionHeader2.obj"
-"./Sustentation_Main.obj"
+"./MesureParInducteur.obj"
 "./syscfg/board.obj"
 "./syscfg/c2000ware_libraries.obj"
 "./device/device.obj"
