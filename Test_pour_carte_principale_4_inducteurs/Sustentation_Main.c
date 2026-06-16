@@ -679,79 +679,96 @@ __interrupt void adcA1ISR(void)
 
         if(PosRegFlag1)
         {
-            // Inductor 1 : Filtre Bandstop + State Regulation
-            IN1[0] = fc1;
-            fc1f = IIR_Filter(IN1, OUT1);
-            if (fc1f <= 0)   fc1f = 0;
-            if (fc1f >= FMAX) fc1f = FMAX;
-
+            // --- Inducteur 1 ---
+            // Calcul de la force de consigne 1
             ep1 = Position_c1 - Position1;
             xr1 += (ep1 - fce1);
             sum_vp1 = v1 * Kddot + Position1 * Kd;
             fc1_prim = Kw * Position_c1 + Kr * xr1 * I - sum_vp1 + FP;
 
+            // Antiwindup
             fc1 = fc1_prim;
             if (fc1_prim <= 0)   fc1 = 0;
             if (fc1_prim >= FMAX) fc1 = FMAX;
             fce1 = (fc1_prim - fc1) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
-            // Inductor 2 : Filtre Bandstop + State Regulation
-            IN2[0] = fc2;
-            fc2f = IIR_Filter(IN2, OUT2);
-            if (fc2f <= 0)   fc2f = 0;
-            if (fc2f >= FMAX) fc2f = FMAX;
+            // Filtre coupe bande
+            IN1[0] = fc1;
+            fc1f = IIR_Filter(IN1, OUT1);
+            if (fc1f <= 0)   fc1f = 0;
+            if (fc1f >= FMAX) fc1f = FMAX;
 
+            // Calcul du courant de consigne 1
+            ic1 = (sqrtf(K_FC * fc1f)) * Position1;
+
+            // --- Inducteur 2 ---
+            // Inductor 2 : Filtre Bandstop + State Regulation
+            // Calcul de la force de consigne 2
             ep2 = Position_c2 - Position2;
             xr2 += (ep2 - fce2);
             sum_vp2 = v2 * Kddot + Position2 * Kd;
             fc2_prim = Kw * Position_c2 + Kr * xr2 * I - sum_vp2 + FP;
 
+            // Antiwindup
             fc2 = fc2_prim;
             if (fc2_prim <= 0)   fc2 = 0;
             if (fc2_prim >= FMAX) fc2 = FMAX;
             fce2 = (fc2_prim - fc2) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
+            // Filtre coupe bande
+            IN2[0] = fc2;
+            fc2f = IIR_Filter(IN2, OUT2);
+            if (fc2f <= 0)   fc2f = 0;
+            if (fc2f >= FMAX) fc2f = FMAX;
+
             // Transformée inverse pour calculer le courant à partir de la force
-            ic1 = (sqrtf(K_FC * fc1f)) * Position1;
             ic2 = (sqrtf(K_FC * fc2f)) * Position2;
         }
 
         if(PosRegFlag3)
         {
-            // Inductor 3 : Filtre Bandstop + State Regulation
-            IN3[0] = fc3;
-            fc3f = IIR_Filter(IN3, OUT3);
-            if (fc3f <= 0)   fc3f = 0;
-            if (fc3f >= FMAX) fc3f = FMAX;
-
+            // --- Inductor 3 ---
+            // Calcul de la force de consigne
             ep3 = Position2_c3 - Position3;
             xr3 += (ep3 - fce3);
             sum_vp3 = (v3 * KDDOT_SANS_INT) + (Position3 * KD_SANS_INT);
             fc3_prim = (KW_SANS_INT * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
 
+            // Antiwindup
             fc3 = fc3_prim;
             if (fc3_prim <= 0)   fc3 = 0;
             if (fc3_prim >= FMAX) fc3 = FMAX;
             fce3 = (fc3_prim - fc3) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
-            // Inductor 4 : Filtre Bandstop + State Regulation
-            IN4[0] = fc4;
-            fc4f = IIR_Filter(IN4, OUT4);
-            if (fc4f <= 0)   fc4f = 0;
-            if (fc4f >= FMAX) fc4f = FMAX;
+            // Filtre coupe bande
+            IN3[0] = fc3;
+            fc3f = IIR_Filter(IN3, OUT3);
+            if (fc3f <= 0)   fc3f = 0;
+            if (fc3f >= FMAX) fc3f = FMAX;
 
+            // Calcul du courant de consigne 3
+            ic3 = sqrtf(K_FC * fc3f) * Position3;
+
+            // --- Inductor 4 ---
+            // Calcul de la force de consigne 4
             ep4 = Position2_c4 - Position4;
             xr4 += (ep4 - fce4);
             sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
             fc4_prim = (Kw * Position2_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
 
+            // Antiwindup
             fc4 = fc4_prim;
             if (fc4_prim <= 0)   fc4 = 0;
             if (fc4_prim >= FMAX) fc4 = FMAX;
             fce4 = (fc4_prim - fc4) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
-            // Transformée inverse pour calculer le courant à partir de la force
-            ic3 = sqrtf(K_FC * fc3f) * Position3;
+            // Filtre coupe-bande
+            IN4[0] = fc4;
+            fc4f = IIR_Filter(IN4, OUT4);
+            if (fc4f <= 0)   fc4f = 0;
+            if (fc4f >= FMAX) fc4f = FMAX;
+
+            // Calcul du courant de consigne 4
             ic4 = sqrtf(K_FC * fc4f) * Position4;
         }
 
