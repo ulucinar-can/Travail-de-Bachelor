@@ -175,32 +175,32 @@ int ftoa(float n, char* res, int afterpoint)
     return i;
 }
 
-void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7)
-{
-    char str[TX_BUF_LEN];
-    int i = 0, j = 0;
-
-    str[i++] = '\x02'; // start bit
-
-    i += ftoa(f0, &str[i], 3); str[i++] = ',';
-    i += ftoa(f1, &str[i], 3); str[i++] = ',';
-    i += ftoa(f2, &str[i], 3); str[i++] = ',';
-    i += ftoa(f3, &str[i], 3); str[i++] = ',';
-    i += ftoa(f4, &str[i], 3); str[i++] = ',';
-    i += ftoa(f5, &str[i], 3); str[i++] = ',';
-    i += ftoa(f6, &str[i], 3); str[i++] = ',';
-    i += ftoa(f7, &str[i], 3);
-
-    str[i++] = '\x03'; // stop bit
-
-    for (j = 0; j < i && j < TX_BUF_LEN; j++) {
-        txBuffer[j] = (uint8_t)str[j];
-    }
-    txLength = i;
-    txIndex = 0;
-
-    SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
-}
+//void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7)
+//{
+//    char str[TX_BUF_LEN];
+//    int i = 0, j = 0;
+//
+//    str[i++] = '\x02'; // start bit
+//
+//    i += ftoa(f0, &str[i], 3); str[i++] = ',';
+//    i += ftoa(f1, &str[i], 3); str[i++] = ',';
+//    i += ftoa(f2, &str[i], 3); str[i++] = ',';
+//    i += ftoa(f3, &str[i], 3); str[i++] = ',';
+//    i += ftoa(f4, &str[i], 3); str[i++] = ',';
+//    i += ftoa(f5, &str[i], 3); str[i++] = ',';
+//    i += ftoa(f6, &str[i], 3); str[i++] = ',';
+//    i += ftoa(f7, &str[i], 3);
+//
+//    str[i++] = '\x03'; // stop bit
+//
+//    for (j = 0; j < i && j < TX_BUF_LEN; j++) {
+//        txBuffer[j] = (uint8_t)str[j];
+//    }
+//    txLength = i;
+//    txIndex = 0;
+//
+//    SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
+//}
 
 float apply_poly5(float x, const float* coeffs)
 {
@@ -215,28 +215,28 @@ float apply_poly5(float x, const float* coeffs)
     return result;
 }
 
-//void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9)
-//{
-//    char str[TX_BUF_LEN];
-//    int i = 0, j = 0;
-//
-//    str[i++] = '\x02'; // start bit
-//    i += ftoa(f0, &str[i], 3); str[i++] = ','; // Pos Consigne
-//    i += ftoa(f1, &str[i], 3); str[i++] = ','; // Pos Mesure
-//    i += ftoa(f2, &str[i], 3); str[i++] = ','; // Cur Consigne
-//    i += ftoa(f3, &str[i], 3); str[i++] = ','; // Cur Mesure
-//    i += ftoa(f4, &str[i], 3); str[i++] = ','; // Force Consigne
-//    i += ftoa(f5, &str[i], 3); str[i++] = ','; // Xr1
-//    i += ftoa(f6, &str[i], 3); str[i++] = ','; // Tension Consigne
-//    i += ftoa(f7, &str[i], 3); str[i++] = ','; // Integrale
-//    i += ftoa(f8, &str[i], 0); str[i++] = ','; // State (sans virgule)
-//    i += ftoa(f9, &str[i], 3);                 // Vitesse
-//    str[i++] = '\x03'; // stop bit
-//
-//    for (j = 0; j < i && j < TX_BUF_LEN; j++) {
-//        txBuffer[j] = (uint8_t)str[j];
-//    }
-//    txLength = i;
-//    txIndex = 0;
-//    SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
-//}
+void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9)
+{
+    char str[TX_BUF_LEN];
+    int i = 0, j = 0;
+
+    str[i++] = '\x02'; // start bit
+    i += ftoa(f0, &str[i], 3); str[i++] = ','; // Pos Consigne
+    i += ftoa(f1, &str[i], 3); str[i++] = ','; // Pos Mesure
+    i += ftoa(f2, &str[i], 3); str[i++] = ','; // Cur Consigne
+    i += ftoa(f3, &str[i], 3); str[i++] = ','; // Cur Mesure
+    i += ftoa(f4, &str[i], 3); str[i++] = ','; // Force Consigne
+    i += ftoa(f5, &str[i], 3); str[i++] = ','; // Xr1
+    i += ftoa(f6, &str[i], 3); str[i++] = ','; // Tension Consigne
+    i += ftoa(f7, &str[i], 3); str[i++] = ','; // Integrale
+    i += ftoa(f8, &str[i], 0); str[i++] = ','; // State (sans virgule)
+    i += ftoa(f9, &str[i], 3);                 // Vitesse
+    str[i++] = '\x03'; // stop bit
+
+    for (j = 0; j < i && j < TX_BUF_LEN; j++) {
+        txBuffer[j] = (uint8_t)str[j];
+    }
+    txLength = i;
+    txIndex = 0;
+    SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
+}

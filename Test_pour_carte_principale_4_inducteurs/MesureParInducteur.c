@@ -185,6 +185,10 @@ float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
 
+uint8_t AntiWindupCheck1 = 0;
+uint8_t AntiWindupCheck2 = 0;
+uint8_t AntiWindupCheck3 = 0;
+uint8_t AntiWindupCheck4 = 0;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -365,7 +369,7 @@ __interrupt void adcA1ISR(void)
     if (UartCounter >= 250) // Avec 25 kHz de boucle
     {
         UartCounter = 0;
-        SendFloatAsText(Position_c4*1000.0f, Pos4_filt*1000.0f, ic4, Cur4_filt, fc4f, xr4, uc4, integral_i4, (float)state, v4);
+        SendFloatAsText(Position_c4*1000.0f, Pos4_filt*1000.0f, ic4, Cur4_filt, fc4f, xr4, fc4, integral_i4, (float) AntiWindupCheck4, v4);
     }
 
     /* --------------------------------------------------------------------- *
@@ -484,24 +488,27 @@ __interrupt void adcA1ISR(void)
                 // Activer la régulation d'état
                 if(!PosRegFlag1) PosRegFlag1 = true;
 
-                // Set point generator (Ramp from 3mm to 2mm)
-                if(Position_c1 > DELTA_N)
-                {
-                    Position_c1 -= 2.5 * 4e-7;
-                }
-                else
-                {
-                    Position_c1 = DELTA_N;
-                }
+                Position_c1 = DELTA_N;
+                Position_c2 = DELTA_N;
 
-                if(Position_c2 > DELTA_N)
-                {
-                    Position_c2 -= 2.5 * 4e-7;
-                }
-                else
-                {
-                    Position_c2 = DELTA_N;
-                }
+//                // Set point generator (Ramp from 3mm to 2mm)
+//                if(Position_c1 > DELTA_N)
+//                {
+//                    Position_c1 -= 2.5 * 4e-7;
+//                }
+//                else
+//                {
+//                    Position_c1 = DELTA_N;
+//                }
+//
+//                if(Position_c2 > DELTA_N)
+//                {
+//                    Position_c2 -= 2.5 * 4e-7;
+//                }
+//                else
+//                {
+//                    Position_c2 = DELTA_N;
+//                }
 
                 // Incrémentation du timer
                 i_store++;
@@ -608,24 +615,27 @@ __interrupt void adcA1ISR(void)
                 // Activer la régulation d'état
                 if(!PosRegFlag3) PosRegFlag3 = true;
 
-                // Set point generator (Ramp from 3mm to 2mm)
-                if(Position_c3 > DELTA_N)
-                {
-                    Position_c3 -= 2.5 * 4e-7;
-                }
-                else
-                {
-                    Position_c3 = DELTA_N;
-                }
+                Position_c3 = DELTA_N;
+                Position_c4 = DELTA_N;
 
-                if(Position_c4 > DELTA_N)
-                {
-                    Position_c4 -= 2.5 * 4e-7;
-                }
-                else
-                {
-                    Position_c4 = DELTA_N;
-                }
+//                // Set point generator (Ramp from 3mm to 2mm)
+//                if(Position_c3 > DELTA_N)
+//                {
+//                    Position_c3 -= 2.5 * 4e-7;
+//                }
+//                else
+//                {
+//                    Position_c3 = DELTA_N;
+//                }
+//
+//                if(Position_c4 > DELTA_N)
+//                {
+//                    Position_c4 -= 2.5 * 4e-7;
+//                }
+//                else
+//                {
+//                    Position_c4 = DELTA_N;
+//                }
 
                 // Incrémentation du timer
                 i_store++;
@@ -682,8 +692,22 @@ __interrupt void adcA1ISR(void)
 
             // Antiwindup
             fc1 = fc1_prim;
-            if (fc1_prim <= 0)   fc1 = 0;
-            if (fc1_prim >= FMAX) fc1 = FMAX;
+            if (fc1_prim <= 0)
+            {
+                fc1 = 0;
+                AntiWindupCheck1 = 2;
+            }
+            else if(fc1_prim >= FMAX)
+            {
+                fc1 = FMAX;
+                AntiWindupCheck1 = 1;
+
+            }
+            else
+            {
+                AntiWindupCheck1 = 0;
+            }
+
             fce1 = (fc1_prim - fc1) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe bande
@@ -703,10 +727,22 @@ __interrupt void adcA1ISR(void)
             sum_vp2 = v2 * Kddot + Position2 * Kd;
             fc2_prim = Kw * Position_c2 + Kr * xr2 * I - sum_vp2 + FP;
 
-            // Antiwindup
+            // Antiwindup avec check
             fc2 = fc2_prim;
-            if (fc2_prim <= 0)   fc2 = 0;
-            if (fc2_prim >= FMAX) fc2 = FMAX;
+            if (fc2_prim <= 0)
+            {
+                fc2 = 0;
+                AntiWindupCheck2 = 2;
+            }
+            else if(fc2_prim >= FMAX)
+            {
+                fc2 = FMAX;
+                AntiWindupCheck2 = 1;
+            }
+            else
+            {
+                AntiWindupCheck2 = 0;
+            }
             fce2 = (fc2_prim - fc2) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe bande
@@ -728,10 +764,23 @@ __interrupt void adcA1ISR(void)
             sum_vp3 = (v3 * KDDOT_SANS_INT) + (Position3 * KD_SANS_INT);
             fc3_prim = (KW_SANS_INT * Position_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
 
-            // Antiwindup
+            // Antiwindup avec check
             fc3 = fc3_prim;
-            if (fc3_prim <= 0)   fc3 = 0;
-            if (fc3_prim >= FMAX) fc3 = FMAX;
+            if (fc3_prim <= 0)
+            {
+                fc3 = 0;
+                AntiWindupCheck3 = 2;
+            }
+            else if(fc3_prim >= FMAX)
+            {
+                fc3 = FMAX;
+                AntiWindupCheck3 = 1;
+
+            }
+            else
+            {
+                AntiWindupCheck3 = 0;
+            }
             fce3 = (fc3_prim - fc3) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe bande
@@ -750,10 +799,23 @@ __interrupt void adcA1ISR(void)
             sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
             fc4_prim = (Kw * Position_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
 
-            // Antiwindup
+            // Antiwindup avec check
             fc4 = fc4_prim;
-            if (fc4_prim <= 0)   fc4 = 0;
-            if (fc4_prim >= FMAX) fc4 = FMAX;
+            if (fc4_prim <= 0)
+            {
+                fc4 = 0;
+                AntiWindupCheck4 = 2;
+            }
+            else if(fc4_prim >= FMAX)
+            {
+                fc4 = FMAX;
+                AntiWindupCheck4 = 1;
+
+            }
+            else
+            {
+                AntiWindupCheck4 = 0;
+            }
             fce4 = (fc4_prim - fc4) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe-bande

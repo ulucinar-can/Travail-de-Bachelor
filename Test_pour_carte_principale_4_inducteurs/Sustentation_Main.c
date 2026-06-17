@@ -123,14 +123,14 @@ float ic3 = 0, ue3 = 0, integral_i3 = 0;
 float fc3 = 0;
 float pos3Buff[FILTWINDOW] = {[0 ... 8] = 0};
 float v3 = 0, ep3 = 0, xr3 = 0, fce3 = 0, sum_vp3 = 0, fc3_prim = 0;
-float Position_c3_dec = 0, Position2_c3 = DELTA_0;
+float Position_c3_dec = 0, Position_c3 = DELTA_0;
 
 // --- Inductor 4 Control ---
 float ic4 = 0, ue4 = 0, integral_i4 = 0;
 float fc4 = 0;
 float pos4Buff[FILTWINDOW] = {[0 ... 8] = 0};
 float v4 = 0, ep4 = 0, xr4 = 0, fce4 = 0, sum_vp4 = 0, fc4_prim = 0;
-float Position_c4_dec = 0 ,Position2_c4 = DELTA_0;
+float Position_c4_dec = 0 ,Position_c4 = DELTA_0;
 
 // --- PID Variables (Archive for future tests) ---
 //float Kp_pid = 2050;
@@ -584,8 +584,8 @@ __interrupt void adcA1ISR(void)
                 if(Position3 <= Position_c3_dec && Position4 <= Position_c4_dec)
                 {
                     // Update des variables
-                    Position2_c3 = Position3;
-                    Position2_c4 = Position4;
+                    Position_c3 = Position3;
+                    Position_c4 = Position4;
 
                     // Changement d'état
                     state = STATE_6;
@@ -615,22 +615,22 @@ __interrupt void adcA1ISR(void)
                 if(!PosRegFlag3) PosRegFlag3 = true;
 
                 // Set point generator (Ramp from 3mm to 2mm)
-                if(Position2_c3 > DELTA_N)
+                if(Position_c3 > DELTA_N)
                 {
-                    Position2_c3 -= 2.5 * 4e-7;
+                    Position_c3 -= 2.5 * 4e-7;
                 }
                 else
                 {
-                    Position2_c3 = DELTA_N;
+                    Position_c3 = DELTA_N;
                 }
 
-                if(Position2_c4 > DELTA_N)
+                if(Position_c4 > DELTA_N)
                 {
-                    Position2_c4 -= 2.5 * 4e-7;
+                    Position_c4 -= 2.5 * 4e-7;
                 }
                 else
                 {
-                    Position2_c4 = DELTA_N;
+                    Position_c4 = DELTA_N;
                 }
 
                 // Incrémentation du timer
@@ -729,10 +729,10 @@ __interrupt void adcA1ISR(void)
         {
             // --- Inductor 3 ---
             // Calcul de la force de consigne
-            ep3 = Position2_c3 - Position3;
+            ep3 = Position_c3 - Position3;
             xr3 += (ep3 - fce3);
             sum_vp3 = (v3 * KDDOT_SANS_INT) + (Position3 * KD_SANS_INT);
-            fc3_prim = (KW_SANS_INT * Position2_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
+            fc3_prim = (KW_SANS_INT * Position_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
 
             // Antiwindup
             fc3 = fc3_prim;
@@ -751,10 +751,10 @@ __interrupt void adcA1ISR(void)
 
             // --- Inductor 4 ---
             // Calcul de la force de consigne 4
-            ep4 = Position2_c4 - Position4;
+            ep4 = Position_c4 - Position4;
             xr4 += (ep4 - fce4);
             sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
-            fc4_prim = (Kw * Position2_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
+            fc4_prim = (Kw * Position_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
 
             // Antiwindup
             fc4 = fc4_prim;

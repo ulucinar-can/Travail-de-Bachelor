@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v22.6.1                     
 ******************************************************************************
->> Linked Wed Jun 17 07:04:59 2026
+>> Linked Wed Jun 17 14:21:16 2026
 
 OUTPUT FILE NAME:   <Test_pour_carte_principale_4_inducteurs.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00000000
@@ -427,7 +427,7 @@ address     data page           name
 0000a892     2a2 (0000a880)     sum_vp3
 0000a894     2a2 (0000a880)     fc3_prim
 0000a896     2a2 (0000a880)     Position_c3_dec
-0000a898     2a2 (0000a880)     Position2_c3
+0000a898     2a2 (0000a880)     Position_c3
 0000a89a     2a2 (0000a880)     ic4
 0000a89c     2a2 (0000a880)     ue4
 0000a89e     2a2 (0000a880)     integral_i4
@@ -439,7 +439,7 @@ address     data page           name
 0000a8aa     2a2 (0000a880)     sum_vp4
 0000a8ac     2a2 (0000a880)     fc4_prim
 0000a8ae     2a2 (0000a880)     Position_c4_dec
-0000a8b0     2a2 (0000a880)     Position2_c4
+0000a8b0     2a2 (0000a880)     Position_c4
 0000a8b2     2a2 (0000a880)     fc1f
 0000a8b4     2a2 (0000a880)     fc2f
 0000a8b6     2a2 (0000a880)     fc3f
@@ -586,15 +586,15 @@ page  address   name
 0     0000a811  PosRegFlag3                      
 0     0000a81c  Position1                        
 0     0000a81e  Position2                        
-0     0000a898  Position2_c3                     
-0     0000a8b0  Position2_c4                     
 0     0000a820  Position3                        
 0     0000a822  Position4                        
 0     0000a866  Position_c1                      
 0     0000a868  Position_c1_dec                  
 0     0000a87e  Position_c2                      
 0     0000a880  Position_c2_dec                  
+0     0000a898  Position_c3                      
 0     0000a896  Position_c3_dec                  
+0     0000a8b0  Position_c4                      
 0     0000a8ae  Position_c4_dec                  
 0     0000985a  Push_Button_Start_XINT_init      
 0     0000adbe  SAVITZKY                         
@@ -920,7 +920,7 @@ page  address   name
 0     0000a892  sum_vp3                          
 0     0000a894  fc3_prim                         
 0     0000a896  Position_c3_dec                  
-0     0000a898  Position2_c3                     
+0     0000a898  Position_c3                      
 0     0000a89a  ic4                              
 0     0000a89c  ue4                              
 0     0000a89e  integral_i4                      
@@ -932,7 +932,7 @@ page  address   name
 0     0000a8aa  sum_vp4                          
 0     0000a8ac  fc4_prim                         
 0     0000a8ae  Position_c4_dec                  
-0     0000a8b0  Position2_c4                     
+0     0000a8b0  Position_c4                      
 0     0000a8b2  fc1f                             
 0     0000a8b4  fc2f                             
 0     0000a8b6  fc3f                             

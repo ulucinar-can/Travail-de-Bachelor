@@ -169,8 +169,8 @@ extern const float POS_COR_4[6];
 void reverse(char* str, int len);
 int ConvertIntToStr(int x, char str[], int p);
 int ftoa(float n, char* res, int afterpoint);
-void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7); // pour envoyer le courant et la position
-//void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9);
+//void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7); // pour envoyer le courant et la position
+void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9);
 float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);
