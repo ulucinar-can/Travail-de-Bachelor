@@ -61,7 +61,7 @@
 #define STATE_8                     8
 
 #define SKIP_BACK                   0
-#define SKIP_FRONT                  1
+#define SKIP_FRONT                  0
 
 #define GAIN_COR_1                  8.6659e-7f
 #define OFFSET_COR_1                2.0069e-4f
@@ -366,16 +366,16 @@ __interrupt void adcA1ISR(void)
     {
         UartCounter = 0; // Reset du compteur (~1s)
 
-        //Envoie des positions et des courants
-        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
-                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+//        //Envoie des positions et des courants
+//        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
+//                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
 
         //Envoie des courrants
         //SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
     }
 
     /* --------------------------------------------------------------------- *
-     * 4. MACHINE D'ETAT & REGULATION (Si activée)
+     * 4. MACHINE D'ETAT & REGULATION
      * --------------------------------------------------------------------- */
 
     // State 0 :
@@ -819,39 +819,54 @@ __interrupt void adcA1ISR(void)
         // Mesure des variables
     }
     // State 8 :
-    // Arrêt de la sustentation
-    else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
-    {
-        GPIO_writePin(LED_D2, 1); // Eteindre LED
-
-        // Forcer les PWM à 50%
-        for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
+        // Arrêt de la sustentation
+        else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
         {
-            dutyFine = ((float)(duty_cycle_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
-            compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
-            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+            GPIO_writePin(LED_D2, 1); // Eteindre LED
+
+            // Forcer les PWM à 50%
+            for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
+            {
+                dutyFine = ((float)(duty_cycle_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
+                compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
+                HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
+                HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+            }
+
+            // Reset de la machine d'état
+            state = STATE_1;
+            PosRegFlag1 = false;
+            PosRegFlag3 = false;
+
+            Kw = KW;
+            Kd = KD;
+            Kddot = KDDOT;
+            Kr = KR;
+            Kr_sans_int = KR_SANS_INT;
+
+            i_store = 0;
+
+            // ================================================================= //
+            // NOUVEAU : RÉINITIALISATION DES INTÉGRATEURS ET CONSIGNES
+            // ================================================================= //
+            // 1. Reset des intégrales du régulateur de courant PI et de l'anti-windup
+            integral_i1 = 0.0f; ue1 = 0.0f; ic1 = 0.0f;
+            integral_i2 = 0.0f; ue2 = 0.0f; ic2 = 0.0f;
+            integral_i3 = 0.0f; ue3 = 0.0f; ic3 = 0.0f;
+            integral_i4 = 0.0f; ue4 = 0.0f; ic4 = 0.0f;
+
+            // 2. Reset des intégrateurs de la régulation d'état (position) et anti-windup de force
+            xr1 = 0.0f; fce1 = 0.0f;
+            xr2 = 0.0f; fce2 = 0.0f;
+            xr3 = 0.0f; fce3 = 0.0f;
+            xr4 = 0.0f; fce4 = 0.0f;
+
+            status = SFO();
+            if (status == SFO_ERROR) error();
+
+            // State 9 :
+            // Arrêt de la sustentation avec erreur
         }
-
-        // Reset de la machine d'état
-        state = STATE_1;
-        PosRegFlag1 = false;
-        PosRegFlag3 = false;
-
-        Kw = KW;
-        Kd = KD;
-        Kddot = KDDOT;
-        Kr = KR;
-        Kr_sans_int = KR_SANS_INT;
-
-        i_store = 0;
-
-        status = SFO();
-        if (status == SFO_ERROR) error();
-
-        // State 9 :
-        // Arrêt de la sustentation avec erreur
-    }
 
     /* --------------------------------------------------------------------- *
      * 6. ACQUITTEMENTS & FLAGS (ADC)
