@@ -10,7 +10,7 @@ GEN_OPTS__FLAG := --cmd_file="syscfg/board.opt" --cmd_file="syscfg/c2000ware_lib
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
-"./FunctionHeader2.obj" \
+"./FunctionHeader.obj" \
 "./Sustentation_Main.obj" \
 "./syscfg/board.obj" \
 "./syscfg/c2000ware_libraries.obj" \
@@ -130,21 +130,21 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-Test_pour_carte_principale_4_inducteurs.out 
+CodePrincipal.out 
 
 EXE_OUTPUTS__QUOTED += \
-"Test_pour_carte_principale_4_inducteurs.out" 
+"CodePrincipal.out" 
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "Test_pour_carte_principale_4_inducteurs.out"
+	@$(MAKE) --no-print-directory -Onone "CodePrincipal.out"
 
 # Tool invocations
-Test_pour_carte_principale_4_inducteurs.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
+CodePrincipal.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
-	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -O3 --opt_for_speed=5 --fp_mode=relaxed --fp_reassoc=on --advice:performance=all --define=DEBUG --define=RAM --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"Test_pour_carte_principale_4_inducteurs.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/c2000/C2000Ware_5_02_00_00" -i"C:/Users/CanUl/Documents/TB/Travail de Bachelor/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --define=RAM --diag_wrap=off --display_error_number --xml_link_info="Test_pour_carte_principale_4_inducteurs_linkInfo.xml" --entry_point=code_start --rom_model -o "Test_pour_carte_principale_4_inducteurs.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla2 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcrc -O3 --opt_for_speed=5 --fp_mode=relaxed --fp_reassoc=on --advice:performance=all --define=DEBUG --define=RAM --diag_suppress=10063 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --abi=eabi -z -m"CodePrincipal.map" --heap_size=0x100 --stack_size=0x200 --warn_sections -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/c2000/C2000Ware_5_02_00_00" -i"C:/Users/CanUl/Documents/TB/Travail de Bachelor/Test_pour_carte_principale_4_inducteurs/CPU1_RAM/syscfg" -i"C:/ti/ccs1260/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" --reread_libs --define=RAM --diag_wrap=off --display_error_number --xml_link_info="CodePrincipal_linkInfo.xml" --entry_point=code_start --rom_model -o "CodePrincipal.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -152,8 +152,8 @@ Test_pour_carte_principale_4_inducteurs.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(G
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "FunctionHeader2.obj" "Sustentation_Main.obj" "syscfg\board.obj" "syscfg\c2000ware_libraries.obj" "device\device.obj" "device\f28003x_codestartbranch.obj" 
-	-$(RM) "FunctionHeader2.d" "Sustentation_Main.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "device\device.d" 
+	-$(RM) "FunctionHeader.obj" "Sustentation_Main.obj" "syscfg\board.obj" "syscfg\c2000ware_libraries.obj" "device\device.obj" "device\f28003x_codestartbranch.obj" 
+	-$(RM) "FunctionHeader.d" "Sustentation_Main.d" "syscfg\board.d" "syscfg\c2000ware_libraries.d" "device\device.d" 
 	-$(RM) "device\f28003x_codestartbranch.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'

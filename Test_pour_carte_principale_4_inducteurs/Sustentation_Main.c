@@ -5,11 +5,11 @@
 // TITLE:   Power command and regulation for magnetic sustenance
 //
 // AUTHOR :
-//          - Thomas Freyche - 2025
 //          - Can Uluçinar   - 2026
 //
 //###########################################################################
 
+#include <FunctionHeader.h>
 #include "driverlib.h"
 #include "device.h"
 #include "board.h"
@@ -17,7 +17,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include "FunctionHeader2.h"
 
 /* ========================================================================= *
  * CONFIGURATION DEFINES
@@ -174,7 +173,7 @@ uint8_t state = STATE_1;
 bool PosRegFlag1 = false;
 bool PosRegFlag3 = false;
 
-// --- Variable for value sending ---
+// --- Variable for filtrered value sending ---
 float Pos1_filt = DELTA_0;
 float Pos2_filt = DELTA_0;
 float Pos3_filt = DELTA_0;
@@ -184,7 +183,6 @@ float Cur1_filt = 0;
 float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
-
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -200,15 +198,6 @@ __interrupt void INT_mySCI0_TX_ISR(void);
  * MAIN PROGRAM
  * ========================================================================= */
 void main(void)
-{
-    // Main init
-    init();
-
-    // Infinite loop
-    while(1);
-}
-
-void init(void)
 {
     // Initialize device clock and peripherals
     Device_init();
@@ -261,6 +250,10 @@ void init(void)
     GPIO_writePin(LED_D2,1);
     GPIO_writePin(LED_D5,0);
     GPIO_writePin(LED_D6,0);
+
+
+    // Infinite loop
+    while(1);
 }
 
 void error (void)
@@ -329,7 +322,6 @@ __interrupt void adcA1ISR(void)
     Position3 = ((float)(ADC_pos_3) * CONV_POS2);
     Position4 = ((float)(ADC_pos_4) * CONV_POS2);
 
-
 //    Position1 = apply_poly5((float)(ADC_pos_1), POS_COR_1);
 //    Position2 = apply_poly5((float)(ADC_pos_2), POS_COR_2);
 //    Position3 = apply_poly5((float)(ADC_pos_3), POS_COR_3);
@@ -367,11 +359,8 @@ __interrupt void adcA1ISR(void)
         UartCounter = 0; // Reset du compteur (~1s)
 
 //        //Envoie des positions et des courants
-//        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
-//                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
-
-        //Envoie des courrants
-        //SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
+                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
     }
 
     /* --------------------------------------------------------------------- *
@@ -838,17 +827,16 @@ __interrupt void adcA1ISR(void)
             PosRegFlag1 = false;
             PosRegFlag3 = false;
 
+            // Reset des gains d'état
             Kw = KW;
             Kd = KD;
             Kddot = KDDOT;
             Kr = KR;
             Kr_sans_int = KR_SANS_INT;
 
+            // Reset timer
             i_store = 0;
 
-            // ================================================================= //
-            // NOUVEAU : RÉINITIALISATION DES INTÉGRATEURS ET CONSIGNES
-            // ================================================================= //
             // 1. Reset des intégrales du régulateur de courant PI et de l'anti-windup
             integral_i1 = 0.0f; ue1 = 0.0f; ic1 = 0.0f;
             integral_i2 = 0.0f; ue2 = 0.0f; ic2 = 0.0f;

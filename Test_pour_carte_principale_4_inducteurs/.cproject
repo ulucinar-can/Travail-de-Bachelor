@@ -126,13 +126,13 @@
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.DEVICE.132264336" name="Name of the device as defined in the core SOC data (-d, --device)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.DEVICE" value="F28003x" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.OTHER_FLAGS.808878531" name="Other flags" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.OTHER_FLAGS"/>
-								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE.1044156158" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE" value="100PZ" valueType="string"/>
-								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PART.1974743109" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PART" value="F28003x_100PZ" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE.1044156158" name="Name of the package as defined in the core SOC data (-p, --package)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE" value="100PZ" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PART.1974743109" name="Name of the part as defined in the core SOC data (-r, --part)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PART" value="F28003x_100PZ" valueType="string"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="MesureParInducteur.c|Fichier_de_test/MesurePosition.c|Ancien_code/hrpwm_ex1_duty_sfo.c|Fichier_de_test/Test_regulation_position.c|Fichier_de_test/Test_regulation_courant.c|Ancien_code/Fichier_de_test/Sans_UART/hrpwm_ex1_duty_sfo_sans_uart.c|Ancien_code/Fichier_de_test/Sans_UART/Inducteur_3_4_sans_uart.c|Ancien_code/Fichier_de_test/Sans_UART/Inducteur_1_2_sans_uart.c|Ancien_code/Fichier_de_test/Avec_UART/Inducteur_3_4.c|Ancien_code/Fichier_de_test/Avec_UART/Inducteur_1_2.c|device/driverlib|28003x_generic_flash_lnk.cmd|targetConfigs/TMS320F280039C_LaunchPad.ccxml" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="device/driverlib|28003x_generic_flash_lnk.cmd|targetConfigs/TMS320F280039C_LaunchPad.ccxml" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -255,13 +255,13 @@
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.DEVICE.401502782" name="Name of the device as defined in the core SOC data (-d, --device)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.DEVICE" value="F28003x" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.OTHER_FLAGS.702772080" name="Other flags" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.OTHER_FLAGS"/>
-								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE.88744367" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE" value="100PZ" valueType="string"/>
-								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PART.763412809" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PART" value="F28003x_100PZ" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE.88744367" name="Name of the package as defined in the core SOC data (-p, --package)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE" value="100PZ" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PART.763412809" name="Name of the part as defined in the core SOC data (-r, --part)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PART" value="F28003x_100PZ" valueType="string"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Ancien_code/hrpwm_ex1_duty_sfo.c|Ancien_code/Fichier_de_test/Sans_UART/Inducteur_3_4_sans_uart.c|Ancien_code/Fichier_de_test/Sans_UART/Inducteur_1_2_sans_uart.c|Ancien_code/Fichier_de_test/Sans_UART/hrpwm_ex1_duty_sfo_sans_uart.c|Ancien_code/Fichier_de_test/Avec_UART/Inducteur_3_4.c|Ancien_code/Fichier_de_test/Avec_UART/Inducteur_1_2.c|Fichier_de_test/Test_regulation_position.c|Fichier_de_test/Test_regulation_courant.c|Fichier_de_test/MesurePosition.c|Sustentation_Main.c|device/driverlib|28003x_generic_ram_lnk.cmd|targetConfigs/TMS320F280039C_LaunchPad.ccxml" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Sustentation_Main.c|device/driverlib|28003x_generic_ram_lnk.cmd|targetConfigs/TMS320F280039C_LaunchPad.ccxml" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -383,8 +383,8 @@
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.DEVICE.1277007137" name="Name of the device as defined in the core SOC data (-d, --device)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.DEVICE" value="F28003x" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.OTHER_FLAGS.1050386847" name="Other flags" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.OTHER_FLAGS"/>
-								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE.1466569449" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE" value="100PZ" valueType="string"/>
-								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PART.1022317357" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PART" value="F28003x_100PZ" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE.1466569449" name="Name of the package as defined in the core SOC data (-p, --package)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE" value="100PZ" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PART.1022317357" name="Name of the part as defined in the core SOC data (-r, --part)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PART" value="F28003x_100PZ" valueType="string"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
@@ -511,8 +511,8 @@
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.DEVICE.1825388810" name="Name of the device as defined in the core SOC data (-d, --device)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.DEVICE" value="F28003x" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.OTHER_FLAGS.465786404" name="Other flags" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.OTHER_FLAGS"/>
-								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE.735650918" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE" value="100PZ" valueType="string"/>
-								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PART.1245409808" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PART" value="F28003x_100PZ" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE.735650918" name="Name of the package as defined in the core SOC data (-p, --package)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PACKAGE" value="100PZ" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.sysConfig.PART.1245409808" name="Name of the part as defined in the core SOC data (-r, --part)" superClass="com.ti.ccstudio.buildDefinitions.sysConfig.PART" value="F28003x_100PZ" valueType="string"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
