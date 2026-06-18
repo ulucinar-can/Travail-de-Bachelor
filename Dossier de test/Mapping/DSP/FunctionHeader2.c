@@ -240,3 +240,37 @@ void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5,
     txIndex = 0;
     SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
 }
+
+void SendFloatAsBinary(float f0, float f1, float f2, float f3)
+{
+    char localBuf[TX_BUF_LEN];
+    float data[4] = {f0, f1, f2, f3};
+    uint16_t *ptr = (uint16_t*)data; // 4 floats = 8 mots de 16-bits sur C2000
+    uint16_t i;
+    uint16_t idx = 0;
+
+    // 1. En-tête de synchronisation (2 octets)
+    localBuf[idx++] = 0xAA;
+    localBuf[idx++] = 0xBB;
+
+    // 2. Traitement des 4 floats (8 mots de 16-bits = 16 octets)
+    for(i = 0; i < 8; i++) {
+        localBuf[idx++] = ptr[i] & 0xFF;         // Octet de poids faible (LSB)
+        localBuf[idx++] = (ptr[i] >> 8) & 0xFF;  // Octet de poids fort (MSB)
+    }
+
+    // 3. Fin de trame (2 octets)
+    localBuf[idx++] = 0xCC;
+    localBuf[idx++] = 0xDD;
+
+    // 4. Copie vers le buffer d'interruption UART
+    for(i = 0; i < idx && i < TX_BUF_LEN; i++) {
+        txBuffer[i] = localBuf[i];
+    }
+
+    txLength = idx; // Trame totale de 20 octets
+    txIndex = 0;
+
+    // Déclenchement de l'envoi matériel
+    SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
+}

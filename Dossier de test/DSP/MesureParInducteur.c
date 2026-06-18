@@ -61,7 +61,7 @@
 #define STATE_8                     8
 
 #define SKIP_BACK                   0
-#define SKIP_FRONT                  0
+#define SKIP_FRONT                  1
 
 #define GAIN_COR_1                  8.6659e-7f
 #define OFFSET_COR_1                2.0069e-4f
@@ -184,6 +184,31 @@ float Cur1_filt = 0;
 float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
+
+float fc1_filt = 0;
+float fc2_filt = 0;
+float fc3_filt = 0;
+float fc4_filt = 0;
+
+float fc1f_filt = 0;
+float fc2f_filt = 0;
+float fc3f_filt = 0;
+float fc4f_filt = 0;
+
+float ep1_filt = 0;
+float ep2_filt = 0;
+float ep3_filt = 0;
+float ep4_filt = 0;
+
+float v1_filt = 0;
+float v2_filt = 0;
+float v3_filt = 0;
+float v4_filt = 0;
+
+float xr1_filt = 0;
+float xr2_filt = 0;
+float xr3_filt = 0;
+float xr4_filt = 0;
 
 uint8_t AntiWindupCheck1 = 0;
 uint8_t AntiWindupCheck2 = 0;
@@ -361,15 +386,45 @@ __interrupt void adcA1ISR(void)
     Cur3_filt = (0.0001f * Current3) + (0.9999f * Cur3_filt);
     Cur4_filt = (0.0001f * Current4) + (0.9999f * Cur4_filt);
 
+    // --- force filtré pour l'envoie ---
+    fc1_filt = (0.1f * fc1) + (0.9f * fc1_filt);
+    fc2_filt = (0.1f * fc2) + (0.9f * fc2_filt);
+    fc3_filt = (0.1f * fc3) + (0.9f * fc3_filt);
+    fc4_filt = (0.1f * fc4) + (0.9f * fc4_filt);
+
+    // --- force filtré filtré (lol) pour l'envoie ---
+    fc1f_filt = (0.1f * fc1f) + (0.9f * fc1f_filt);
+    fc2f_filt = (0.1f * fc2f) + (0.9f * fc2f_filt);
+    fc3f_filt = (0.1f * fc3f) + (0.9f * fc3f_filt);
+    fc4f_filt = (0.1f * fc4f) + (0.9f * fc4f_filt);
+
+    // --- vitesse filtré pour l'envoie ---
+    v1_filt = (0.1f * v1) + (0.9f * v1_filt);
+    v2_filt = (0.1f * v2) + (0.9f * v2_filt);
+    v3_filt = (0.1f * v3) + (0.9f * v3_filt);
+    v4_filt = (0.1f * v4) + (0.9f * v4_filt);
+
+    // --- erreur filtré pour l'envoie ---
+    ep1_filt = (0.1f * ep1) + (0.9f * ep1_filt);
+    ep2_filt = (0.1f * ep2) + (0.9f * ep2_filt);
+    ep3_filt = (0.1f * ep3) + (0.9f * ep3_filt);
+    ep4_filt = (0.1f * ep4) + (0.9f * ep4_filt);
+
+    // --- intégrale filtré pour l'envoie ---
+    xr1_filt = (0.1f * xr1) + (0.9f * xr1_filt);
+    xr2_filt = (0.1f * xr2) + (0.9f * xr2_filt);
+    xr3_filt = (0.1f * xr3) + (0.9f * xr3_filt);
+    xr4_filt = (0.1f * xr4) + (0.9f * xr4_filt);
+
     /* --------------------------------------------------------------------- *
      * 3. COMMUNICATION (TELEMETRIE)
      * --------------------------------------------------------------------- */
-    // Exemple pour un envoi toutes les 10 ms (100 Hz)
+    // Exemple pour un envoi toutes les 1 ms (100 Hz)
     UartCounter++;
-    if (UartCounter >= 250) // Avec 25 kHz de boucle
+    if (UartCounter >= 25) // Avec 25 kHz de boucle
     {
         UartCounter = 0;
-        SendFloatAsText(Position_c4*1000.0f, Pos4_filt*1000.0f, ic4, Cur4_filt, fc4f, xr4, fc4, integral_i4, (float) AntiWindupCheck4, v4);
+        SendFloatAsText(fc3f_filt, fc4f_filt, ic4, Cur4_filt, fc4f_filt, xr4_filt, fc4_filt, ep4_filt, (float) AntiWindupCheck4, v4_filt);
     }
 
     /* --------------------------------------------------------------------- *

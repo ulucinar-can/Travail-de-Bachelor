@@ -175,5 +175,5 @@ float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);
 float apply_poly5(float x, const float* coeffs);
-
+void SendFloatAsBinary(float f0, float f1, float f2, float f3);
 #endif /* FUNCTIONHEADER_H_ */

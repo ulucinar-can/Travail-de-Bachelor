@@ -7,7 +7,7 @@
  - Gérer la communication UART entre l'ESP32S2 et le DSP dans les deux sens ainsi qu'au traitement des données reçues.
 
   Options de compilation Arduino
-  1. esp32 dev module
+  1. esp32s2 dev module
   2. USB CDC On Boot Enable
   3. Erase All Flash Before Sketch Upload Enable
   upload speed 115200
@@ -177,19 +177,18 @@ void loop() {
   // } 
 
 // Réception de l'UART
-  // Réception de l'UART (Limité à 128 caractères par boucle pour ne pas bloquer le WebServer)
-  int bytesToRead = 128;
-  while (MySerial.available() > 0 && bytesToRead > 0) {
-  uint8_t c = MySerial.read();
-  
-  if (RxIndex < UART_BUFFER) {
-    buffer[RxIndex++] = c;
-  } else {
-    RxIndex = 0;
-    Serial.println("Buffer plein, réinitialisation");
+  while (MySerial.available() > 0) {
+    uint8_t c = MySerial.read();  // Lecture du caractère reçu
+
+    // Remplissage du buffer tant qu'il y a des données reçues
+    if (RxIndex < UART_BUFFER) {
+      buffer[RxIndex++] = c;  
+    }
+    else {
+      RxIndex = 0;  // Réinitialisation de l'index pour éviter le débordement
+      Serial.println("Buffer plein, réinitialisation");
+    }
   }
-  bytesToRead--;
-}
 // Envoi Hello World!
   // if (RxIndex > 0) {
   //   Serial.print("Message reçu : ");

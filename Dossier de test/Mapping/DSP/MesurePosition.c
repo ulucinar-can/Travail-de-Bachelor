@@ -51,17 +51,6 @@
 #define ALPHA                       0.001f
 #define ALPHA_INV                   0.999f
 
-#define STATE_1                     1
-#define STATE_2                     2
-#define STATE_3                     3
-#define STATE_4                     4
-#define STATE_5                     5
-#define STATE_6                     6
-#define STATE_7                     7
-#define STATE_8                     8
-
-#define SKIP_BACK                   0
-#define SKIP_FRONT                  0
 
 /* ========================================================================= *
  * GLOBAL VARIABLES
@@ -158,7 +147,6 @@ volatile uint16_t rxIndex = 0;
 static uint16_t dataIndex = 0;
 
 // --- State machine variable ---
-uint8_t state = STATE_1;
 bool PosRegFlag1 = false;
 bool PosRegFlag3 = false;
 
@@ -273,58 +261,20 @@ __interrupt void adcA1ISR(void)
     ADC_pos_3 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER2);
     ADC_pos_4 = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER3);
 
-    // --- Lecture du courant ---
-    ADC_cur_1 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER0);
-    ADC_cur_2 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER1);
-    ADC_cur_3 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER2);
-    ADC_cur_4 = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER3);
-
-    // --- Calibration de l'offset initial (0A = 1.5V = ~1861.36) ---
-    if(Offset_count <= 999 && !Offset_stop)
-    {
-        Offset_ADC1 += ((float)ADC_cur_1) - ADC_ZERO_CURRENT;
-        Offset_ADC2 += ((float)ADC_cur_2) - ADC_ZERO_CURRENT;
-        Offset_ADC3 += ((float)ADC_cur_3) - ADC_ZERO_CURRENT;
-        Offset_ADC4 += ((float)ADC_cur_4) - ADC_ZERO_CURRENT;
-        Offset_count++;
-
-        // Moyenne pour definir l'offset de mesure de courant (1000 Ã©chantillons)
-        if(Offset_count > 999)
-        {
-            Offset_ADC1 = Offset_ADC1 * OFFSET_COUNT_INV;
-            Offset_ADC2 = Offset_ADC2 * OFFSET_COUNT_INV;
-            Offset_ADC3 = Offset_ADC3 * OFFSET_COUNT_INV;
-            Offset_ADC4 = Offset_ADC4 * OFFSET_COUNT_INV;
-
-            Offset_stop = true; // Arret de l'echantillonnage
-
-            // Mesure de position une fois stabilisÃ©e
-            Position_c1_dec = Position1 * POS_DETECT;
-            Position_c2_dec = Position2 * POS_DETECT;
-            Position_c3_dec = Position3 * POS_DETECT;
-            Position_c4_dec = Position4 * POS_DETECT;
-        }
-    }
-
     /* --------------------------------------------------------------------- *
      * 2. CONVERSIONS PHYSIQUES
      * --------------------------------------------------------------------- */
     // --- Conversion 12 bits -> Position en mm ---
-//    Position1 = (float)(ADC_pos_1) * CONV_POS2;
-//    Position2 = (float)(ADC_pos_2) * CONV_POS2;
-//    Position3 = (float)(ADC_pos_3) * CONV_POS2;
-//    Position4 = (float)(ADC_pos_4) * CONV_POS2;
+    Position1 = (float)(ADC_pos_1) * CONV_POS2;
+    Position2 = (float)(ADC_pos_2) * CONV_POS2;
+    Position3 = (float)(ADC_pos_3) * CONV_POS2;
+    Position4 = (float)(ADC_pos_4) * CONV_POS2;
 
-    // --- Conversion 12 bits -> Position en mm ---
-      Position1 = ADC_pos_1;
-      Position2 = ADC_pos_2;
-      Position3 = ADC_pos_3;
-      Position4 = ADC_pos_4;
-
-//    Position1 = ((float)(ADC_pos_1) * CONV_POS2) * GAIN_COR_1 + OFFSET_COR_1;
-//    Position2 = ((float)(ADC_pos_2) * CONV_POS2) * GAIN_COR_2 + OFFSET_COR_2;
-//    Position3 = ((float)(ADC_pos_3) * CONV_POS2) * GAIN_COR_3 + OFFSET_COR_3;
-//    Position4 = ((float)(ADC_pos_4) * CONV_POS2) * GAIN_COR_4 + OFFSET_COR_4;
+    // --- Conversion 12 bits -> Position en brute ---
+//      Position1 = ADC_pos_1;
+//      Position2 = ADC_pos_2;
+//      Position3 = ADC_pos_3;
+//      Position4 = ADC_pos_4;
 
     // --- Position filtrÃ© pour l'envoie ---
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
@@ -338,28 +288,24 @@ __interrupt void adcA1ISR(void)
     Current3  = (((float)(ADC_cur_3) - ADC_ZERO_CURRENT - Offset_ADC3) / (ADC_ZERO_CURRENT + Offset_ADC3)) * I_MAX;
     Current4  = (((float)(ADC_cur_4) - ADC_ZERO_CURRENT - Offset_ADC4) / (ADC_ZERO_CURRENT + Offset_ADC4)) * I_MAX;
 
-    // --- Courant filtrÃ© pour l'envoie ---
-    Cur1_filt = (0.0001f * Current1) + (0.9999f * Cur1_filt);
-    Cur2_filt = (0.0001f * Current2) + (0.9999f * Cur2_filt);
-    Cur3_filt = (0.0001f * Current3) + (0.9999f * Cur3_filt);
-    Cur4_filt = (0.0001f * Current4) + (0.9999f * Cur4_filt);
-
     /* --------------------------------------------------------------------- *
-     * 3. COMMUNICATION (TELEMETRIE)
+     * 3. COMMUNICATION BINAIRE CONDITIONNELLE (MAPPING 4 CANAUX)
      * --------------------------------------------------------------------- */
-    UartCounter++;
-    if (UartCounter >= 25000)
+    if (state_PIN) // Active l'envoi UNIQUEMENT si le bouton "Start" a été pressé
     {
-        UartCounter = 0; // Reset du compteur (~1s)
+        UartCounter++;
+        // Boucle à 25kHz / 10 = Envoi à 2.5 kHz (Une mesure toutes les 400 µs)
+        if (UartCounter >= 10)
+        {
+            UartCounter = 0;
 
-        //Envoie des positions en mm
-        //SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f);
-
-        //Envoie des positions en brut
-        SendFloatAsText(Pos1_filt, Pos2_filt, Pos3_filt, Pos4_filt);
-
-        //Envoie des courrants
-        //SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+            // Envoi exclusif des 4 positions filtrées
+            SendFloatAsBinary(Position1, Position2, Position3, Position4);
+        }
+    }
+    else
+    {
+        UartCounter = 0; // Maintien du compteur à 0 à l'arrêt
     }
 
     /* --------------------------------------------------------------------- *
