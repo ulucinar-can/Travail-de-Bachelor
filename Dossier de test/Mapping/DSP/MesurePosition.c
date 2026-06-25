@@ -156,10 +156,19 @@ float Pos2_filt = DELTA_0;
 float Pos3_filt = DELTA_0;
 float Pos4_filt = DELTA_0;
 
-float Cur1_filt = 0;
-float Cur2_filt = 0;
-float Cur3_filt = 0;
-float Cur4_filt = 0;
+uint16_t Min1 = 0;
+uint16_t Max1 = 0;
+
+uint16_t Min2 = 0;
+uint16_t Max2 = 0;
+
+uint16_t Min3 = 0;
+uint16_t Max3 = 0;
+
+uint16_t Min4 = 0;
+uint16_t Max4 = 0;
+
+bool flag = true;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -265,10 +274,10 @@ __interrupt void adcA1ISR(void)
      * 2. CONVERSIONS PHYSIQUES
      * --------------------------------------------------------------------- */
     // --- Conversion 12 bits -> Position en mm ---
-    Position1 = (float)(ADC_pos_1) * CONV_POS2;
-    Position2 = (float)(ADC_pos_2) * CONV_POS2;
-    Position3 = (float)(ADC_pos_3) * CONV_POS2;
-    Position4 = (float)(ADC_pos_4) * CONV_POS2;
+//    Position1 = (float)(ADC_pos_1) * CONV_POS2 * 1000;
+//    Position2 = (float)(ADC_pos_2) * CONV_POS2 * 1000;
+//    Position3 = (float)(ADC_pos_3) * CONV_POS2 * 1000;
+//    Position4 = (float)(ADC_pos_4) * CONV_POS2 * 1000;
 
     // --- Conversion 12 bits -> Position en brute ---
 //      Position1 = ADC_pos_1;
@@ -277,10 +286,55 @@ __interrupt void adcA1ISR(void)
 //      Position4 = ADC_pos_4;
 
     // --- Position filtrÃ© pour l'envoie ---
-    Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
-    Pos2_filt = (ALPHA * Position2) + (ALPHA_INV * Pos2_filt);
-    Pos3_filt = (ALPHA * Position3) + (ALPHA_INV * Pos3_filt);
-    Pos4_filt = (ALPHA * Position4) + (ALPHA_INV * Pos4_filt);
+//    Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
+//    Pos2_filt = (ALPHA * Position2) + (ALPHA_INV * Pos2_filt);
+//    Pos3_filt = (ALPHA * Position3) + (ALPHA_INV * Pos3_filt);
+//    Pos4_filt = (ALPHA * Position4) + (ALPHA_INV * Pos4_filt);
+
+    if(flag){
+        Min1 = ADC_pos_1;
+        Min2 = ADC_pos_2;
+        Min3 = ADC_pos_3;
+        Min4 = ADC_pos_4;
+
+        flag = false;
+    }
+
+      if(Min1 > ADC_pos_1)
+      {
+          Min1 = ADC_pos_1;
+      }
+      else if(Max1 < ADC_pos_1)
+      {
+          Max1 = ADC_pos_1;
+      }
+
+      if(Min2 > ADC_pos_2)
+      {
+          Min2 = ADC_pos_2;
+      }
+      else if(Max2 < ADC_pos_2)
+      {
+          Max2 = ADC_pos_2;
+      }
+
+      if(Min3 > ADC_pos_3)
+      {
+          Min3 = ADC_pos_3;
+      }
+      else if(Max3 < ADC_pos_3)
+      {
+          Max3 = ADC_pos_3;
+      }
+
+      if(Min4 > ADC_pos_4)
+      {
+          Min4 = ADC_pos_4;
+      }
+      else if(Max4 < ADC_pos_4)
+      {
+          Max4 = ADC_pos_4;
+      }
 
     // --- Conversion 12 bits -> Courant (TFE 2025) ---
     Current1  = (((float)(ADC_cur_1) - ADC_ZERO_CURRENT - Offset_ADC1) / (ADC_ZERO_CURRENT + Offset_ADC1)) * I_MAX;
@@ -289,24 +343,17 @@ __interrupt void adcA1ISR(void)
     Current4  = (((float)(ADC_cur_4) - ADC_ZERO_CURRENT - Offset_ADC4) / (ADC_ZERO_CURRENT + Offset_ADC4)) * I_MAX;
 
     /* --------------------------------------------------------------------- *
-     * 3. COMMUNICATION BINAIRE CONDITIONNELLE (MAPPING 4 CANAUX)
+     * 3. COMMUNICATION VERS LE PC (Format CSV Texte)
      * --------------------------------------------------------------------- */
-    if (state_PIN) // Active l'envoi UNIQUEMENT si le bouton "Start" a été pressé
-    {
-        UartCounter++;
-        // Boucle à 25kHz / 10 = Envoi à 2.5 kHz (Une mesure toutes les 400 µs)
-        if (UartCounter >= 10)
+
+    UartCounter++;
+        // Avec des entiers plus courts, vous pouvez même tester de descendre
+        // à UartCounter >= 5 pour envoyer 5000 valeurs par seconde !
+        if (UartCounter >= 50)
         {
             UartCounter = 0;
-
-            // Envoi exclusif des 4 positions filtrées
-            SendFloatAsBinary(Position1, Position2, Position3, Position4);
+            SendPositionsAsCSV_Int(ADC_pos_1, ADC_pos_1, ADC_pos_1, ADC_pos_1);
         }
-    }
-    else
-    {
-        UartCounter = 0; // Maintien du compteur à 0 à l'arrêt
-    }
 
     /* --------------------------------------------------------------------- *
      * 6. ACQUITTEMENTS & FLAGS (ADC)

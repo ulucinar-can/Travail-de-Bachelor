@@ -36,8 +36,8 @@
 #define N_MAX_ADC_NEW   3722.7f
 
 // --- Position ---
-#define POS_MAX         ((float)3.0e-3)
-#define POS_MIN         0.0
+#define POS_MAX         ((float)70.0e-3)
+#define POS_MIN         ((float)30.0e-3)
 #define CONV_POS2       ((float)(POS_MAX-POS_MIN)/(N_MAX_ADC_NEW))
 
 // --- Current ---
@@ -175,5 +175,5 @@ float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);
 float apply_poly5(float x, const float* coeffs);
-void SendFloatAsBinary(float f0, float f1, float f2, float f3);
+void SendPositionsAsCSV_Int(uint16_t p1, uint16_t p2, uint16_t p3, uint16_t p4);
 #endif /* FUNCTIONHEADER_H_ */

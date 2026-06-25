@@ -228,7 +228,6 @@ inputxbar_input3.inputxbarLock = true;
 sci1.$name                    = "mySCI0";
 sci1.registerInterrupts       = true;
 sci1.rxFifo                   = "SCI_FIFO_RX1";
-sci1.baudRates                = 921600;
 sci1.sci.sci_rxPin.$assign    = "GPIO28";
 sci1.sci.sci_txPin.$assign    = "GPIO29";
 sci1.sciRXInt.enableInterrupt = true;

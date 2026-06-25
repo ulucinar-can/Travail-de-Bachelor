@@ -310,10 +310,10 @@ __interrupt void adcA1ISR(void)
      * 2. CONVERSIONS PHYSIQUES
      * --------------------------------------------------------------------- */
     // --- Conversion 12 bits -> Position en mm ---
-    Position1 = (float)(ADC_pos_1) * CONV_POS2;
-    Position2 = (float)(ADC_pos_2) * CONV_POS2;
-    Position3 = (float)(ADC_pos_3) * CONV_POS2;
-    Position4 = (float)(ADC_pos_4) * CONV_POS2;
+    Position1 = (float)(ADC_pos_1) * CONV_POS2 * 1000;
+    Position2 = (float)(ADC_pos_2) * CONV_POS2 * 1000;
+    Position3 = (float)(ADC_pos_3) * CONV_POS2 * 1000;
+    Position4 = (float)(ADC_pos_4) * CONV_POS2 * 1000;
 
     // --- Conversion 12 bits -> Position en mm ---
 //      Position1 = ADC_pos_1;
@@ -347,20 +347,20 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 3. COMMUNICATION (TELEMETRIE)
      * --------------------------------------------------------------------- */
-    UartCounter++;
-    if (UartCounter >= 25000)
-    {
-        UartCounter = 0; // Reset du compteur (~1s)
-
-        //Envoie des positions en mm
-        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f, 0, 0, 0, 0);
-
-        //Envoie des positions en brut
-//        SendFloatAsText(Pos1_filt, Pos2_filt, Pos3_filt, Pos4_filt, 0, 0, 0, 0);
-
-        //Envoie des courrants
-        //SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
-    }
+//    UartCounter++;
+//    if (UartCounter >= 25000)
+//    {
+//        UartCounter = 0; // Reset du compteur (~1s)
+//
+//        //Envoie des positions en mm
+////        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f, 0, 0, 0, 0, 0, 0);
+//
+//        //Envoie des positions en brut
+//        //SendFloatAsText(Pos1_filt, Pos2_filt, Pos3_filt, Pos4_filt, 0, 0, 0, 0, 0, 0);
+//
+//        //Envoie des courrants
+//        //SendFloatAsText(Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+//    }
 
     /* --------------------------------------------------------------------- *
      * 6. ACQUITTEMENTS & FLAGS (ADC)
