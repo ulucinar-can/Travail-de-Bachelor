@@ -2,7 +2,7 @@
  * FunctionHeader.h
  *
  * Created on : 9 mars 2018 (Aymeric)
- * Modified by: Laucella (2019), Yersin (2022), Freyche (2025), Uluçinar (2026)
+ * Modified by: Laucella (2019), Yersin (2022), Freyche (2025), Uluï¿½inar (2026)
  *
  * Description: Constants, system parameters, and function prototypes
  * for the magnetic levitation/inductor project.
@@ -19,7 +19,7 @@
  * ========================================================================= */
 #define DELTA_N         ((float)2e-3)           // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
-#define L_N             ((float)4.9e-3)         // Inductance nominal au point nominal
+#define L_N             ((float)8.84e-3)         // Inductance nominal au point nominal
 #define I_N             6.01f                   // Courant nominal par mï¿½thode inverse au point nominal
 #define M               4.513f                  // Masse pour un seul inducteur
 #define G               9.81f                   // Gravity
@@ -61,7 +61,7 @@
 #define I_SP            3.0f
 #define I_SP105         3.15f
 #define I_SP095         2.85f
-#define KP_I            1.88f // Avec Kui à -45° : Kpi = 90.964f et sans kui : Kpi = 1.88
+#define KP_I            1.88f // Avec Kui ï¿½ -45ï¿½ : Kpi = 90.964f et sans kui : Kpi = 1.88
 #define TI_I            ((float)4.636619772367582e-4)
 #define GI_I            (1.0/TI_I)
 #define UMAX            VDC_BUS

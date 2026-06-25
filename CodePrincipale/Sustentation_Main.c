@@ -170,7 +170,7 @@ volatile uint16_t rxIndex = 0;
 static uint16_t dataIndex = 0;
 
 // --- State machine variable ---
-uint8_t state = STATE_1;
+uint8_t state = STATE_0;
 bool PosRegFlag1 = false;
 bool PosRegFlag3 = false;
 
@@ -269,7 +269,7 @@ void error (void)
 __interrupt void adcA1ISR(void)
 {
     // Allumer LED de debug pour mesurer le temps d'ex�cution de la boucle
-    GPIO_writePin(LED_D5, 1);
+    //GPIO_writePin(LED_D5, 1);
 
     /* --------------------------------------------------------------------- *
      * 1. LECTURE ADC & CALIBRATION
@@ -707,6 +707,9 @@ __interrupt void adcA1ISR(void)
 
                 status = SFO();
                 if (status == SFO_ERROR) error();
+
+                // Retour à l'état 0
+                state = STATE_0;
             }
 
             break;
@@ -715,7 +718,6 @@ __interrupt void adcA1ISR(void)
         // Something went wrong so let's just go to state 9 for an error
         default:
             break;
-
     }
     // ================================================================= //
     // STATE MACHINE END
@@ -868,22 +870,6 @@ __interrupt void adcA1ISR(void)
         if (status == SFO_ERROR) error();
     }
 
-
-    // State 0 :
-    // V�rification de l'enclenchement de la r�gulation
-    if(ButtonS2 || state_PIN)
-    {
-
-    }
-    // State 8 :
-        // Arr�t de la sustentation
-        else if(!ButtonS2 || !state_PIN) // --- Arr�t Sustentation ---
-        {
-
-            // State 9 :
-            // Arr�t de la sustentation avec erreur
-        }
-
     /* --------------------------------------------------------------------- *
      * 6. ACQUITTEMENTS & FLAGS (ADC)
      * --------------------------------------------------------------------- */
@@ -918,7 +904,7 @@ __interrupt void adcA1ISR(void)
     }
 
     // Eteindre LED de debug (fin de boucle de r�gulation)
-    GPIO_writePin(LED_D5, 0);
+    //GPIO_writePin(LED_D5, 0);
 }
 
 /* ========================================================================= *
