@@ -20,7 +20,7 @@
 #define DELTA_N         ((float)2e-3)           // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
 #define L_N             ((float)8.84e-3)         // Inductance nominal au point nominal
-#define I_N             6.01f                   // Courant nominal par m�thode inverse au point nominal
+#define I_N             4.48f                   // Courant nominal par m�thode inverse au point nominal
 #define M               4.513f                  // Masse pour un seul inducteur
 #define G               9.81f                   // Gravity
 #define Distance        ((float)26e-3)          // Distance between inductor 1 and 2
