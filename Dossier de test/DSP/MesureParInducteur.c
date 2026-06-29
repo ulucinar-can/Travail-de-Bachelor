@@ -43,7 +43,7 @@
 #define DUTY_CYCLE_3                50
 #define DUTY_CYCLE_4                50
 
-#define ADC_ZERO_CURRENT            1861.36f
+#define ADC_ZERO_CURRENT            2047.5f
 
 #define RX_BUF_LEN                  64
 
@@ -372,9 +372,9 @@ __interrupt void adcA1ISR(void)
     {
         UartCounter = 0; // Reset du compteur (~1s)
 
-//        //Envoie des positions et des courants
-//        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
-//                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+        //Envoie des positions et des courants
+        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
+                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
     }
 
     /* --------------------------------------------------------------------- *

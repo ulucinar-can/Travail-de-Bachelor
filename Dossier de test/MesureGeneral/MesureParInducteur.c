@@ -9,7 +9,7 @@
 //
 //###########################################################################
 
-#include <FunctionHeader.h>
+#include <FunctionHeader2.h>
 #include "driverlib.h"
 #include "device.h"
 #include "board.h"
@@ -367,14 +367,27 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 3. COMMUNICATION (TELEMETRIE)
      * --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- *
+     * 3. COMMUNICATION (TELEMETRIE)
+     * --------------------------------------------------------------------- */
     UartCounter++;
-    if (UartCounter >= 25000)
+    // Envoi à 100 Hz (250 boucles * 40 µs = 10 ms).
+    // Ne descends pas trop bas sinon tu vas saturer le port série (UART).
+    if (UartCounter >= 250)
     {
-        UartCounter = 0; // Reset du compteur (~1s)
+        UartCounter = 0; // Reset du compteur
 
-//        //Envoie des positions et des courants
-        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
-                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+        // Envoi des 7 variables (Ici basées sur l'inducteur 1).
+        // Position multipliée par 1000 pour l'avoir en mm.
+        Send7FloatsAsCSV(
+            Position_c1 * 1000.0f,  // 1: Consigne position (mm)
+            Position1 * 1000.0f,    // 2: Mesure position (mm)
+            ic1,                    // 3: Consigne courant (A)
+            Current1,               // 4: Mesure courant (A)
+            fc1,                    // 5: Force consigne (N)
+            xr1,                    // 6: Intégrale d'erreur Xr
+            v1                      // 7: Vitesse
+        );
     }
 
     /* --------------------------------------------------------------------- *
@@ -665,7 +678,7 @@ __interrupt void adcA1ISR(void)
         // Attends que le bouton soit pressÃ© Ã  nouveau pour Ã©teindre la maquette
         case STATE_8:
 
-            if(!ButtonS2 && !state_PIN)
+            if(!ButtonS2 || !state_PIN)
             {
                 GPIO_writePin(LED_D2, 1); // Eteindre LED
 
@@ -679,7 +692,6 @@ __interrupt void adcA1ISR(void)
                 }
 
                 // Reset de la machine d'ï¿½tat
-                state = STATE_1;
                 PosRegFlag1 = false;
                 PosRegFlag3 = false;
 

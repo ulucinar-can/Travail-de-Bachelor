@@ -1,8 +1,8 @@
 /*
- * FunctionHeader.h
+ * FunctionHeader2.h
  *
  * Created on : 9 mars 2018 (Aymeric)
- * Modified by: Laucella (2019), Yersin (2022), Freyche (2025), Uluï¿½inar (2026)
+ * Modified by: Laucella (2019), Yersin (2022), Freyche (2025)
  *
  * Description: Constants, system parameters, and function prototypes
  * for the magnetic levitation/inductor project.
@@ -23,10 +23,10 @@
 #define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
 #define L_N3            ((float)7.699e-3)       // Inductance nominal au point nominal pour l'inducteur 3 (prise à 120 Hz)
 #define L_N4            ((float)7.750e-3)       // Inductance nominal au point nominal pour l'inducteur 4 (prise à 120 Hz)
-#define I_N             4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
+#define I_N             6.01f                   // Courant nominal par mï¿½thode inverse au point nominal
 #define M               4.513f                  // Masse pour un seul inducteur
 #define G               9.81f                   // Gravity
-#define Distance        ((float)26e-3)          // Distance between inductor 1 and 2
+#define distance               ((float)26e-3)          // Distance between inductor 1 and 2
 
 /* ========================================================================= *
  * HARDWARE CONFIGURATION
@@ -35,12 +35,13 @@
 
 // --- ADC ---
 #define N_BIT_ADC       12
-#define N_MAX_ADC       4095.0f
+#define N_MAX_ADC       4096.0f
+#define N_MAX_ADC_NEW   3722.7f
 
 // --- Position ---
 #define POS_MAX         ((float)3.0e-3)
 #define POS_MIN         0.0
-#define CONV_POS2       ((float)(POS_MAX-POS_MIN)/(N_MAX_ADC))
+#define CONV_POS2       ((float)(POS_MAX-POS_MIN)/(N_MAX_ADC_NEW))
 
 // --- Current ---
 #define I_MAX           30.0f
@@ -63,7 +64,7 @@
 #define I_SP            3.0f
 #define I_SP105         3.15f
 #define I_SP095         2.85f
-#define KP_I            1.88f // Avec Kui ï¿½ -45ï¿½ : Kpi = 90.964f et sans kui : Kpi = 1.88
+#define KP_I            1.88f // Avec Kui à -45° : Kpi = 90.964f et sans kui : Kpi = 1.88
 #define TI_I            ((float)4.636619772367582e-4)
 #define GI_I            (1.0/TI_I)
 #define UMAX            VDC_BUS
@@ -76,9 +77,9 @@
 #define K_FC3            ((float)(2.0/(L_N3*DELTA_N)))
 #define K_FC4            ((float)(2.0/(L_N4*DELTA_N)))
 
+// --- State method regulation ---
 #define FP              M*G
 
-// --- State method regulation for inductor ---
 #define KW_SANS_INT      ((float)-3.6386e4)
 #define KDDOT_SANS_INT   -701.9f
 #define KD_SANS_INT      ((float)-3.6386e4)
@@ -177,10 +178,11 @@ extern const float POS_COR_4[6];
 void reverse(char* str, int len);
 int ConvertIntToStr(int x, char str[], int p);
 int ftoa(float n, char* res, int afterpoint);
-void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7);
+//void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7); // pour envoyer le courant et la position
+void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9);
 float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);
 float apply_poly5(float x, const float* coeffs);
-
+void Send7FloatsAsCSV(float f1, float f2, float f3, float f4, float f5, float f6, float f7);
 #endif /* FUNCTIONHEADER_H_ */
