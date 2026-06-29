@@ -241,29 +241,27 @@ void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5,
     SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
 }
 
-void Send7FloatsAsCSV(float f1, float f2, float f3, float f4, float f5, float f6, float f7)
+void Send32FloatsAsCSV(float v[32])
 {
     char str[TX_BUF_LEN];
-    int i = 0, j = 0;
+    int i = 0, j = 0, k = 0;
 
-    // Conversion des 7 floats avec 4 chiffres après la virgule
-    i += ftoa(f1, &str[i], 4); str[i++] = ',';
-    i += ftoa(f2, &str[i], 4); str[i++] = ',';
-    i += ftoa(f3, &str[i], 4); str[i++] = ',';
-    i += ftoa(f4, &str[i], 4); str[i++] = ',';
-    i += ftoa(f5, &str[i], 4); str[i++] = ',';
-    i += ftoa(f6, &str[i], 4); str[i++] = ',';
-    i += ftoa(f7, &str[i], 4);
+    // Ajoute les 31 premières valeurs suivies d'une virgule
+    for(k = 0; k < 31; k++) {
+        i += ftoa(v[k], &str[i], 4);
+        str[i++] = ',';
+    }
 
-    // Le '\n' final est crucial pour la fonction readline() de Python
+    // Ajoute la 32ème valeur sans virgule, suivie d'un retour à la ligne
+    i += ftoa(v[31], &str[i], 4);
     str[i++] = '\n';
 
+    // Copie dans le buffer UART
     for (j = 0; j < i && j < TX_BUF_LEN; j++) {
         txBuffer[j] = (uint8_t)str[j];
     }
     txLength = i;
     txIndex = 0;
 
-    // Déclenche l'envoi UART
     SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
 }

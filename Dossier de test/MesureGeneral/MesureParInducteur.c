@@ -365,29 +365,56 @@ __interrupt void adcA1ISR(void)
     Cur4_filt = (0.0001f * Current4) + (0.9999f * Cur4_filt);
 
     /* --------------------------------------------------------------------- *
-     * 3. COMMUNICATION (TELEMETRIE)
-     * --------------------------------------------------------------------- */
-    /* --------------------------------------------------------------------- *
-     * 3. COMMUNICATION (TELEMETRIE)
+     * 3. COMMUNICATION (TELEMETRIE A 921600 BAUDS)
      * --------------------------------------------------------------------- */
     UartCounter++;
-    // Envoi à 100 Hz (250 boucles * 40 µs = 10 ms).
-    // Ne descends pas trop bas sinon tu vas saturer le port série (UART).
-    if (UartCounter >= 250)
+    if (UartCounter >= 250) // Envoi à 100 Hz
     {
-        UartCounter = 0; // Reset du compteur
+        UartCounter = 0;
 
-        // Envoi des 7 variables (Ici basées sur l'inducteur 1).
-        // Position multipliée par 1000 pour l'avoir en mm.
-        Send7FloatsAsCSV(
-            Position_c1 * 1000.0f,  // 1: Consigne position (mm)
-            Position1 * 1000.0f,    // 2: Mesure position (mm)
-            ic1,                    // 3: Consigne courant (A)
-            Current1,               // 4: Mesure courant (A)
-            fc1,                    // 5: Force consigne (N)
-            xr1,                    // 6: Intégrale d'erreur Xr
-            v1                      // 7: Vitesse
-        );
+        float telemetry[32]; // Passage à 32 variables
+
+        // --- Inducteur 1 ---
+        telemetry[0] = Position_c1 * 1000.0f;
+        telemetry[1] = Position1 * 1000.0f;
+        telemetry[2] = ep1 * 1000.0f;          // Erreur de position en mm
+        telemetry[3] = ic1;
+        telemetry[4] = Current1;
+        telemetry[5] = fc1;
+        telemetry[6] = xr1;
+        telemetry[7] = v1;
+
+        // --- Inducteur 2 ---
+        telemetry[8] = Position_c2 * 1000.0f;
+        telemetry[9] = Position2 * 1000.0f;
+        telemetry[10] = ep2 * 1000.0f;
+        telemetry[11] = ic2;
+        telemetry[12] = Current2;
+        telemetry[13] = fc2;
+        telemetry[14] = xr2;
+        telemetry[15] = v2;
+
+        // --- Inducteur 3 ---
+        telemetry[16] = Position_c3 * 1000.0f;
+        telemetry[17] = Position3 * 1000.0f;
+        telemetry[18] = ep3 * 1000.0f;
+        telemetry[19] = ic3;
+        telemetry[20] = Current3;
+        telemetry[21] = fc3;
+        telemetry[22] = xr3;
+        telemetry[23] = v3;
+
+        // --- Inducteur 4 ---
+        telemetry[24] = Position_c4 * 1000.0f;
+        telemetry[25] = Position4 * 1000.0f;
+        telemetry[26] = ep4 * 1000.0f;
+        telemetry[27] = ic4;
+        telemetry[28] = Current4;
+        telemetry[29] = fc4;
+        telemetry[30] = xr4;
+        telemetry[31] = v4;
+
+        Send32FloatsAsCSV(telemetry);
     }
 
     /* --------------------------------------------------------------------- *
@@ -678,7 +705,7 @@ __interrupt void adcA1ISR(void)
         // Attends que le bouton soit pressÃ© Ã  nouveau pour Ã©teindre la maquette
         case STATE_8:
 
-            if(!ButtonS2 || !state_PIN)
+            if(!ButtonS2 && !state_PIN)
             {
                 GPIO_writePin(LED_D2, 1); // Eteindre LED
 

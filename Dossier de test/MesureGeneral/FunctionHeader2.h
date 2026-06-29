@@ -162,7 +162,7 @@
 /* ========================================================================= *
  * SHARED GLOBALS & COMMUNICATION
  * ========================================================================= */
-#define TX_BUF_LEN 128
+#define TX_BUF_LEN 512
 extern volatile char txBuffer[TX_BUF_LEN];
 extern volatile uint16_t txIndex;
 extern volatile uint16_t txLength;
@@ -184,5 +184,5 @@ float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);
 float apply_poly5(float x, const float* coeffs);
-void Send7FloatsAsCSV(float f1, float f2, float f3, float f4, float f5, float f6, float f7);
+void Send32FloatsAsCSV(float v[32]);
 #endif /* FUNCTIONHEADER_H_ */
