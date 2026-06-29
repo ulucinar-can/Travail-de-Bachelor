@@ -352,7 +352,7 @@ __interrupt void adcA1ISR(void)
         if (UartCounter >= 50)
         {
             UartCounter = 0;
-            SendPositionsAsCSV_Int(ADC_pos_1, ADC_pos_1, ADC_pos_1, ADC_pos_1);
+            SendPositionsAsCSV_Int(ADC_pos_1, ADC_pos_2, ADC_pos_3, ADC_pos_4);
         }
 
     /* --------------------------------------------------------------------- *
