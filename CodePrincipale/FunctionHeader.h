@@ -19,10 +19,10 @@
  * ========================================================================= */
 #define DELTA_N         ((float)2e-3)           // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
-#define L_N1            ((float)7.742e-3)        // Inductance nominal au point nominal pour l'inducteur 1 (prise à 120 Hz)
-#define L_N2            ((float)8.647e-3)        // Inductance nominal au point nominal pour l'inducteur 1
-#define L_N3            ((float)7.699e-3)        // Inductance nominal au point nominal pour l'inducteur 1
-#define L_N4            ((float)7.750e-3)        // Inductance nominal au point nominal pour l'inducteur 1
+#define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise à 120 Hz)
+#define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
+#define L_N3            ((float)7.699e-3)       // Inductance nominal au point nominal pour l'inducteur 3 (prise à 120 Hz)
+#define L_N4            ((float)7.750e-3)       // Inductance nominal au point nominal pour l'inducteur 4 (prise à 120 Hz)
 #define I_N             4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
 #define M               4.513f                  // Masse pour un seul inducteur
 #define G               9.81f                   // Gravity
@@ -35,13 +35,12 @@
 
 // --- ADC ---
 #define N_BIT_ADC       12
-#define N_MAX_ADC       4096.0f
-#define N_MAX_ADC_NEW   3722.7f
+#define N_MAX_ADC       4095.0f
 
 // --- Position ---
 #define POS_MAX         ((float)3.0e-3)
 #define POS_MIN         0.0
-#define CONV_POS2       ((float)(POS_MAX-POS_MIN)/(N_MAX_ADC_NEW))
+#define CONV_POS2       ((float)(POS_MAX-POS_MIN)/(N_MAX_ADC))
 
 // --- Current ---
 #define I_MAX           30.0f

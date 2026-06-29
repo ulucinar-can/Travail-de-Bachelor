@@ -5,11 +5,11 @@
 // TITLE:   Power command and regulation for magnetic sustenance
 //
 // AUTHOR :
-//          - Thomas Freyche - 2025
-//          - Can Uluçinar   - 2026
+//          - Can Uluï¿½inar   - 2026
 //
 //###########################################################################
 
+#include <FunctionHeader2.h>
 #include "driverlib.h"
 #include "device.h"
 #include "board.h"
@@ -17,7 +17,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include "FunctionHeader2.h"
 
 /* ========================================================================= *
  * CONFIGURATION DEFINES
@@ -35,7 +34,7 @@
 #define POS_CORRECTION_2            1.06f
 #define TAKEOFF_CURRENT_STEP1       0.04f
 #define TAKEOFF_CURRENT_STEP2       0.004f
-#define POS_DETECT                  0.90f
+#define POS_DETECT                  0.99f
 
 #define COUNT_TO_REACH              500
 
@@ -51,6 +50,7 @@
 #define ALPHA                       0.001f
 #define ALPHA_INV                   0.999f
 
+#define STATE_0                     0
 #define STATE_1                     1
 #define STATE_2                     2
 #define STATE_3                     3
@@ -61,7 +61,7 @@
 #define STATE_8                     8
 
 #define SKIP_BACK                   0
-#define SKIP_FRONT                  1
+#define SKIP_FRONT                  0
 
 #define GAIN_COR_1                  8.6659e-7f
 #define OFFSET_COR_1                2.0069e-4f
@@ -96,7 +96,7 @@ float mean1 = 0, mean2 = 0, mean3 = 0, mean4 = 0;
 unsigned int dt_mean = 0;
 
 // --- Shared Control Variables ---
-float I = 1; // Conservée en variable pour pouvoir couper l'intégrateur en direct via debugger
+float I = 1; // Conservï¿½e en variable pour pouvoir couper l'intï¿½grateur en direct via debugger
 float Kw = KW, Kd = KD, Kddot = KDDOT, Kr = KR, Kr_sans_int = KR_SANS_INT;
 
 bool takeOff = true;
@@ -170,11 +170,11 @@ volatile uint16_t rxIndex = 0;
 static uint16_t dataIndex = 0;
 
 // --- State machine variable ---
-uint8_t state = STATE_1;
+uint8_t state = STATE_0;
 bool PosRegFlag1 = false;
 bool PosRegFlag3 = false;
 
-// --- Variable for value sending ---
+// --- Variable for filtrered value sending ---
 float Pos1_filt = DELTA_0;
 float Pos2_filt = DELTA_0;
 float Pos3_filt = DELTA_0;
@@ -184,36 +184,6 @@ float Cur1_filt = 0;
 float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
-
-float fc1_filt = 0;
-float fc2_filt = 0;
-float fc3_filt = 0;
-float fc4_filt = 0;
-
-float fc1f_filt = 0;
-float fc2f_filt = 0;
-float fc3f_filt = 0;
-float fc4f_filt = 0;
-
-float ep1_filt = 0;
-float ep2_filt = 0;
-float ep3_filt = 0;
-float ep4_filt = 0;
-
-float v1_filt = 0;
-float v2_filt = 0;
-float v3_filt = 0;
-float v4_filt = 0;
-
-float xr1_filt = 0;
-float xr2_filt = 0;
-float xr3_filt = 0;
-float xr4_filt = 0;
-
-uint8_t AntiWindupCheck1 = 0;
-uint8_t AntiWindupCheck2 = 0;
-uint8_t AntiWindupCheck3 = 0;
-uint8_t AntiWindupCheck4 = 0;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -229,15 +199,6 @@ __interrupt void INT_mySCI0_TX_ISR(void);
  * MAIN PROGRAM
  * ========================================================================= */
 void main(void)
-{
-    // Main init
-    init();
-
-    // Infinite loop
-    while(1);
-}
-
-void init(void)
 {
     // Initialize device clock and peripherals
     Device_init();
@@ -290,6 +251,10 @@ void init(void)
     GPIO_writePin(LED_D2,1);
     GPIO_writePin(LED_D5,0);
     GPIO_writePin(LED_D6,0);
+
+
+    // Infinite loop
+    while(1);
 }
 
 void error (void)
@@ -303,8 +268,8 @@ void error (void)
 
 __interrupt void adcA1ISR(void)
 {
-    // Allumer LED de debug pour mesurer le temps d'exécution de la boucle
-    GPIO_writePin(LED_D5, 1);
+    // Allumer LED de debug pour mesurer le temps d'exï¿½cution de la boucle
+    //GPIO_writePin(LED_D5, 1);
 
     /* --------------------------------------------------------------------- *
      * 1. LECTURE ADC & CALIBRATION
@@ -331,7 +296,7 @@ __interrupt void adcA1ISR(void)
         Offset_ADC4 += ((float)ADC_cur_4) - ADC_ZERO_CURRENT;
         Offset_count++;
 
-        // Moyenne pour definir l'offset de mesure de courant (1000 échantillons)
+        // Moyenne pour definir l'offset de mesure de courant (1000 ï¿½chantillons)
         if(Offset_count > 999)
         {
             Offset_ADC1 = Offset_ADC1 * OFFSET_COUNT_INV;
@@ -341,7 +306,7 @@ __interrupt void adcA1ISR(void)
 
             Offset_stop = true; // Arret de l'echantillonnage
 
-            // Mesure de position une fois stabilisée
+            // Mesure de position une fois stabilisï¿½e
             Position_c1_dec = Position1 * POS_DETECT;
             Position_c2_dec = Position2 * POS_DETECT;
             Position_c3_dec = Position3 * POS_DETECT;
@@ -352,7 +317,7 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 2. CONVERSIONS PHYSIQUES
      * --------------------------------------------------------------------- */
-    // --- Conversion 12 bits -> Position (Ecart intégré) ---
+    // --- Conversion 12 bits -> Position (Ecart intï¿½grï¿½) ---
     Position1 = ((float)(ADC_pos_1) * CONV_POS2);
     Position2 = ((float)(ADC_pos_2) * CONV_POS2);
     Position3 = ((float)(ADC_pos_3) * CONV_POS2);
@@ -368,7 +333,20 @@ __interrupt void adcA1ISR(void)
 //    Position3 = ((float)(ADC_pos_3)) * GAIN_COR_3 + OFFSET_COR_3;
 //    Position4 = ((float)(ADC_pos_4)) * GAIN_COR_4 + OFFSET_COR_4;
 
-    // --- Position filtré pour l'envoie ---
+    // --- Filtres de vitesse Savitzky-Golay ---
+    pos1Buff[FILTWINDOW-1] = Position1;
+    v1 = savitzky_Filter(pos1Buff);
+
+    pos2Buff[FILTWINDOW-1] = Position2;
+    v2 = savitzky_Filter(pos2Buff);
+
+    pos3Buff[FILTWINDOW-1] = Position3;
+    v3 = savitzky_Filter(pos3Buff);
+
+    pos4Buff[FILTWINDOW-1] = Position4;
+    v4 = savitzky_Filter(pos4Buff);
+
+    // --- Position filtrï¿½ pour l'envoie ---
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
     Pos2_filt = (ALPHA * Position2) + (ALPHA_INV * Pos2_filt);
     Pos3_filt = (ALPHA * Position3) + (ALPHA_INV * Pos3_filt);
@@ -380,362 +358,378 @@ __interrupt void adcA1ISR(void)
     Current3  = (((float)(ADC_cur_3) - ADC_ZERO_CURRENT - Offset_ADC3) / (ADC_ZERO_CURRENT + Offset_ADC3)) * I_MAX;
     Current4  = (((float)(ADC_cur_4) - ADC_ZERO_CURRENT - Offset_ADC4) / (ADC_ZERO_CURRENT + Offset_ADC4)) * I_MAX;
 
-    // --- Courant filtré pour l'envoie ---
+    // --- Courant filtrï¿½ pour l'envoie ---
     Cur1_filt = (0.0001f * Current1) + (0.9999f * Cur1_filt);
     Cur2_filt = (0.0001f * Current2) + (0.9999f * Cur2_filt);
     Cur3_filt = (0.0001f * Current3) + (0.9999f * Cur3_filt);
     Cur4_filt = (0.0001f * Current4) + (0.9999f * Cur4_filt);
 
-    // --- force filtré pour l'envoie ---
-    fc1_filt = (0.1f * fc1) + (0.9f * fc1_filt);
-    fc2_filt = (0.1f * fc2) + (0.9f * fc2_filt);
-    fc3_filt = (0.1f * fc3) + (0.9f * fc3_filt);
-    fc4_filt = (0.1f * fc4) + (0.9f * fc4_filt);
-
-    // --- force filtré filtré (lol) pour l'envoie ---
-    fc1f_filt = (0.1f * fc1f) + (0.9f * fc1f_filt);
-    fc2f_filt = (0.1f * fc2f) + (0.9f * fc2f_filt);
-    fc3f_filt = (0.1f * fc3f) + (0.9f * fc3f_filt);
-    fc4f_filt = (0.1f * fc4f) + (0.9f * fc4f_filt);
-
-    // --- vitesse filtré pour l'envoie ---
-    v1_filt = (0.1f * v1) + (0.9f * v1_filt);
-    v2_filt = (0.1f * v2) + (0.9f * v2_filt);
-    v3_filt = (0.1f * v3) + (0.9f * v3_filt);
-    v4_filt = (0.1f * v4) + (0.9f * v4_filt);
-
-    // --- erreur filtré pour l'envoie ---
-    ep1_filt = (0.1f * ep1) + (0.9f * ep1_filt);
-    ep2_filt = (0.1f * ep2) + (0.9f * ep2_filt);
-    ep3_filt = (0.1f * ep3) + (0.9f * ep3_filt);
-    ep4_filt = (0.1f * ep4) + (0.9f * ep4_filt);
-
-    // --- intégrale filtré pour l'envoie ---
-    xr1_filt = (0.1f * xr1) + (0.9f * xr1_filt);
-    xr2_filt = (0.1f * xr2) + (0.9f * xr2_filt);
-    xr3_filt = (0.1f * xr3) + (0.9f * xr3_filt);
-    xr4_filt = (0.1f * xr4) + (0.9f * xr4_filt);
-
     /* --------------------------------------------------------------------- *
      * 3. COMMUNICATION (TELEMETRIE)
      * --------------------------------------------------------------------- */
-    // Exemple pour un envoi toutes les 1 ms (100 Hz)
     UartCounter++;
-    if (UartCounter >= 25) // Avec 25 kHz de boucle
+    if (UartCounter >= 25000)
     {
-        UartCounter = 0;
-        SendFloatAsText(fc3f_filt, fc4f_filt, ic4, Cur4_filt, fc4f_filt, xr4_filt, fc4_filt, ep4_filt, (float) AntiWindupCheck4, v4_filt);
+        UartCounter = 0; // Reset du compteur (~1s)
+
+//        //Envoie des positions et des courants
+//        SendFloatAsText(Pos1_filt*1000.0f, Pos2_filt*1000.0f, Pos3_filt*1000.0f, Pos4_filt*1000.0f,
+//                        Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
     }
 
     /* --------------------------------------------------------------------- *
-     * 4. MACHINE D'ETAT & REGULATION (Si activée)
+     * 4. MACHINE D'ETAT & REGULATION
      * --------------------------------------------------------------------- */
 
-    // State 0 :
-    // Vérification de l'enclenchement de la régulation
-    if(ButtonS2 || state_PIN)
+    // Verife pour uniquement lever l'avant
+    if(SKIP_FRONT && state == STATE_1) state = STATE_4;
+
+    // ================================================================= //
+    // A. STATE MACHINE BEGINING
+    // ================================================================= //
+    switch(state)
     {
-        GPIO_writePin(LED_D2, 0); // Allumage LED2 (Indicateur sustentation)
+        // State 0 :
+        // Attente de la pression du bouton
+        case STATE_0 :
 
-        // Vérife pour passer le devant ou non
-        if(SKIP_FRONT && state == STATE_1) state = STATE_4;
+            if(ButtonS2 || state_PIN)
+            {
+                GPIO_writePin(LED_D2, 0); // Allumage LED2 (Indicateur sustentation)
+                state = STATE_1;
+            }
 
-        // --- Filtres de vitesse Savitzky-Golay ---
-        pos1Buff[FILTWINDOW-1] = Position1;
-        v1 = savitzky_Filter(pos1Buff);
+        break;
 
-        pos2Buff[FILTWINDOW-1] = Position2;
-        v2 = savitzky_Filter(pos2Buff);
+        // State 1 :
+        // Rampe de courant sur les inducteur 1&2 jusqu'ï¿½ atteindre les 3A
+        case STATE_1:
 
-        pos3Buff[FILTWINDOW-1] = Position3;
-        v3 = savitzky_Filter(pos3Buff);
+            // Rampe vers 3A par pas de 0.04A
+            if(ic1 < I_SP)
+            {
+                ic1 += TAKEOFF_CURRENT_STEP1;
+            }
+            else
+            {
+                ic1 = I_SP;
+            }
 
-        pos4Buff[FILTWINDOW-1] = Position4;
-        v4 = savitzky_Filter(pos4Buff);
+            // Fixe le courant de consigne 2 par rapport ï¿½ ic1
+            ic2 = ic1;
 
-        // ================================================================= //
-        // A. STATE MACHINE BEGINING
-        // ================================================================= //
-        switch(state)
-        {
-            // State 1 :
-            // Rampe de courant sur les inducteur 1&2 jusqu'à atteindre les 3A
-            case STATE_1:
+            mean1 += Current1;
+            mean2 += Current2;
+            dt_mean++;
 
-                // Rampe vers 3A par pas de 0.04A
-                if(ic1 < I_SP)
+            if(dt_mean >= 200) // dt = 8ms
+            {
+                mean1 = mean1 / dt_mean;
+                mean2 = mean2 / dt_mean;
+
+                if((mean1 <= I_SP105 && mean1 >= I_SP095) && (mean2 <= I_SP105 && mean2 >= I_SP095))
                 {
-                    ic1 += TAKEOFF_CURRENT_STEP1;
+                    // Reset des variables
+                    mean1 = 0;
+                    mean2 = 0;
+                    dt_mean = 0;
+
+                    // Changement d'ï¿½tat
+                    state = STATE_2;
+
                 }
                 else
                 {
-                    ic1 = I_SP;
+                    // Reset des variables pour mesurer ï¿½ nouveau
+                    mean1 = 0;
+                    mean2 = 0;
+                    dt_mean = 0;
                 }
+            }
 
-                // Fixe le courant de consigne 2 par rapport à ic1
-                ic2 = ic1;
+            break;
 
-                mean1 += Current1;
-                mean2 += Current2;
-                dt_mean++;
+        // State 2 :
+        // Rampe de courant "infinie" pour atteindre un courant
+        // assez grand pour faire dï¿½coller l'avant
+        case STATE_2:
 
-                if(dt_mean >= 200) // dt = 8ms
-                {
-                    mean1 = mean1 / dt_mean;
-                    mean2 = mean2 / dt_mean;
+            if(Position1 <= Position_c1_dec && Position2 <= Position_c2_dec)
+            {
+                // Update des variables
+                Position_c1 = Position1;
+                Position_c2 = Position2;
 
-                    if((mean1 <= I_SP105 && mean1 >= I_SP095) && (mean2 <= I_SP105 && mean2 >= I_SP095))
-                    {
-                        // Reset des variables
-                        mean1 = 0;
-                        mean2 = 0;
-                        dt_mean = 0;
+                // Changement d'ï¿½tat
+                state = STATE_3;
+            }
+            else if(ic1 < 7.82f)
+            {
+                ic1 += TAKEOFF_CURRENT_STEP1;
+            }
+            else
+            {
+                // Fixe le courant ï¿½ une valeur max
+                ic1 = 7.82f;
+            }
 
-                        // Changement d'état
-                        state = STATE_2;
+            // Fixe le courant de ic2 ï¿½ ic1
+            ic2 = ic1;
 
-                    }
-                    else
-                    {
-                        // Reset des variables pour mesurer à nouveau
-                        mean1 = 0;
-                        mean2 = 0;
-                        dt_mean = 0;
-                    }
-                }
+            break;
 
-                break;
+        // State 3 :
+        // Activation de la rï¿½gulation de position pour atteindre les 2mm
+        // ï¿½ l'avant
+        case STATE_3:
 
-            // State 2 :
-            // Rampe de courant "infinie" pour atteindre un courant
-            // assez grand pour faire décoller l'avant
-            case STATE_2:
+            // Activer la rï¿½gulation d'ï¿½tat
+            if(!PosRegFlag1) PosRegFlag1 = true;
 
-                if(Position1 <= Position_c1_dec && Position2 <= Position_c2_dec)
-                {
-                    // Update des variables
-                    Position_c1 = Position1;
-                    Position_c2 = Position2;
-
-                    // Changement d'état
-                    state = STATE_3;
-                }
-                else if(ic1 < 7.82f)
-                {
-                    ic1 += TAKEOFF_CURRENT_STEP1;
-                }
-                else
-                {
-                    // Fixe le courant à une valeur max
-                    ic1 = 7.82f;
-                }
-
-                // Fixe le courant de ic2 à ic1
-                ic2 = ic1;
-
-                break;
-
-            // State 3 :
-            // Activation de la régulation de position pour atteindre les 2mm
-            // à l'avant
-            case STATE_3:
-
-                // Activer la régulation d'état
-                if(!PosRegFlag1) PosRegFlag1 = true;
-
+            // Set point generator (Ramp from 3mm to 2mm)
+            if(Position_c1 > DELTA_N)
+            {
+                Position_c1 -= 2.5 * 4e-7;
+            }
+            else
+            {
                 Position_c1 = DELTA_N;
+            }
+
+            if(Position_c2 > DELTA_N)
+            {
+                Position_c2 -= 2.5 * 4e-7;
+            }
+            else
+            {
                 Position_c2 = DELTA_N;
+            }
 
-//                // Set point generator (Ramp from 3mm to 2mm)
-//                if(Position_c1 > DELTA_N)
-//                {
-//                    Position_c1 -= 2.5 * 4e-7;
-//                }
-//                else
-//                {
-//                    Position_c1 = DELTA_N;
-//                }
-//
-//                if(Position_c2 > DELTA_N)
-//                {
-//                    Position_c2 -= 2.5 * 4e-7;
-//                }
-//                else
-//                {
-//                    Position_c2 = DELTA_N;
-//                }
+            // Incrï¿½mentation du timer
+            i_store++;
 
-                // Incrémentation du timer
-                i_store++;
+            // Timer pour attendre un peu pour ï¿½tre sur que le systï¿½me ï¿½ bien dï¿½coller
+            if(i_store == I_STORE_2E_DECOLLAGE)
+            {
+                // Reset de la varibale
+                i_store = 0;
 
-                // Timer pour attendre un peu pour être sur que le système à bien décoller
-                if(i_store == I_STORE_2E_DECOLLAGE)
+                if(SKIP_BACK)
                 {
-                    // Reset de la varibale
-                    i_store = 0;
-
-                    if(SKIP_BACK)
-                    {
-                        state = STATE_7;
-                    }
-                    else
-                    {
-                        state = STATE_4;
-                    }
-                }
-
-                break;
-
-            // State 4 :
-            // Rampe de courant sur les inducteur 3&4 jusqu'à atteindre les 3A
-            case STATE_4:
-
-                // Rampe vers 3A par pas de 0.04A
-                if(ic3 < I_SP)
-                {
-                    ic3 += TAKEOFF_CURRENT_STEP1;
-                }
-                else
-                {
-                    ic3 = I_SP;
-                }
-
-                // Fixe le courant de consigne 4 par rapport à ic3
-                ic4 = ic3;
-
-                mean3 += Current3;
-                mean4 += Current4;
-                dt_mean++;
-
-                if(dt_mean >= 200) // dt = 8ms
-                {
-                    mean3 = mean3 / dt_mean;
-                    mean4 = mean4 / dt_mean;
-
-                    if((mean3 <= I_SP105 && mean3 >= I_SP095) && (mean4 <= I_SP105 && mean4 >= I_SP095))
-                    {
-                        // Reset des variables
-                        mean3 = 0;
-                        mean4 = 0;
-                        dt_mean = 0;
-
-                        state = STATE_5;
-                    }
-                    else
-                    {
-                        // Reset des variables pour mesurer à nouveau
-                        mean3 = 0;
-                        mean4 = 0;
-                        dt_mean = 0;
-                    }
-                }
-
-                break;
-
-            // State 5 :
-            // Rampe de courant "infinie" pour atteindre un courant
-            // assez grand pour faire décoller l'arrière
-            case STATE_5:
-
-                if(Position3 <= Position_c3_dec && Position4 <= Position_c4_dec)
-                {
-                    // Update des variables
-                    Position_c3 = Position3;
-                    Position_c4 = Position4;
-
-                    // Changement d'état
-                    state = STATE_6;
-                }
-                else if(ic3 < 7.82f)
-                {
-                    ic3 += TAKEOFF_CURRENT_STEP1;
-                }
-                else
-                {
-                    // Fixe le courant à une valeur max
-                    ic3 = 7.82f;
-                }
-
-                // Fixe le courant de ic4 à ic3
-                ic4 = ic3;
-
-
-                break;
-
-            // State 6 :
-            // Activation de la régulation de position pour atteindre les 2mm
-            // à l'arrière
-            case STATE_6:
-
-                // Activer la régulation d'état
-                if(!PosRegFlag3) PosRegFlag3 = true;
-
-                Position_c3 = DELTA_N;
-                Position_c4 = DELTA_N;
-
-//                // Set point generator (Ramp from 3mm to 2mm)
-//                if(Position_c3 > DELTA_N)
-//                {
-//                    Position_c3 -= 2.5 * 4e-7;
-//                }
-//                else
-//                {
-//                    Position_c3 = DELTA_N;
-//                }
-//
-//                if(Position_c4 > DELTA_N)
-//                {
-//                    Position_c4 -= 2.5 * 4e-7;
-//                }
-//                else
-//                {
-//                    Position_c4 = DELTA_N;
-//                }
-
-                // Incrémentation du timer
-                i_store++;
-
-                // Timer pour attendre un peu pour être sur que le système à bien décoller
-                if(i_store == I_STORE_2E_DECOLLAGE)
-                {
-                    // Reset de la varibale
-                    i_store = 0;
-
-                    // Changement du gain statique de l'inducteur 3
-                    Kr_sans_int = 0.0; //-1.0;
-
-                    // Changement d'état
                     state = STATE_7;
                 }
+                else
+                {
+                    state = STATE_4;
+                }
+            }
 
-                break;
+            break;
 
-            // State 7 :
-            // Régulation de maintien pour tenir la maquette en l'air
-            case STATE_7:
+        // State 4 :
+        // Rampe de courant sur les inducteur 3&4 jusqu'ï¿½ atteindre les 3A
+        case STATE_4:
 
-                // Changement des variables pour une régulation plus douce
-                Kr = KR_CHANGE;
-                Kw = KW_CHANGE;
-                Kd = KD_CHANGE;
-                Kddot = KDDOT_CHANGE;
+            // Rampe vers 3A par pas de 0.04A
+            if(ic3 < I_SP)
+            {
+                ic3 += TAKEOFF_CURRENT_STEP1;
+            }
+            else
+            {
+                ic3 = I_SP;
+            }
 
-                break;
+            // Fixe le courant de consigne 4 par rapport ï¿½ ic3
+            ic4 = ic3;
 
-            // Default :
-            // Something went wrong so let's just go to state 9 for an error
-            default:
-                break;
+            mean3 += Current3;
+            mean4 += Current4;
+            dt_mean++;
 
-        }
-        // ================================================================= //
-        // STATE MACHINE END
-        // ================================================================= //
+            if(dt_mean >= 200) // dt = 8ms
+            {
+                mean3 = mean3 / dt_mean;
+                mean4 = mean4 / dt_mean;
 
-        // ================================================================= //
-        // B. REGULATION DE POSITION (ESPACE D'ETAT)
-        // ================================================================= //
+                if((mean3 <= I_SP105 && mean3 >= I_SP095) && (mean4 <= I_SP105 && mean4 >= I_SP095))
+                {
+                    // Reset des variables
+                    mean3 = 0;
+                    mean4 = 0;
+                    dt_mean = 0;
 
+                    state = STATE_5;
+                }
+                else
+                {
+                    // Reset des variables pour mesurer ï¿½ nouveau
+                    mean3 = 0;
+                    mean4 = 0;
+                    dt_mean = 0;
+                }
+            }
+
+            break;
+
+        // State 5 :
+        // Rampe de courant "infinie" pour atteindre un courant
+        // assez grand pour faire dï¿½coller l'arriï¿½re
+        case STATE_5:
+
+            if(Position3 <= Position_c3_dec && Position4 <= Position_c4_dec)
+            {
+                // Update des variables
+                Position_c3 = Position3;
+                Position_c4 = Position4;
+
+                // Changement d'ï¿½tat
+                state = STATE_6;
+            }
+            else if(ic3 < 7.82f)
+            {
+                ic3 += TAKEOFF_CURRENT_STEP1;
+            }
+            else
+            {
+                // Fixe le courant ï¿½ une valeur max
+                ic3 = 7.82f;
+            }
+
+            // Fixe le courant de ic4 ï¿½ ic3
+            ic4 = ic3;
+
+
+            break;
+
+        // State 6 :
+        // Activation de la rï¿½gulation de position pour atteindre les 2mm
+        // ï¿½ l'arriï¿½re
+        case STATE_6:
+
+            // Activer la rï¿½gulation d'ï¿½tat
+            if(!PosRegFlag3) PosRegFlag3 = true;
+
+            // Set point generator (Ramp from 3mm to 2mm)
+            if(Position_c3 > DELTA_N)
+            {
+                Position_c3 -= 2.5 * 4e-7;
+            }
+            else
+            {
+                Position_c3 = DELTA_N;
+            }
+
+            if(Position_c4 > DELTA_N)
+            {
+                Position_c4 -= 2.5 * 4e-7;
+            }
+            else
+            {
+                Position_c4 = DELTA_N;
+            }
+
+            // Incrï¿½mentation du timer
+            i_store++;
+
+            // Timer pour attendre un peu pour ï¿½tre sur que le systï¿½me ï¿½ bien dï¿½coller
+            if(i_store == I_STORE_2E_DECOLLAGE)
+            {
+                // Reset de la varibale
+                i_store = 0;
+
+                // Changement du gain statique de l'inducteur 3
+                Kr_sans_int = 0.0; //-1.0;
+
+                // Changement d'ï¿½tat
+                state = STATE_7;
+            }
+
+            break;
+
+        // State 7 :
+        // Rï¿½gulation de maintien pour tenir la maquette en l'air
+        case STATE_7:
+
+            // Changement des variables pour une rï¿½gulation plus douce
+            Kr = KR_CHANGE;
+            Kw = KW_CHANGE;
+            Kd = KD_CHANGE;
+            Kddot = KDDOT_CHANGE;
+
+            state = STATE_8;
+
+            break;
+
+        // State 8 :
+        // Attends que le bouton soit pressÃ© Ã  nouveau pour Ã©teindre la maquette
+        case STATE_8:
+
+            if(!ButtonS2 || !state_PIN)
+            {
+                GPIO_writePin(LED_D2, 1); // Eteindre LED
+
+                // Forcer les PWM ï¿½ 50%
+                for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
+                {
+                    dutyFine = ((float)(duty_cycle_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
+                    compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
+                    HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
+                    HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+                }
+
+                // Reset de la machine d'ï¿½tat
+                state = STATE_1;
+                PosRegFlag1 = false;
+                PosRegFlag3 = false;
+
+                // Reset des gains d'ï¿½tat
+                Kw = KW;
+                Kd = KD;
+                Kddot = KDDOT;
+                Kr = KR;
+                Kr_sans_int = KR_SANS_INT;
+
+                // Reset timer
+                i_store = 0;
+
+                // 1. Reset des intï¿½grales du rï¿½gulateur de courant PI et de l'anti-windup
+                integral_i1 = 0.0f; ue1 = 0.0f; ic1 = 0.0f;
+                integral_i2 = 0.0f; ue2 = 0.0f; ic2 = 0.0f;
+                integral_i3 = 0.0f; ue3 = 0.0f; ic3 = 0.0f;
+                integral_i4 = 0.0f; ue4 = 0.0f; ic4 = 0.0f;
+
+                // 2. Reset des intï¿½grateurs de la rï¿½gulation d'ï¿½tat (position) et anti-windup de force
+                xr1 = 0.0f; fce1 = 0.0f;
+                xr2 = 0.0f; fce2 = 0.0f;
+                xr3 = 0.0f; fce3 = 0.0f;
+                xr4 = 0.0f; fce4 = 0.0f;
+
+                status = SFO();
+                if (status == SFO_ERROR) error();
+
+                // Retour Ã  l'Ã©tat 0
+                state = STATE_0;
+            }
+
+            break;
+
+        // Default :
+        // Something went wrong so let's just go to state 9 for an error
+        default:
+            break;
+    }
+    // ================================================================= //
+    // STATE MACHINE END
+    // ================================================================= //
+
+    // ================================================================= //
+    // B. REGULATION DE POSITION (ESPACE D'ETAT)
+    // ================================================================= //
+
+    // Active la rÃ©gulation uniquement si l'Ã©tat 0 n'est pas active
+    if(state != STATE_0)
+    {
         if(PosRegFlag1)
         {
             // --- Inducteur 1 ---
@@ -747,32 +741,18 @@ __interrupt void adcA1ISR(void)
 
             // Antiwindup
             fc1 = fc1_prim;
-            if (fc1_prim <= 0)
-            {
-                fc1 = 0;
-                AntiWindupCheck1 = 2;
-            }
-            else if(fc1_prim >= FMAX)
-            {
-                fc1 = FMAX;
-                AntiWindupCheck1 = 1;
-
-            }
-            else
-            {
-                AntiWindupCheck1 = 0;
-            }
-
+            if (fc1_prim <= 0)   fc1 = 0;
+            if (fc1_prim >= FMAX1) fc1 = FMAX1;
             fce1 = (fc1_prim - fc1) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe bande
             IN1[0] = fc1;
             fc1f = IIR_Filter(IN1, OUT1);
             if (fc1f <= 0)   fc1f = 0;
-            if (fc1f >= FMAX) fc1f = FMAX;
+            if (fc1f >= FMAX1) fc1f = FMAX1;
 
             // Calcul du courant de consigne 1
-            ic1 = (sqrtf(K_FC * fc1f)) * Position1;
+            ic1 = (sqrtf(K_FC1 * fc1f)) * Position1;
 
             // --- Inducteur 2 ---
             // Inductor 2 : Filtre Bandstop + State Regulation
@@ -782,32 +762,20 @@ __interrupt void adcA1ISR(void)
             sum_vp2 = v2 * Kddot + Position2 * Kd;
             fc2_prim = Kw * Position_c2 + Kr * xr2 * I - sum_vp2 + FP;
 
-            // Antiwindup avec check
+            // Antiwindup
             fc2 = fc2_prim;
-            if (fc2_prim <= 0)
-            {
-                fc2 = 0;
-                AntiWindupCheck2 = 2;
-            }
-            else if(fc2_prim >= FMAX)
-            {
-                fc2 = FMAX;
-                AntiWindupCheck2 = 1;
-            }
-            else
-            {
-                AntiWindupCheck2 = 0;
-            }
+            if (fc2_prim <= 0)   fc2 = 0;
+            if (fc2_prim >= FMAX2) fc2 = FMAX2;
             fce2 = (fc2_prim - fc2) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe bande
             IN2[0] = fc2;
             fc2f = IIR_Filter(IN2, OUT2);
             if (fc2f <= 0)   fc2f = 0;
-            if (fc2f >= FMAX) fc2f = FMAX;
+            if (fc2f >= FMAX2) fc2f = FMAX2;
 
-            // Transformée inverse pour calculer le courant à partir de la force
-            ic2 = (sqrtf(K_FC * fc2f)) * Position2;
+            // Transformï¿½e inverse pour calculer le courant ï¿½ partir de la force
+            ic2 = (sqrtf(K_FC2 * fc2f)) * Position2;
         }
 
         if(PosRegFlag3)
@@ -819,33 +787,20 @@ __interrupt void adcA1ISR(void)
             sum_vp3 = (v3 * KDDOT_SANS_INT) + (Position3 * KD_SANS_INT);
             fc3_prim = (KW_SANS_INT * Position_c3) + (Kr_sans_int * xr3 * I) - sum_vp3 + FP;
 
-            // Antiwindup avec check
+            // Antiwindup
             fc3 = fc3_prim;
-            if (fc3_prim <= 0)
-            {
-                fc3 = 0;
-                AntiWindupCheck3 = 2;
-            }
-            else if(fc3_prim >= FMAX)
-            {
-                fc3 = FMAX;
-                AntiWindupCheck3 = 1;
-
-            }
-            else
-            {
-                AntiWindupCheck3 = 0;
-            }
+            if (fc3_prim <= 0)   fc3 = 0;
+            if (fc3_prim >= FMAX3) fc3 = FMAX3;
             fce3 = (fc3_prim - fc3) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe bande
             IN3[0] = fc3;
             fc3f = IIR_Filter(IN3, OUT3);
             if (fc3f <= 0)   fc3f = 0;
-            if (fc3f >= FMAX) fc3f = FMAX;
+            if (fc3f >= FMAX3) fc3f = FMAX3;
 
             // Calcul du courant de consigne 3
-            ic3 = sqrtf(K_FC * fc3f) * Position3;
+            ic3 = sqrtf(K_FC3 * fc3f) * Position3;
 
             // --- Inductor 4 ---
             // Calcul de la force de consigne 4
@@ -854,33 +809,20 @@ __interrupt void adcA1ISR(void)
             sum_vp4 = (v4 * Kddot) + (Position4 * Kd);
             fc4_prim = (Kw * Position_c4) + (Kr * xr4 * I) - sum_vp4 + FP;
 
-            // Antiwindup avec check
+            // Antiwindup
             fc4 = fc4_prim;
-            if (fc4_prim <= 0)
-            {
-                fc4 = 0;
-                AntiWindupCheck4 = 2;
-            }
-            else if(fc4_prim >= FMAX)
-            {
-                fc4 = FMAX;
-                AntiWindupCheck4 = 1;
-
-            }
-            else
-            {
-                AntiWindupCheck4 = 0;
-            }
+            if (fc4_prim <= 0)   fc4 = 0;
+            if (fc4_prim >= FMAX4) fc4 = FMAX4;
             fce4 = (fc4_prim - fc4) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe-bande
             IN4[0] = fc4;
             fc4f = IIR_Filter(IN4, OUT4);
             if (fc4f <= 0)   fc4f = 0;
-            if (fc4f >= FMAX) fc4f = FMAX;
+            if (fc4f >= FMAX4) fc4f = FMAX4;
 
             // Calcul du courant de consigne 4
-            ic4 = sqrtf(K_FC * fc4f) * Position4;
+            ic4 = sqrtf(K_FC4 * fc4f) * Position4;
         }
 
         // ================================================================= //
@@ -908,7 +850,7 @@ __interrupt void adcA1ISR(void)
 
         for (i = 0; i < NUM_OF_PWM_CHANNEL; i++)
         {
-            // Vérification des limites MIN et MAX avec le bon index [i]
+            // Vï¿½rification des limites MIN et MAX avec le bon index [i]
             if (duty_table[i] >= LIMITE_MAX_DUTY_FINE) {
                 duty_table[i] = LIMITE_MAX_DUTY_FINE;
             }
@@ -916,7 +858,7 @@ __interrupt void adcA1ISR(void)
                 duty_table[i] = LIMITE_MIN_DUTY_FINE;
             }
 
-            // Mise à jour des registres HRPWM
+            // Mise ï¿½ jour des registres HRPWM
             dutyFine = ((float)(duty_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
             compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
             HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
@@ -927,55 +869,6 @@ __interrupt void adcA1ISR(void)
         status = SFO();
         if (status == SFO_ERROR) error();
     }
-    // State 8 :
-        // Arrêt de la sustentation
-        else if(!ButtonS2 || !state_PIN) // --- Arrêt Sustentation ---
-        {
-            GPIO_writePin(LED_D2, 1); // Eteindre LED
-
-            // Forcer les PWM à 50%
-            for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
-            {
-                dutyFine = ((float)(duty_cycle_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
-                compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-                HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
-                HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
-            }
-
-            // Reset de la machine d'état
-            state = STATE_1;
-            PosRegFlag1 = false;
-            PosRegFlag3 = false;
-
-            Kw = KW;
-            Kd = KD;
-            Kddot = KDDOT;
-            Kr = KR;
-            Kr_sans_int = KR_SANS_INT;
-
-            i_store = 0;
-
-            // ================================================================= //
-            // RÉINITIALISATION DES INTÉGRATEURS ET CONSIGNES
-            // ================================================================= //
-            // Reset des intégrales du régulateur de courant PI et de l'anti-windup
-            integral_i1 = 0.0f; ue1 = 0.0f; ic1 = 0.0f;
-            integral_i2 = 0.0f; ue2 = 0.0f; ic2 = 0.0f;
-            integral_i3 = 0.0f; ue3 = 0.0f; ic3 = 0.0f;
-            integral_i4 = 0.0f; ue4 = 0.0f; ic4 = 0.0f;
-
-            // Reset des intégrateurs de la régulation d'état (position) et anti-windup de force
-            xr1 = 0.0f; fce1 = 0.0f;
-            xr2 = 0.0f; fce2 = 0.0f;
-            xr3 = 0.0f; fce3 = 0.0f;
-            xr4 = 0.0f; fce4 = 0.0f;
-
-            status = SFO();
-            if (status == SFO_ERROR) error();
-
-            // State 9 :
-            // Arrêt de la sustentation avec erreur
-        }
 
     /* --------------------------------------------------------------------- *
      * 6. ACQUITTEMENTS & FLAGS (ADC)
@@ -991,7 +884,7 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 7. DEBOUNCE BOUTON POUSSOIR EXTERNE
      * --------------------------------------------------------------------- */
-    if(Ext_Int_Flag) // Détection flanc montant
+    if(Ext_Int_Flag) // Dï¿½tection flanc montant
     {
 
         count_ext_int++;
@@ -1010,8 +903,8 @@ __interrupt void adcA1ISR(void)
 
     }
 
-    // Eteindre LED de debug (fin de boucle de régulation)
-    GPIO_writePin(LED_D5, 0);
+    // Eteindre LED de debug (fin de boucle de rï¿½gulation)
+    //GPIO_writePin(LED_D5, 0);
 }
 
 /* ========================================================================= *
@@ -1038,12 +931,12 @@ __interrupt void INT_mySCI0_RX_ISR(void)
         }
 
         if(c == '\x02'){
-            dataIndex = rxIndex; // Début de trame
+            dataIndex = rxIndex; // Dï¿½but de trame
         }
 
         if(c == '\x03'){ // Fin de trame
             if(dataIndex > 0 && dataIndex < rxIndex - 1) {
-                // Utilisation d'une évaluation booléenne directe !
+                // Utilisation d'une ï¿½valuation boolï¿½enne directe !
                 state_PIN = (rxBuffer[dataIndex] == '1');
             }
             // Reset du buffer

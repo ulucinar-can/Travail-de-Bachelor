@@ -19,11 +19,14 @@
  * ========================================================================= */
 #define DELTA_N         ((float)2e-3)           // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
-#define L_N             ((float)4.9e-3)         // Inductance nominal au point nominal
+#define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise à 120 Hz)
+#define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
+#define L_N3            ((float)7.699e-3)       // Inductance nominal au point nominal pour l'inducteur 3 (prise à 120 Hz)
+#define L_N4            ((float)7.750e-3)       // Inductance nominal au point nominal pour l'inducteur 4 (prise à 120 Hz)
 #define I_N             6.01f                   // Courant nominal par mï¿½thode inverse au point nominal
 #define M               4.513f                  // Masse pour un seul inducteur
 #define G               9.81f                   // Gravity
-#define d               ((float)26e-3)          // Distance between inductor 1 and 2
+#define distance               ((float)26e-3)          // Distance between inductor 1 and 2
 
 /* ========================================================================= *
  * HARDWARE CONFIGURATION
@@ -69,7 +72,10 @@
 #define ANTIWINDUP_DIS  0
 
 // --- Inverse transform method ---
-#define K_FC            ((float)(2.0/(L_N*DELTA_N)))
+#define K_FC1            ((float)(2.0/(L_N1*DELTA_N)))
+#define K_FC2            ((float)(2.0/(L_N2*DELTA_N)))
+#define K_FC3            ((float)(2.0/(L_N3*DELTA_N)))
+#define K_FC4            ((float)(2.0/(L_N4*DELTA_N)))
 
 // --- State method regulation ---
 #define FP              M*G
@@ -93,7 +99,10 @@
 #define I_STORE_2E_DECOLLAGE            15000
 
 #define IMAX            12.0f
-#define FMAX            ((float)(0.5*L_N*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
+#define FMAX1           ((float)(0.5*L_N1*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
+#define FMAX2           ((float)(0.5*L_N2*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
+#define FMAX3           ((float)(0.5*L_N3*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
+#define FMAX4           ((float)(0.5*L_N4*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
 #define K_ANTIWINDUP    ((float)(1.0/KW))
 
 /* ========================================================================= *

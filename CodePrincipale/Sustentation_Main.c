@@ -43,7 +43,7 @@
 #define DUTY_CYCLE_3                50
 #define DUTY_CYCLE_4                50
 
-#define ADC_ZERO_CURRENT            1861.36f
+#define ADC_ZERO_CURRENT            2047.5f
 
 #define RX_BUF_LEN                  64
 
