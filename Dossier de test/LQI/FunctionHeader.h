@@ -23,10 +23,7 @@
 #define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
 #define L_N3            ((float)7.699e-3)       // Inductance nominal au point nominal pour l'inducteur 3 (prise à 120 Hz)
 #define L_N4            ((float)7.750e-3)       // Inductance nominal au point nominal pour l'inducteur 4 (prise à 120 Hz)
-#define I_N1            4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
-#define I_N2            4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
-#define I_N3            4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
-#define I_N4            4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
+#define I_N             4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
 #define M               4.513f                  // Masse pour un seul inducteur
 #define G               9.81f                   // Gravity
 #define Distance        ((float)26e-3)          // Distance between inductor 1 and 2
@@ -66,7 +63,7 @@
 #define I_SP            3.0f
 #define I_SP105         3.15f
 #define I_SP095         2.85f
-#define KP_I            2.0f // Avec Kui ï¿½ -45ï¿½ : Kpi = 90.964f et sans kui : Kpi = 1.88
+#define KP_I            1.88f // Avec Kui ï¿½ -45ï¿½ : Kpi = 90.964f et sans kui : Kpi = 1.88
 #define TI_I            ((float)4.636619772367582e-4)
 #define GI_I            (1.0/TI_I)
 #define UMAX            VDC_BUS
@@ -81,44 +78,21 @@
 
 #define FP              M*G
 
-// --- State method regulation for inductor 1 ---
-#define KW1               ((float)-4.666654866439874e3)
-#define KDDOT1            -2.388e2f
-#define KD1               ((float)-7.851053024916462e3)
-#define KR1               -3.732f
+// --- State method regulation for inductor ---
+#define KW_SANS_INT      ((float)-3.6386e4)
+#define KDDOT_SANS_INT   -701.9f
+#define KD_SANS_INT      ((float)-3.6386e4)
+#define KR_SANS_INT      0.0f
 
-//#define KW_CHANGE1        ((float)-8.8418e3)
-//#define KDDOT_CHANGE1     -663.35f
-//#define KD_CHANGE1        ((float)-3.9798e4)
-//#define KR_CHANGE2        -24.72f
+#define KW               ((float)-1.4862e4)
+#define KDDOT            -603.41f
+#define KD               ((float)-3.8998e4)
+#define KR               -35.63f
 
-// --- State method regulation for inductor 2 ---
-#define KW2               ((float)-4.633348838698967e3)
-#define KDDOT2            -2.384e2f
-#define KD2               ((float)-7.812198212066115e3)
-#define KR2               -3.705f
-
-//#define KW_CHANGE2        ((float)-8.8418e3)
-//#define KDDOT_CHANGE2     -663.35f
-//#define KD_CHANGE2        ((float)-3.9798e4)
-//#define KR_CHANGE2        -24.72f
-
-// --- State method regulation for inductor 3 (sans intégrateur) ---
-#define KW3               ((float)-1.920919830969161e4)
-#define KDDOT3            -5.0997e2f
-#define KD3               ((float)-1.920919830969161e4)
-#define KR3               0.0f
-
-// --- State method regulation for inductor 4 ---
-#define KW4               ((float)-4.666654866439874e3)
-#define KDDOT4            -2.388298618857441e2f
-#define KD4               ((float)-7.851053024916462e3)
-#define KR4               -3.731831160687625f
-
-//#define KW_CHANGE4        ((float)-8.8418e3)
-//#define KDDOT_CHANGE4     -663.35f
-//#define KD_CHANGE4        ((float)-3.9798e4)
-//#define KR_CHANGE4        -24.72f
+#define KW_CHANGE        ((float)-8.8418e3)
+#define KDDOT_CHANGE     -663.35f
+#define KD_CHANGE        ((float)-3.9798e4)
+#define KR_CHANGE        -24.72f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000
@@ -128,10 +102,7 @@
 #define FMAX2           ((float)(0.5*L_N2*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
 #define FMAX3           ((float)(0.5*L_N3*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
 #define FMAX4           ((float)(0.5*L_N4*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
-#define K_ANTIWINDUP1   ((float)(1.0/KW1))
-#define K_ANTIWINDUP2   ((float)(1.0/KW2))
-#define K_ANTIWINDUP3   ((float)(1.0/KW3))
-#define K_ANTIWINDUP4   ((float)(1.0/KW4))
+#define K_ANTIWINDUP    ((float)(1.0/KW))
 
 /* ========================================================================= *
  * IIR FILTER COEFFICIENTS
@@ -190,7 +161,7 @@
 /* ========================================================================= *
  * SHARED GLOBALS & COMMUNICATION
  * ========================================================================= */
-#define TX_BUF_LEN 128
+#define TX_BUF_LEN 512
 extern volatile char txBuffer[TX_BUF_LEN];
 extern volatile uint16_t txIndex;
 extern volatile uint16_t txLength;
@@ -199,6 +170,22 @@ extern const float POS_COR_1[6];
 extern const float POS_COR_2[6];
 extern const float POS_COR_3[6];
 extern const float POS_COR_4[6];
+
+#define LQI1_Q    14102.7f
+#define LQI1_QD   440.51f
+#define LQI1_EPS  202477.6f/50
+
+#define LQI2_Q    14112.7f
+#define LQI2_QD   441.34f
+#define LQI2_EPS  202426.2f/50
+
+#define LQI3_Q    14102.7f
+#define LQI3_QD   440.51f
+#define LQI3_EPS  202477.6f/50
+
+#define LQI4_Q    14102.7f
+#define LQI4_QD   440.51f
+#define LQI4_EPS  202477.6f/50
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES
@@ -211,5 +198,5 @@ float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);
 float apply_poly5(float x, const float* coeffs);
-
+void Send32FloatsAsCSV(float v[32]);
 #endif /* FUNCTIONHEADER_H_ */
