@@ -61,7 +61,7 @@
 #define STATE_8                     8
 
 #define SKIP_BACK                   0
-#define SKIP_FRONT                  0
+#define SKIP_FRONT                  1
 
 #define GAIN_COR_1                  8.6659e-7f
 #define OFFSET_COR_1                2.0069e-4f
@@ -156,7 +156,7 @@ uint16_t i = 0, status;
 const uint32_t ePWM[NUM_OF_PWM_CHANNEL] = {myEPWM1_BASE, myEPWM2_BASE, myEPWM3_BASE, myEPWM4_BASE};
 
 // --- User Interface & Buttons ---
-bool ButtonS2 = false, Ext_Int_Flag = false, state_PIN = false;
+bool SystemOn = false, Ext_Int_Flag = false;
 uint16_t count_ext_int = 0;
 
 // --- Communication (UART) ---
@@ -184,6 +184,11 @@ float Cur1_filt = 0;
 float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
+
+// --- Variable for filtrered value sending ---
+float TotoMes = 0;
+float TotoCon = 0;
+float TotoErr = 0;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -421,22 +426,28 @@ __interrupt void adcA1ISR(void)
      * 4. MACHINE D'ETAT & REGULATION
      * --------------------------------------------------------------------- */
 
-    // Verife pour uniquement lever l'avant
-    if(SKIP_FRONT && state == STATE_1) state = STATE_4;
-
     // ================================================================= //
     // A. STATE MACHINE BEGINING
     // ================================================================= //
+
+    // Permet de vérifier si l'on veut éteindre la maquette à n'importe quel moment
+    if (!SystemOn && (state != STATE_0) && (state != STATE_8))
+    {
+        state = STATE_8;
+    }
+
     switch(state)
     {
         // State 0 :
         // Attente de la pression du bouton
         case STATE_0 :
 
-            if(ButtonS2 || state_PIN)
+            if(SystemOn)
             {
                 GPIO_writePin(LED_D2, 0); // Allumage LED2 (Indicateur sustentation)
-                state = STATE_1;
+
+                // Verife si l'on veut uniquement lever l'arrière
+                state = SKIP_FRONT ? STATE_4 : STATE_1;
             }
 
         break;
@@ -554,14 +565,9 @@ __interrupt void adcA1ISR(void)
                 // Reset de la varibale
                 i_store = 0;
 
-                if(SKIP_BACK)
-                {
-                    state = STATE_7;
-                }
-                else
-                {
-                    state = STATE_4;
-                }
+                // Vérifie si l'on veut uniquement lever l'avant
+                state = SKIP_BACK ? STATE_7 : STATE_4;
+
             }
 
             break;
@@ -705,7 +711,7 @@ __interrupt void adcA1ISR(void)
         // Attends que le bouton soit pressÃ© Ã  nouveau pour Ã©teindre la maquette
         case STATE_8:
 
-            if(!ButtonS2 && !state_PIN)
+            if(!SystemOn)
             {
                 GPIO_writePin(LED_D2, 1); // Eteindre LED
 
@@ -739,10 +745,10 @@ __interrupt void adcA1ISR(void)
                 integral_i4 = 0.0f; ue4 = 0.0f; ic4 = 0.0f;
 
                 // 2. Reset des intï¿½grateurs de la rï¿½gulation d'ï¿½tat (position) et anti-windup de force
-                xr1 = 0.0f; fce1 = 0.0f;
-                xr2 = 0.0f; fce2 = 0.0f;
-                xr3 = 0.0f; fce3 = 0.0f;
-                xr4 = 0.0f; fce4 = 0.0f;
+                xr1 = 0.0f; fce1 = 0.0f; ep1 = 0.0f;
+                xr2 = 0.0f; fce2 = 0.0f; ep2 = 0.0f;
+                xr3 = 0.0f; fce3 = 0.0f; ep3 = 0.0f;
+                xr4 = 0.0f; fce4 = 0.0f; ep4 = 0.0f;
 
                 status = SFO();
                 if (status == SFO_ERROR) error();
@@ -933,7 +939,7 @@ __interrupt void adcA1ISR(void)
             if(GPIO_readPin(Push_Button_Start) == 0)
             {
                 // Toggle button state
-                ButtonS2 = !ButtonS2;
+                SystemOn = !SystemOn;
             }
 
             Ext_Int_Flag = false;
@@ -976,7 +982,7 @@ __interrupt void INT_mySCI0_RX_ISR(void)
         if(c == '\x03'){ // Fin de trame
             if(dataIndex > 0 && dataIndex < rxIndex - 1) {
                 // Utilisation d'une ï¿½valuation boolï¿½enne directe !
-                state_PIN = (rxBuffer[dataIndex] == '1');
+                SystemOn = (rxBuffer[dataIndex] == '1');
             }
             // Reset du buffer
             rxIndex = 0;
