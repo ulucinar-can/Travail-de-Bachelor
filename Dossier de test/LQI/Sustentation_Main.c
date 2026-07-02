@@ -75,54 +75,6 @@
 #define GAIN_COR_4                  8.3439e-7f
 #define OFFSET_COR_4                3.9979e-4f
 
-// --- Matrices Observateur Inducteur 1 ---
-#define AD11_1  1.000000f
-#define AD12_1  0.000040f
-#define AD13_1  0.000000f
-#define AD22_1  1.000000f
-#define AD23_1  0.000009f
-#define AD33_1  0.992818f
-#define BD3_1   0.007182f
-#define L1_1    0.01f
-#define L2_1    0.51f
-#define L3_1    -21.68f
-
-// --- Matrices Observateur Inducteur 2 ---
-#define AD11_2  1.000000f
-#define AD12_2  0.000040f
-#define AD13_2  0.000000f
-#define AD22_2  1.000000f
-#define AD23_2  0.000009f
-#define AD33_2  0.992818f
-#define BD3_2   0.007182f
-#define L1_2    0.01f
-#define L2_2    0.51f
-#define L3_2    -21.68f
-
-// --- Matrices Observateur Inducteur 3 ---
-#define AD11_3  1.000000f
-#define AD12_3  0.000040f
-#define AD13_3  0.000000f
-#define AD22_3  1.000000f
-#define AD23_3  0.000009f
-#define AD33_3  0.992818f
-#define BD3_3   0.007182f
-#define L1_3    0.01f
-#define L2_3    0.51f
-#define L3_3    -21.68f
-
-// --- Matrices Observateur Inducteur 4 ---
-#define AD11_4  1.000000f
-#define AD12_4  0.000040f
-#define AD13_4  0.000000f
-#define AD22_4  1.000000f
-#define AD23_4  0.000009f
-#define AD33_4  0.992818f
-#define BD3_4   0.007182f
-#define L1_4    0.01f
-#define L2_4    0.51f
-#define L3_4    -21.68f
-
 /* ========================================================================= *
  * GLOBAL VARIABLES
  * ========================================================================= */
@@ -156,25 +108,25 @@ uint32_t i_store = 0;
 float ic1 = 0.0, ue1 = 0.0, integral_i1 = 0;
 float fc1 = 0;
 float v1 = 0, ep1 = 0, xr1 = 0, fce1 = 0, sum_vp1 = 0, fc1_prim = 0;
-float Position_c1 = DELTA_0, Position_c1_dec = 2.85f;
+float Position_c1 = DELTA_0, Position_c1_dec = 2.85e-3f;
 
 // --- Inductor 2 Control ---
 float ic2 = 0, ue2 = 0, integral_i2 = 0;
 float fc2 = 0;
 float v2 = 0, ep2 = 0, xr2 = 0, fce2 = 0, sum_vp2 = 0, fc2_prim = 0;
-float Position_c2 = DELTA_0, Position_c2_dec = 2.85f;
+float Position_c2 = DELTA_0, Position_c2_dec = 2.85e-3f;
 
 // --- Inductor 3 Control ---
 float ic3 = 0, ue3 = 0, integral_i3 = 0;
 float fc3 = 0;
 float v3 = 0, ep3 = 0, xr3 = 0, fce3 = 0, sum_vp3 = 0, fc3_prim = 0;
-float Position_c3_dec = 2.85f, Position_c3 = DELTA_0;
+float Position_c3_dec = 2.85e-3f, Position_c3 = DELTA_0;
 
 // --- Inductor 4 Control ---
 float ic4 = 0, ue4 = 0, integral_i4 = 0;
 float fc4 = 0;
 float v4 = 0, ep4 = 0, xr4 = 0, fce4 = 0, sum_vp4 = 0, fc4_prim = 0;
-float Position_c4_dec = 2.85f ,Position_c4 = DELTA_0;
+float Position_c4_dec = 2.85e-3f ,Position_c4 = DELTA_0;
 
 // --- PID Variables (Archive for future tests) ---
 //float Kp_pid = 2050;
@@ -388,28 +340,28 @@ __interrupt void adcA1ISR(void)
     err_obs1 = Position1 - pos_est1;
     float pos_est1_new = AD11_1 * pos_est1 + AD12_1 * vit_est1                     + L1_1 * err_obs1;
     float vit_est1_new =                     AD22_1 * vit_est1 + AD23_1 * for_est1 + L2_1 * err_obs1;
-    float for_est1_new =                                         AD33_1 * for_est1 + BD3_1 * fc1 + L3_1 * err_obs1;
+    float for_est1_new =                                         AD33_1 * for_est1 + BD3_1 * (fc1 - FP) + L3_1 * err_obs1;
     pos_est1 = pos_est1_new; vit_est1 = vit_est1_new; for_est1 = for_est1_new;
 
     // --- Inducteur 2 ---
     err_obs2 = Position2 - pos_est2;
     float pos_est2_new = AD11_2 * pos_est2 + AD12_2 * vit_est2                     + L1_2 * err_obs2;
     float vit_est2_new =                     AD22_2 * vit_est2 + AD23_2 * for_est2 + L2_2 * err_obs2;
-    float for_est2_new =                                         AD33_2 * for_est2 + BD3_2 * fc2 + L3_2 * err_obs2;
+    float for_est2_new =                                         AD33_2 * for_est2 + BD3_2 * (fc2 - FP) + L3_2 * err_obs2;
     pos_est2 = pos_est2_new; vit_est2 = vit_est2_new; for_est2 = for_est2_new;
 
     // --- Inducteur 3 ---
     err_obs3 = Position3 - pos_est3;
     float pos_est3_new = AD11_3 * pos_est3 + AD12_3 * vit_est3                     + L1_3 * err_obs3;
     float vit_est3_new =                     AD22_3 * vit_est3 + AD23_3 * for_est3 + L2_3 * err_obs3;
-    float for_est3_new =                                         AD33_3 * for_est3 + BD3_3 * fc3 + L3_3 * err_obs3;
+    float for_est3_new =                                         AD33_3 * for_est3 + BD3_3 * (fc3 - FP) + L3_3 * err_obs3;
     pos_est3 = pos_est3_new; vit_est3 = vit_est3_new; for_est3 = for_est3_new;
 
     // --- Inducteur 4 ---
     err_obs4 = Position4 - pos_est4;
     float pos_est4_new = AD11_4 * pos_est4 + AD12_4 * vit_est4                     + L1_4 * err_obs4;
     float vit_est4_new =                     AD22_4 * vit_est4 + AD23_4 * for_est4 + L2_4 * err_obs4;
-    float for_est4_new =                                         AD33_4 * for_est4 + BD3_4 * fc4 + L3_4 * err_obs4;
+    float for_est4_new =                                         AD33_4 * for_est4 + BD3_4 * (fc4 - FP) + L3_4 * err_obs4;
     pos_est4 = pos_est4_new; vit_est4 = vit_est4_new; for_est4 = for_est4_new;
 
     // --- Position filtr  pour l'envoie ---
@@ -591,6 +543,12 @@ __interrupt void adcA1ISR(void)
                 xr3 = 0.0f;
                 xr4 = 0.0f;
 
+                // Reset standard de l'état estimé
+                pos_est1 = Position1; vit_est1 = 0.0f; for_est1 = 0.0f;
+                pos_est2 = Position2; vit_est2 = 0.0f; for_est2 = 0.0f;
+                pos_est3 = Position3; vit_est3 = 0.0f; for_est3 = 0.0f;
+                pos_est4 = Position4; vit_est4 = 0.0f; for_est4 = 0.0f;
+
                 // Changement d' tat
                 state = STATE_3;
             }
@@ -716,6 +674,12 @@ __interrupt void adcA1ISR(void)
                 xr3 = 0.0f; fce3 = 0.0f; ep3 = 0.0f;
                 xr4 = 0.0f; fce4 = 0.0f; ep4 = 0.0f;
 
+                // RESET DES OBSERVATEURS POUR LE PROCHAIN VOL
+                pos_est1 = Position1; vit_est1 = 0.0f; for_est1 = 0.0f;
+                pos_est2 = Position2; vit_est2 = 0.0f; for_est2 = 0.0f;
+                pos_est3 = Position3; vit_est3 = 0.0f; for_est3 = 0.0f;
+                pos_est4 = Position4; vit_est4 = 0.0f; for_est4 = 0.0f;
+
                 status = SFO();
                 if (status == SFO_ERROR) error();
 
@@ -755,10 +719,10 @@ __interrupt void adcA1ISR(void)
             if (!sat1) xr1 += ep1 * H;          // n'intègre que si pas saturé
 
             // Notch + transformée inverse : INCHANGÉS
-            IN1[0] = fc1;
-            fc1f = IIR_Filter(IN1, OUT1);
-            if (fc1f < 0) fc1f = 0; else if (fc1f > FMAX1) fc1f = FMAX1;
-            ic1 = sqrtf(K_FC1 * fc1f) * Position1;
+//            IN1[0] = fc1;
+//            fc1f = IIR_Filter(IN1, OUT1);
+//            if (fc1f < 0) fc1f = 0; else if (fc1f > FMAX1) fc1f = FMAX1;
+            ic1 = sqrtf(K_FC1 * fc1) * Position1;
 
             // --- Inducteur 2 (LQI 2 DDL) ---
             ep2 = Position_c2 - Position2;
@@ -772,10 +736,10 @@ __interrupt void adcA1ISR(void)
             if (!sat2) xr2 += ep2 * H;
 
             // Notch + transformée inverse : INCHANGÉS
-            IN2[0] = fc2;
-            fc2f = IIR_Filter(IN2, OUT2);
-            if (fc2f < 0) fc2f = 0; else if (fc2f > FMAX2) fc2f = FMAX2; // CORRIGÉ (FMAX1 -> FMAX2)
-            ic2 = sqrtf(K_FC2 * fc2f) * Position2;
+//            IN2[0] = fc2;
+//            fc2f = IIR_Filter(IN2, OUT2);
+//            if (fc2f < 0) fc2f = 0; else if (fc2f > FMAX2) fc2f = FMAX2; // CORRIGÉ (FMAX1 -> FMAX2)
+            ic2 = sqrtf(K_FC2 * fc2) * Position2;
 
             // --- Inducteur 3 (LQI 3 DDL) ---
             ep3 = Position_c3 - Position3;
@@ -789,10 +753,10 @@ __interrupt void adcA1ISR(void)
             if (!sat3) xr3 += ep3 * H;          // n'intègre que si pas saturé
 
             // Notch + transformée inverse : INCHANGÉS
-            IN3[0] = fc3;
-            fc3f = IIR_Filter(IN3, OUT3);
-            if (fc3f < 0) fc3f = 0; else if (fc3f > FMAX3) fc3f = FMAX3; // CORRIGÉ (fc1f -> fc3f)
-            ic3 = sqrtf(K_FC3 * fc3f) * Position3;
+//            IN3[0] = fc3;
+//            fc3f = IIR_Filter(IN3, OUT3);
+//            if (fc3f < 0) fc3f = 0; else if (fc3f > FMAX3) fc3f = FMAX3; // CORRIGÉ (fc1f -> fc3f)
+            ic3 = sqrtf(K_FC3 * fc3) * Position3;
 
             // --- Inducteur 4 (LQI 4 DDL) ---
             ep4 = Position_c4 - Position4;
@@ -806,10 +770,10 @@ __interrupt void adcA1ISR(void)
             if (!sat4) xr4 += ep4 * H;          // n'intègre que si pas saturé
 
             // Notch + transformée inverse : INCHANGÉS
-            IN4[0] = fc4;
-            fc4f = IIR_Filter(IN4, OUT4);
-            if (fc4f < 0) fc4f = 0; else if (fc4f > FMAX4) fc4f = FMAX4;
-            ic4 = sqrtf(K_FC4 * fc4f) * Position4;
+//            IN4[0] = fc4;
+//            fc4f = IIR_Filter(IN4, OUT4);
+//            if (fc4f < 0) fc4f = 0; else if (fc4f > FMAX4) fc4f = FMAX4;
+            ic4 = sqrtf(K_FC4 * fc4) * Position4;
         }
 
         // ================================================================= //

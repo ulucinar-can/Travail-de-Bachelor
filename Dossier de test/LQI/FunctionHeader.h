@@ -171,21 +171,68 @@ extern const float POS_COR_2[6];
 extern const float POS_COR_3[6];
 extern const float POS_COR_4[6];
 
-#define LQI1_Q    14102.7f
-#define LQI1_QD   440.51f
-#define LQI1_EPS  202477.6f/50
+// ================= INDUCTEUR 1 =================
+#define LQI1_Q    18780.5f
+#define LQI1_QD   323.07f
+#define LQI1_EPS  408964.1f
 
-#define LQI2_Q    14112.7f
-#define LQI2_QD   441.34f
-#define LQI2_EPS  202426.2f/50
+#define AD11_1  1.000000f
+#define AD12_1  0.000040f
+#define AD22_1  1.000000f
+#define AD23_1  -0.000009f
+#define AD33_1  0.974516f
+#define BD3_1   0.025484f
+#define L1_1    0.0198f
+#define L2_1    4.45f
+#define L3_1    3213.41f
 
-#define LQI3_Q    14102.7f
-#define LQI3_QD   440.51f
-#define LQI3_EPS  202477.6f/50
 
-#define LQI4_Q    14102.7f
-#define LQI4_QD   440.51f
-#define LQI4_EPS  202477.6f/50
+// ================= INDUCTEUR 2 =================
+#define LQI2_Q    19699.4f
+#define LQI2_QD   338.87f
+#define LQI2_EPS  428974.1f
+
+#define AD11_2  1.000000f
+#define AD12_2  0.000040f
+#define AD22_2  1.000000f
+#define AD23_2  -0.000009f
+#define AD33_2  0.975704f
+#define BD3_2   0.024296f
+#define L1_2    0.0210f
+#define L2_2    4.31f
+#define L3_2    2221.94f
+
+
+// ================= INDUCTEUR 3 =================
+#define LQI3_Q    18780.5f
+#define LQI3_QD   323.07f
+#define LQI3_EPS  408964.1f
+
+#define AD11_3  1.000000f
+#define AD12_3  0.000040f
+#define AD22_3  1.000000f
+#define AD23_3  -0.000009f
+#define AD33_3  0.974516f
+#define BD3_3   0.025484f
+#define L1_3    0.0198f
+#define L2_3    4.45f
+#define L3_3    3213.41f
+
+
+// ================= INDUCTEUR 4 =================
+#define LQI4_Q    18780.5f
+#define LQI4_QD   323.07f
+#define LQI4_EPS  408964.1f
+
+#define AD11_4  1.000000f
+#define AD12_4  0.000040f
+#define AD22_4  1.000000f
+#define AD23_4  -0.000009f
+#define AD33_4  0.974516f
+#define BD3_4   0.025484f
+#define L1_4    0.0198f
+#define L2_4    4.45f
+#define L3_4    3213.41f
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES
