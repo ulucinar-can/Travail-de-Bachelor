@@ -76,14 +76,6 @@
 #define OFFSET_COR_4                3.9979e-4f
 
 #define GEO_THX    1.923077f
-#define K_ROLL_D   43.7f
-#define ROLL_AD12  0.000040f
-#define ROLL_AD23  -0.000097f
-#define ROLL_AD33  0.974524f
-#define ROLL_BD3   0.025476f
-#define ROLL_L1    0.0269f
-#define ROLL_L2    5.66f
-#define ROLL_L3    129.70f
 
 /* ========================================================================= *
  * GLOBAL VARIABLES

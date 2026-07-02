@@ -177,9 +177,9 @@ extern const float POS_COR_3[6];
 extern const float POS_COR_4[6];
 
 // ================= INDUCTEUR 1 =================
-#define LQI1_Q    66641.0f
-#define LQI1_QD   1146.37f
-#define LQI1_EPS  1451174.1f
+#define LQI1_Q    18780.5f
+#define LQI1_QD   323.07f
+#define LQI1_EPS  408964.1f
 
 #define AD11_1  1.000000f
 #define AD12_1  0.000040f
@@ -193,9 +193,9 @@ extern const float POS_COR_4[6];
 
 
 // ================= INDUCTEUR 2 =================
-#define LQI2_Q    67559.8f
-#define LQI2_QD   1162.18f
-#define LQI2_EPS  1471180.7f
+#define LQI2_Q    19699.4f
+#define LQI2_QD   338.87f
+#define LQI2_EPS  428974.1f
 
 #define AD11_2  1.000000f
 #define AD12_2  0.000040f
@@ -209,9 +209,9 @@ extern const float POS_COR_4[6];
 
 
 // ================= INDUCTEUR 3 =================
-#define LQI3_Q    66641.0f
-#define LQI3_QD   1146.37f
-#define LQI3_EPS  1451174.1f
+#define LQI3_Q    18780.5f
+#define LQI3_QD   323.07f
+#define LQI3_EPS  408964.1f
 
 #define AD11_3  1.000000f
 #define AD12_3  0.000040f
@@ -225,9 +225,9 @@ extern const float POS_COR_4[6];
 
 
 // ================= INDUCTEUR 4 =================
-#define LQI4_Q    66641.0f
-#define LQI4_QD   1146.37f
-#define LQI4_EPS  1451174.1f
+#define LQI4_Q    18780.5f
+#define LQI4_QD   323.07f
+#define LQI4_EPS  408964.1f
 
 #define AD11_4  1.000000f
 #define AD12_4  0.000040f
@@ -238,6 +238,17 @@ extern const float POS_COR_4[6];
 #define L1_4    0.0643f
 #define L2_4    26.11f
 #define L3_4    -186.19f
+
+
+// ================= OBSERVATEUR MODAL ===================
+#define K_ROLL_D   43.7f
+#define ROLL_AD12  0.000040f
+#define ROLL_AD23  -0.000097f
+#define ROLL_AD33  0.974516f
+#define ROLL_BD3   0.025484f
+#define ROLL_L1    0.0269f
+#define ROLL_L2    5.66f
+#define ROLL_L3    130.11f
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES
