@@ -70,11 +70,16 @@
 #define ANTIWINDUP_EN   1
 #define ANTIWINDUP_DIS  0
 
+#define K_CAL1  0.567f
+#define K_CAL2  0.801f
+#define K_CAL3  0.703f
+#define K_CAL4  0.621f
+
 // --- Inverse transform method ---
-#define K_FC1            ((float)(2.0/(L_N1*DELTA_N)))
-#define K_FC2            ((float)(2.0/(L_N2*DELTA_N)))
-#define K_FC3            ((float)(2.0/(L_N3*DELTA_N)))
-#define K_FC4            ((float)(2.0/(L_N4*DELTA_N)))
+#define K_FC1            ((float)(2.0/(L_N1*DELTA_N*K_CAL1)))
+#define K_FC2            ((float)(2.0/(L_N2*DELTA_N*K_CAL2)))
+#define K_FC3            ((float)(2.0/(L_N3*DELTA_N*K_CAL3)))
+#define K_FC4            ((float)(2.0/(L_N4*DELTA_N*K_CAL4)))
 
 #define FP              M*G
 
@@ -98,10 +103,10 @@
 #define I_STORE_2E_DECOLLAGE            15000
 
 #define IMAX            12.0f
-#define FMAX1           ((float)(0.5*L_N1*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
-#define FMAX2           ((float)(0.5*L_N2*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
-#define FMAX3           ((float)(0.5*L_N3*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
-#define FMAX4           ((float)(0.5*L_N4*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
+#define FMAX1           ((float)(0.5*L_N1*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0) * K_CAL1))
+#define FMAX2           ((float)(0.5*L_N2*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0) * K_CAL2))
+#define FMAX3           ((float)(0.5*L_N3*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0) * K_CAL3))
+#define FMAX4           ((float)(0.5*L_N4*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0) * K_CAL4))
 #define K_ANTIWINDUP    ((float)(1.0/KW))
 
 /* ========================================================================= *
@@ -172,9 +177,9 @@ extern const float POS_COR_3[6];
 extern const float POS_COR_4[6];
 
 // ================= INDUCTEUR 1 =================
-#define LQI1_Q    18780.5f
-#define LQI1_QD   323.07f
-#define LQI1_EPS  408964.1f
+#define LQI1_Q    66641.0f
+#define LQI1_QD   1146.37f
+#define LQI1_EPS  1451174.1f
 
 #define AD11_1  1.000000f
 #define AD12_1  0.000040f
@@ -182,15 +187,15 @@ extern const float POS_COR_4[6];
 #define AD23_1  -0.000009f
 #define AD33_1  0.974516f
 #define BD3_1   0.025484f
-#define L1_1    0.0198f
-#define L2_1    4.45f
-#define L3_1    3213.41f
+#define L1_1    0.0643f
+#define L2_1    26.11f
+#define L3_1    -186.19f
 
 
 // ================= INDUCTEUR 2 =================
-#define LQI2_Q    19699.4f
-#define LQI2_QD   338.87f
-#define LQI2_EPS  428974.1f
+#define LQI2_Q    67559.8f
+#define LQI2_QD   1162.18f
+#define LQI2_EPS  1471180.7f
 
 #define AD11_2  1.000000f
 #define AD12_2  0.000040f
@@ -198,15 +203,15 @@ extern const float POS_COR_4[6];
 #define AD23_2  -0.000009f
 #define AD33_2  0.975704f
 #define BD3_2   0.024296f
-#define L1_2    0.0210f
-#define L2_2    4.31f
-#define L3_2    2221.94f
+#define L1_2    0.0655f
+#define L2_2    27.30f
+#define L3_2    -431.52f
 
 
 // ================= INDUCTEUR 3 =================
-#define LQI3_Q    18780.5f
-#define LQI3_QD   323.07f
-#define LQI3_EPS  408964.1f
+#define LQI3_Q    66641.0f
+#define LQI3_QD   1146.37f
+#define LQI3_EPS  1451174.1f
 
 #define AD11_3  1.000000f
 #define AD12_3  0.000040f
@@ -214,15 +219,15 @@ extern const float POS_COR_4[6];
 #define AD23_3  -0.000009f
 #define AD33_3  0.974516f
 #define BD3_3   0.025484f
-#define L1_3    0.0198f
-#define L2_3    4.45f
-#define L3_3    3213.41f
+#define L1_3    0.0643f
+#define L2_3    26.11f
+#define L3_3    -186.19f
 
 
 // ================= INDUCTEUR 4 =================
-#define LQI4_Q    18780.5f
-#define LQI4_QD   323.07f
-#define LQI4_EPS  408964.1f
+#define LQI4_Q    66641.0f
+#define LQI4_QD   1146.37f
+#define LQI4_EPS  1451174.1f
 
 #define AD11_4  1.000000f
 #define AD12_4  0.000040f
@@ -230,9 +235,9 @@ extern const float POS_COR_4[6];
 #define AD23_4  -0.000009f
 #define AD33_4  0.974516f
 #define BD3_4   0.025484f
-#define L1_4    0.0198f
-#define L2_4    4.45f
-#define L3_4    3213.41f
+#define L1_4    0.0643f
+#define L2_4    26.11f
+#define L3_4    -186.19f
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES

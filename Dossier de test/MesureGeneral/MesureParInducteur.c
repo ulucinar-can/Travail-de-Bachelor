@@ -861,8 +861,10 @@ __interrupt void adcA1ISR(void)
             fce4 = (fc4_prim - fc4) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
             // Filtre coupe-bande
+            GPIO_writePin(LED_D5, 1);
             IN4[0] = fc4;
             fc4f = IIR_Filter(IN4, OUT4);
+            GPIO_writePin(LED_D5, 0);
             if (fc4f <= 0)   fc4f = 0;
             if (fc4f >= FMAX4) fc4f = FMAX4;
 
