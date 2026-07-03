@@ -189,9 +189,6 @@ float pos_est2 = DELTA_0, vit_est2 = 0.0f, for_est2 = 0.0f, err_obs2 = 0.0f;
 float pos_est3 = DELTA_0, vit_est3 = 0.0f, for_est3 = 0.0f, err_obs3 = 0.0f;
 float pos_est4 = DELTA_0, vit_est4 = 0.0f, for_est4 = 0.0f, err_obs4 = 0.0f;
 
-// --- Variable pours les angles
-float th_est=0, thd_est=0, Mx_est=0;
-
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
  * ========================================================================= */
@@ -368,16 +365,6 @@ __interrupt void adcA1ISR(void)
     float for_est4_new =                                         AD33_4 * for_est4 + BD3_4 * (fc4f - FP) + L3_4 * err_obs4;
     pos_est4 = pos_est4_new; vit_est4 = vit_est4_new; for_est4 = for_est4_new;
 
-    // Angle de roulis mesuré et couple réellement appliqué (post-notch, cycle précédent)
-    float ThX    = GEO_THX*(Position1 - Position2 + Position3 - Position4);
-    float Mx_app = 0.13f*(fc1f - fc2f + fc3f - fc4f);
-    float err_r  = ThX - th_est;
-    float th_n   = th_est  + ROLL_AD12*thd_est                    + ROLL_L1*err_r;
-    float thd_n  = thd_est + ROLL_AD23*Mx_est                     + ROLL_L2*err_r;
-    float Mx_n   = ROLL_AD33*Mx_est + ROLL_BD3*Mx_app             + ROLL_L3*err_r;
-    th_est=th_n; thd_est=thd_n; Mx_est=Mx_n;
-    float dF_roll = K_ROLL_D * thd_est;
-
     // --- Position filtr  pour l'envoie ---
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
     Pos2_filt = (ALPHA * Position2) + (ALPHA_INV * Pos2_filt);
@@ -429,7 +416,7 @@ __interrupt void adcA1ISR(void)
         // --- Inducteur 3 ---
         telemetry[16] = Position_c3 * 1000.0f;
         telemetry[17] = Position3 * 1000.0f;
-        telemetry[18] = ThX * 1000.0f;
+        telemetry[18] = ep3 * 1000;
         telemetry[19] = ic3;
         telemetry[20] = Current3;
         telemetry[21] = fc3;
@@ -439,7 +426,7 @@ __interrupt void adcA1ISR(void)
         // --- Inducteur 4 ---
         telemetry[24] = Position_c4 * 1000.0f;
         telemetry[25] = Position4 * 1000.0f;
-        telemetry[26] = thd_est;
+        telemetry[26] = ep4 * 1000;
         telemetry[27] = ic4;
         telemetry[28] = Current4;
         telemetry[29] = fc4;
@@ -803,7 +790,7 @@ __interrupt void adcA1ISR(void)
         {
             // --- Inducteur 1 (LQI 1 DDL) ---
             ep1 = Position_c1 - Position1;
-            fc1_prim = FP + LQI1_Q*(Position1 - Position_c1) + LQI1_QD*vit_est1 - LQI1_EPS*xr1*I + dF_roll;
+            fc1_prim = FP + LQI1_Q*(Position1 - Position_c1) + LQI1_QD*vit_est1 - LQI1_EPS*xr1*I;
 
             // Saturation + anti-windup par gel de l'intégrateur
             fc1 = fc1_prim;
@@ -820,7 +807,7 @@ __interrupt void adcA1ISR(void)
 
             // --- Inducteur 2 (LQI 2 DDL) ---
             ep2 = Position_c2 - Position2;
-            fc2_prim = FP + LQI2_Q*(Position2 - Position_c2) + LQI2_QD*vit_est2 - LQI2_EPS*xr2*I - dF_roll;
+            fc2_prim = FP + LQI2_Q*(Position2 - Position_c2) + LQI2_QD*vit_est2 - LQI2_EPS*xr2*I;
 
             // Saturation + anti-windup par gel de l'intégrateur
             fc2 = fc2_prim;
@@ -840,7 +827,7 @@ __interrupt void adcA1ISR(void)
         {
             // --- Inducteur 3 (LQI 3 DDL) ---
             ep3 = Position_c3 - Position3;
-            fc3_prim = FP + LQI3_Q*(Position3 - Position_c3) + LQI3_QD*vit_est3 - LQI3_EPS*xr3*I + dF_roll;
+            fc3_prim = FP + LQI3_Q*(Position3 - Position_c3) + LQI3_QD*vit_est3 - LQI3_EPS*xr3*I;
 
             // Saturation + anti-windup par gel de l'intégrateur
             fc3 = fc3_prim;
@@ -857,7 +844,7 @@ __interrupt void adcA1ISR(void)
 
             // --- Inducteur 4 (LQI 4 DDL) ---
             ep4 = Position_c4 - Position4;
-            fc4_prim = FP + LQI4_Q*(Position4 - Position_c4) + LQI4_QD*vit_est4 - LQI4_EPS*xr4*I - dF_roll;
+            fc4_prim = FP + LQI4_Q*(Position4 - Position_c4) + LQI4_QD*vit_est4 - LQI4_EPS*xr4*I;
 
             // Saturation + anti-windup par gel de l'intégrateur
             fc4 = fc4_prim;
