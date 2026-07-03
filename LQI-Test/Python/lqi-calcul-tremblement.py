@@ -37,7 +37,7 @@ def design_lqi_place(tau_act):
     Ad, Bd = c2d(A, B, H)
     
     # Placement de pôles vers 80-95 rad/s pour dominer l'instabilité (qui est à 99 rad/s)
-    poles_cont = [-80.0, -85.0, -90.0, -95.0]
+    poles_cont = [-80.0, -85.0, -90.0, -8]
     poles_disc = np.exp(np.array(poles_cont) * H)
     
     res = place_poles(Ad, Bd, poles_disc)
