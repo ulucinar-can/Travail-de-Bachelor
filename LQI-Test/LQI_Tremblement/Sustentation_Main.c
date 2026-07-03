@@ -75,7 +75,6 @@
 #define GAIN_COR_4                  8.3439e-7f
 #define OFFSET_COR_4                3.9979e-4f
 
-#define GEO_THX    1.923077f
 
 /* ========================================================================= *
  * GLOBAL VARIABLES
