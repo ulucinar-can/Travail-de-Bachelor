@@ -34,21 +34,17 @@ BY = DY/2
 TY = 2.267
 JY    = (M_TOT*g*BY**2 *TY**2)/(4*np.pi**2*L)
 
-# --- Correctifs issus du vol MIMO du 06.07 (mesure_complete_4_inducteurs.csv) ---
-# 1) L'affectation des deux essais bifilaires (1.985 / 0.362 kg.m^2) aux axes
-#    X/Y reste ambigue ; le vol avec roulis=1.985 a diverge (bang-bang roulis).
-#    On synthetise avec la moyenne geometrique : elle couvre les deux
-#    affectations avec un rapport 2.34x, dans la marge +/-4x validee en simu.
-# 2) Force reelle / force commandee : 1.14 au point nominal (SISO), ~1.35 en
-#    regime sature (bilan d'impulsion du vol : somme(fc)=131 N pour 177 N).
-#    On prend 1.15 (valeur petit-signal) : si k reel est plus grand la maquette
-#    monte un peu (rattrapable), s'il etait surestime elle retomberait sur les
-#    appuis a l'engagement. Applique aux inerties de synthese et au feedforward
-#    statique (l'integrateur Z portait +100 N).
-K_FORCE = 1.15
-J_MID   = np.sqrt(JX * JY)
-JX_SYN  = J_MID / K_FORCE
-JY_SYN  = J_MID / K_FORCE
+# --- Identification du vol 2 (K_CAL retire de K_FC/FMAX, sans saturation) ---
+# 1) Force reelle / commandee : k = 0.639 (mediane sur 905 points quasi-statiques,
+#    somme(fc) ~ 277 N pour porter 177 N ; l'integrateur Z portait -135 N).
+# 2) Affectation bifilaire TRANCHEE par le vol : le roulis etait sous-gaine
+#    (pic a 3.3 Hz = omega*, croissance x2/15 s) -> J roulis = 1.985 (ton
+#    affectation d'origine) ; tangage = 0.362, le canal le plus amorti.
+#    Confirme par J_eff_Z identifie a 14.8 Hz : 23-30 vs 28.2 = 18.05/0.639.
+# 3) La synthese utilise J_eff = J/k : absorbe la calibration de force.
+K_FORCE = 0.639
+JX_SYN  = JX / K_FORCE
+JY_SYN  = JY / K_FORCE
 M_SYN   = M_TOT / K_FORCE
 
 # Positions des inducteurs PAR RAPPORT AU CG [m]

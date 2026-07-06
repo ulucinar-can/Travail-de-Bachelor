@@ -128,23 +128,24 @@ static const float W_MAT[4][3] = {{2.50000000e-01f, 1.78571429e+00f, 1.92307692e
                                   {2.50000000e-01f, 1.78571429e+00f, -1.92307692e+00f},
                                   {2.50000000e-01f, -1.78571429e+00f, 1.92307692e+00f},
                                   {2.50000000e-01f, -1.78571429e+00f, -1.92307692e+00f}};
-// J_syn = sqrt(1.985*0.362) = 0.848 (ambiguite d'affectation bifilaire), k_force = 1.15 (identifie en vol 06.07)
-static const float F_STAT[4]   = {3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f};
-static const float U_STAT[3]   = {1.53991409e+02f, 0.00000000e+00f, 0.00000000e+00f};
+// Identifie en vol 2 (06.07, sans saturation) : k_force = 0.639, J roulis = 1.985, J tangage = 0.362
+// Synthese sur J_eff = J/k : Z = 28.25, T = 0.567, R = 3.107
+static const float F_STAT[4]   = {6.92840845e+01f, 6.92840845e+01f, 6.92840845e+01f, 6.92840845e+01f};
+static const float U_STAT[3]   = {2.77136338e+02f, 0.00000000e+00f, 0.00000000e+00f};
 
-static const float LQI_Q[3]       = {8.17531348e+04f, 3.84011724e+03f, 3.84011724e+03f};
-static const float LQI_QD[3]      = {2.22448377e+03f, 1.04488694e+02f, 1.04488694e+02f};
-static const float LQI_EPS[3]     = {8.01010531e+05f, 3.76251552e+04f, 3.76251552e+04f};
-static const float LQI_EPS_INV[3] = {1.24842304e-06f, 2.65779635e-05f, 2.65779635e-05f};
-static const float AW_TOL[3]      = {3.07982817e+00f, 4.31175944e-01f, 4.00377663e-01f};
+static const float LQI_Q[3]       = {1.47130084e+05f, 2.95146906e+03f, 1.61824658e+04f};
+static const float LQI_QD[3]      = {4.00337510e+03f, 8.03087840e+01f, 4.40321118e+02f};
+static const float LQI_EPS[3]     = {1.44156857e+06f, 2.89182528e+04f, 1.58554479e+05f};
+static const float LQI_EPS_INV[3] = {6.93688818e-07f, 3.45802357e-05f, 6.30698045e-06f};
+static const float AW_TOL[3]      = {5.54272676e+00f, 7.75981746e-01f, 7.20554479e-01f};
 
 static const float OBS_AD12[3] = {4.00000000e-05f, 4.00000000e-05f, 4.00000000e-05f};
-static const float OBS_AD23[3] = {-2.53906413e-06f, -5.40547220e-05f, -5.40547220e-05f};
+static const float OBS_AD23[3] = {-1.41083651e-06f, -7.03298820e-05f, -1.28272460e-05f};
 static const float OBS_AD33[3] = {9.92842731e-01f, 9.92842731e-01f, 9.92842731e-01f};
 static const float OBS_BD3[3]  = {7.15726889e-03f, 7.15726889e-03f, 7.15726889e-03f};
-static const float OBS_L1[3]   = {8.26648412e-02f, 8.26648447e-02f, 8.26648447e-02f};
-static const float OBS_L2[3]   = {5.21595706e+01f, 5.21595753e+01f, 5.21595753e+01f};
-static const float OBS_L3[3]   = {-1.15644149e+05f, -5.43205012e+03f, -5.43205012e+03f};
+static const float OBS_L1[3]   = {8.26648480e-02f, 8.26648448e-02f, 8.26648435e-02f};
+static const float OBS_L2[3]   = {5.21595795e+01f, 5.21595755e+01f, 5.21595738e+01f};
+static const float OBS_L3[3]   = {-2.08123334e+05f, -4.17501001e+03f, -2.28909577e+04f};
 
 #define REF_SMOOTH 1.333333e-04f
 
