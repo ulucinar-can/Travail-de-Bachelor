@@ -55,7 +55,8 @@ PLACEHOLDER = False
 
 H          = 1.0/25e3        # periode ISR [s]
 NOTCH_LAG  = 4.0e-3          # retard equivalent du coupe-bande 75 Hz [s]
-TAU_IBF    = np.mean([1.5495e-3, 1.6263e-3, 1.5495e-3, 1.5495e-3])
+TAU_IBF    = np.mean([0.001276750704319, 0.001361865236756
+, 0.001276750704319, 0.001276750704319])
 TAU_ACT    = TAU_IBF + NOTCH_LAG
 G_ACC      = 9.81
 
@@ -63,7 +64,7 @@ G_ACC      = 9.81
 # avec [-80,-85,-90,-15], la boucle etait au point critique |R|=1.0-1.15 a
 # 14.8 Hz (Z), 3.3 Hz (R) et ~30 Hz (Z/T) -> croissance lente observee en vol.
 # [-50,-55,-60,-11] ramene tous ces points a |R| = 0.34-0.49 (6-9 dB de marge).
-POLES_LQI  = [-50.0, -55.0, -60.0, -11.0]
+POLES_LQI  = [-80.0, -85.0, -90.0, -15.0]
 POLES_OBS  = [-700.0, -760.0, -820.0]
 
 TAU_REF    = 0.3             # lissage des references modales [s]

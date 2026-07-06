@@ -117,7 +117,7 @@ float ic4 = 0, ue4 = 0, integral_i4 = 0;
 float fc4 = 0;
 float Position_c4_dec = 2.85e-3f;
 
-// ======== MIMO genere par lqi-inertie.py ï¿½ modes [Z, T, R] ========
+// ======== MIMO genere par lqi-inertie.py — modes [Z, T, R] ========
 static const float T_MAT[3][4] = {{2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f},
                                   {1.78571429e+00f, 1.78571429e+00f, -1.78571429e+00f, -1.78571429e+00f},
                                   {1.92307692e+00f, -1.92307692e+00f, 1.92307692e+00f, -1.92307692e+00f}};
@@ -128,24 +128,22 @@ static const float W_MAT[4][3] = {{2.50000000e-01f, 1.78571429e+00f, 1.92307692e
                                   {2.50000000e-01f, 1.78571429e+00f, -1.92307692e+00f},
                                   {2.50000000e-01f, -1.78571429e+00f, 1.92307692e+00f},
                                   {2.50000000e-01f, -1.78571429e+00f, -1.92307692e+00f}};
-// Config vol 2 (J_syn = 0.848, k_force = 1.15) + poles ralentis [-50,-55,-60,-11] :
-// loop-shaping sur la plante mesuree, points critiques 14.8/3.3/30 Hz ramenes de |R|~1.0-1.15 a 0.34-0.49
 static const float F_STAT[4]   = {3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f};
 static const float U_STAT[3]   = {1.53991409e+02f, 0.00000000e+00f, 0.00000000e+00f};
 
-static const float LQI_Q[3]       = {2.31301821e+04f, 1.08647335e+03f, 1.08647335e+03f};
-static const float LQI_QD[3]      = {9.50282811e+02f, 4.46367845e+01f, 4.46367845e+01f};
-static const float LQI_EPS[3]     = {1.58667629e+05f, 7.45295255e+03f, 7.45295255e+03f};
-static const float LQI_EPS_INV[3] = {6.30248280e-06f, 1.34175012e-04f, 1.34175012e-04f};
+static const float LQI_Q[3]       = {7.77937283e+04f, 3.65413514e+03f, 3.65413514e+03f};
+static const float LQI_QD[3]      = {2.11674909e+03f, 9.94281608e+01f, 9.94281608e+01f};
+static const float LQI_EPS[3]     = {7.62216611e+05f, 3.58029181e+04f, 3.58029181e+04f};
+static const float LQI_EPS_INV[3] = {1.31196301e-06f, 2.79306842e-05f, 2.79306842e-05f};
 static const float AW_TOL[3]      = {3.07982817e+00f, 4.31175944e-01f, 4.00377663e-01f};
 
 static const float OBS_AD12[3] = {4.00000000e-05f, 4.00000000e-05f, 4.00000000e-05f};
-static const float OBS_AD23[3] = {-2.53906413e-06f, -5.40547220e-05f, -5.40547220e-05f};
-static const float OBS_AD33[3] = {9.92842731e-01f, 9.92842731e-01f, 9.92842731e-01f};
-static const float OBS_BD3[3]  = {7.15726889e-03f, 7.15726889e-03f, 7.15726889e-03f};
-static const float OBS_L1[3]   = {8.26648412e-02f, 8.26648447e-02f, 8.26648447e-02f};
-static const float OBS_L2[3]   = {5.21595706e+01f, 5.21595753e+01f, 5.21595753e+01f};
-static const float OBS_L3[3]   = {-1.15644149e+05f, -5.43205012e+03f, -5.43205012e+03f};
+static const float OBS_AD23[3] = {-2.53859887e-06f, -5.40448168e-05f, -5.40448168e-05f};
+static const float OBS_AD33[3] = {9.92478452e-01f, 9.92478452e-01f, 9.92478452e-01f};
+static const float OBS_BD3[3]  = {7.52154758e-03f, 7.52154758e-03f, 7.52154758e-03f};
+static const float OBS_L1[3]   = {8.23005674e-02f, 8.23005660e-02f, 8.23005660e-02f};
+static const float OBS_L2[3]   = {5.14822021e+01f, 5.14822004e+01f, 5.14822004e+01f};
+static const float OBS_L3[3]   = {-1.10187656e+05f, -5.17574601e+03f, -5.17574601e+03f};
 
 #define REF_SMOOTH 1.333333e-04f
 
