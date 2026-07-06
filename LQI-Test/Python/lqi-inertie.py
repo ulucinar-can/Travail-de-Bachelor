@@ -34,17 +34,15 @@ BY = DY/2
 TY = 2.267
 JY    = (M_TOT*g*BY**2 *TY**2)/(4*np.pi**2*L)
 
-# --- Identification du vol 2 (K_CAL retire de K_FC/FMAX, sans saturation) ---
-# 1) Force reelle / commandee : k = 0.639 (mediane sur 905 points quasi-statiques,
-#    somme(fc) ~ 277 N pour porter 177 N ; l'integrateur Z portait -135 N).
-# 2) Affectation bifilaire TRANCHEE par le vol : le roulis etait sous-gaine
-#    (pic a 3.3 Hz = omega*, croissance x2/15 s) -> J roulis = 1.985 (ton
-#    affectation d'origine) ; tangage = 0.362, le canal le plus amorti.
-#    Confirme par J_eff_Z identifie a 14.8 Hz : 23-30 vs 28.2 = 18.05/0.639.
-# 3) La synthese utilise J_eff = J/k : absorbe la calibration de force.
-K_FORCE = 0.639
-JX_SYN  = JX / K_FORCE
-JY_SYN  = JY / K_FORCE
+# --- Parametrage du vol 2 (la meilleure config volee), conserve tel quel ---
+# On garde J_MID / K_FORCE = 1.15 : c'est la base experimentale validee.
+# La correction se fait UNIQUEMENT par les poles (voir POLES_LQI ci-dessous).
+# Pour memoire, identifie sur le vol 2 : k reel = 0.639 (Sfc = 277 N pour
+# porter 177 N, integrateur Z a -135 N), J_eff = 28.2 / 0.57 / 3.1 (Z/T/R).
+K_FORCE = 1.15
+J_MID   = np.sqrt(JX * JY)
+JX_SYN  = J_MID / K_FORCE
+JY_SYN  = J_MID / K_FORCE
 M_SYN   = M_TOT / K_FORCE
 
 # Positions des inducteurs PAR RAPPORT AU CG [m]
@@ -61,9 +59,11 @@ TAU_IBF    = np.mean([1.5495e-3, 1.6263e-3, 1.5495e-3, 1.5495e-3])
 TAU_ACT    = TAU_IBF + NOTCH_LAG
 G_ACC      = 9.81
 
-# Pole integrateur ralenti a -15 rad/s (lecon du cycle limite 5.72 Hz :
-# omega* = sqrt(EPS/QD) doit rester loin de la zone a faible gain de boucle)
-POLES_LQI  = [-80.0, -85.0, -90.0, -15.0]
+# Poles ralentis par loop-shaping sur la plante MESUREE du vol 2 (q/u_sat) :
+# avec [-80,-85,-90,-15], la boucle etait au point critique |R|=1.0-1.15 a
+# 14.8 Hz (Z), 3.3 Hz (R) et ~30 Hz (Z/T) -> croissance lente observee en vol.
+# [-50,-55,-60,-11] ramene tous ces points a |R| = 0.34-0.49 (6-9 dB de marge).
+POLES_LQI  = [-50.0, -55.0, -60.0, -11.0]
 POLES_OBS  = [-700.0, -760.0, -820.0]
 
 TAU_REF    = 0.3             # lissage des references modales [s]

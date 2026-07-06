@@ -128,14 +128,15 @@ static const float W_MAT[4][3] = {{2.50000000e-01f, 1.78571429e+00f, 1.92307692e
                                   {2.50000000e-01f, 1.78571429e+00f, -1.92307692e+00f},
                                   {2.50000000e-01f, -1.78571429e+00f, 1.92307692e+00f},
                                   {2.50000000e-01f, -1.78571429e+00f, -1.92307692e+00f}};
-// J_syn = sqrt(1.985*0.362) = 0.848 (ambiguite d'affectation bifilaire), k_force = 1.15 (identifie en vol 06.07)
+// Config vol 2 (J_syn = 0.848, k_force = 1.15) + poles ralentis [-50,-55,-60,-11] :
+// loop-shaping sur la plante mesuree, points critiques 14.8/3.3/30 Hz ramenes de |R|~1.0-1.15 a 0.34-0.49
 static const float F_STAT[4]   = {3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f};
 static const float U_STAT[3]   = {1.53991409e+02f, 0.00000000e+00f, 0.00000000e+00f};
 
-static const float LQI_Q[3]       = {8.17531348e+04f, 3.84011724e+03f, 3.84011724e+03f};
-static const float LQI_QD[3]      = {2.22448377e+03f, 1.04488694e+02f, 1.04488694e+02f};
-static const float LQI_EPS[3]     = {8.01010531e+05f, 3.76251552e+04f, 3.76251552e+04f};
-static const float LQI_EPS_INV[3] = {1.24842304e-06f, 2.65779635e-05f, 2.65779635e-05f};
+static const float LQI_Q[3]       = {2.31301821e+04f, 1.08647335e+03f, 1.08647335e+03f};
+static const float LQI_QD[3]      = {9.50282811e+02f, 4.46367845e+01f, 4.46367845e+01f};
+static const float LQI_EPS[3]     = {1.58667629e+05f, 7.45295255e+03f, 7.45295255e+03f};
+static const float LQI_EPS_INV[3] = {6.30248280e-06f, 1.34175012e-04f, 1.34175012e-04f};
 static const float AW_TOL[3]      = {3.07982817e+00f, 4.31175944e-01f, 4.00377663e-01f};
 
 static const float OBS_AD12[3] = {4.00000000e-05f, 4.00000000e-05f, 4.00000000e-05f};
