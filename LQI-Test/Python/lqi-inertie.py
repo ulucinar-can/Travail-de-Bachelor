@@ -21,16 +21,43 @@ from scipy.signal import place_poles
 
 # =============================== PARAMETRES ==================================
 M_TOT = 18.052               # masse totale sustentee [kg] (= 4 x 4.513)
-JX    = 0.20                 # <<< PLACEHOLDER : inertie ROULIS (axe X) [kg.m^2]
-JY    = 0.20                 # <<< PLACEHOLDER : inertie TANGAGE (axe Y) [kg.m^2]
+L = 1.23
+g = 9.81
+
+DX = 0.385
+BX = DX/2
+TX = 5.833 - 2
+JX = (M_TOT*g*BX**2 *TX**2)/(4*np.pi**2*L)
+
+DY = 0.278
+BY = DY/2
+TY = 2.267
+JY    = (M_TOT*g*BY**2 *TY**2)/(4*np.pi**2*L)
+
+# --- Correctifs issus du vol MIMO du 06.07 (mesure_complete_4_inducteurs.csv) ---
+# 1) L'affectation des deux essais bifilaires (1.985 / 0.362 kg.m^2) aux axes
+#    X/Y reste ambigue ; le vol avec roulis=1.985 a diverge (bang-bang roulis).
+#    On synthetise avec la moyenne geometrique : elle couvre les deux
+#    affectations avec un rapport 2.34x, dans la marge +/-4x validee en simu.
+# 2) Force reelle / force commandee : 1.14 au point nominal (SISO), ~1.35 en
+#    regime sature (bilan d'impulsion du vol : somme(fc)=131 N pour 177 N).
+#    On prend 1.15 (valeur petit-signal) : si k reel est plus grand la maquette
+#    monte un peu (rattrapable), s'il etait surestime elle retomberait sur les
+#    appuis a l'engagement. Applique aux inerties de synthese et au feedforward
+#    statique (l'integrateur Z portait +100 N).
+K_FORCE = 1.15
+J_MID   = np.sqrt(JX * JY)
+JX_SYN  = J_MID / K_FORCE
+JY_SYN  = J_MID / K_FORCE
+M_SYN   = M_TOT / K_FORCE
 
 # Positions des inducteurs PAR RAPPORT AU CG [m]
-# (mesurer par rapport au centre geometrique puis soustraire X_CG/Y_CG,
-#  estimables via estimate_cg_from_forces() ci-dessous)
-X_I = np.array([+0.150, +0.150, -0.150, -0.150])   # <<< PLACEHOLDER : A MESURER
-Y_I = np.array([+0.150, -0.150, +0.150, -0.150])   # <<< PLACEHOLDER : A MESURER
+# 1<->3 = 28 cm (longitudinal, X) ; 1<->2 = 26 cm (lateral, Y)
+# CG quasi centre (offsets < 3 mm via estimate_cg_from_forces)
+X_I = np.array([+0.140, +0.140, -0.140, -0.140])
+Y_I = np.array([+0.130, -0.130, +0.130, -0.130])
 
-PLACEHOLDER = True           # passer a False une fois JX/JY/X_I/Y_I mesures
+PLACEHOLDER = False
 
 H          = 1.0/25e3        # periode ISR [s]
 NOTCH_LAG  = 4.0e-3          # retard equivalent du coupe-bande 75 Hz [s]
@@ -191,12 +218,12 @@ def main():
     W = G @ np.linalg.inv(G.T @ G)                       # forces = W @ efforts
     assert np.allclose(E @ W, np.eye(3), atol=1e-12)
 
-    U_STAT = np.array([M_TOT * G_ACC, 0.0, 0.0])
+    U_STAT = np.array([M_TOT * G_ACC / K_FORCE, 0.0, 0.0])
     F_STAT = W @ U_STAT
 
-    modes = [("Z (pompage)", M_TOT),
-             ("T (tangage)", JY),
-             ("R (roulis) ", JX)]
+    modes = [("Z (pompage)", M_SYN),
+             ("T (tangage)", JY_SYN),
+             ("R (roulis) ", JX_SYN)]
 
     print("=" * 70)
     print(" SYNTHESE MIMO : LQI MODAL + OBSERVATEURS + ALLOCATION")
@@ -212,9 +239,9 @@ def main():
 
     KQ, KQD, KEPS = [], [], []
     OAD12, OAD23, OAD33, OBD3, OL1, OL2, OL3 = [], [], [], [], [], [], []
-    AWTOL = [AW_FRAC * M_TOT * G_ACC,
-             AW_FRAC * M_TOT * G_ACC * np.mean(np.abs(X_I)),
-             AW_FRAC * M_TOT * G_ACC * np.mean(np.abs(Y_I))]
+    AWTOL = [AW_FRAC * U_STAT[0],
+             AW_FRAC * U_STAT[0] * np.mean(np.abs(X_I)),
+             AW_FRAC * U_STAT[0] * np.mean(np.abs(Y_I))]
 
     print("--- Verification par mode ---")
     for name, inertia in modes:

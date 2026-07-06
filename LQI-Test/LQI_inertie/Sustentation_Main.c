@@ -117,6 +117,37 @@ float ic4 = 0, ue4 = 0, integral_i4 = 0;
 float fc4 = 0;
 float Position_c4_dec = 2.85e-3f;
 
+// ======== MIMO genere par lqi-inertie.py � modes [Z, T, R] ========
+static const float T_MAT[3][4] = {{2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f},
+                                  {1.78571429e+00f, 1.78571429e+00f, -1.78571429e+00f, -1.78571429e+00f},
+                                  {1.92307692e+00f, -1.92307692e+00f, 1.92307692e+00f, -1.92307692e+00f}};
+static const float E_MAT[3][4] = {{1.00000000e+00f, 1.00000000e+00f, 1.00000000e+00f, 1.00000000e+00f},
+                                  {1.40000000e-01f, 1.40000000e-01f, -1.40000000e-01f, -1.40000000e-01f},
+                                  {1.30000000e-01f, -1.30000000e-01f, 1.30000000e-01f, -1.30000000e-01f}};
+static const float W_MAT[4][3] = {{2.50000000e-01f, 1.78571429e+00f, 1.92307692e+00f},
+                                  {2.50000000e-01f, 1.78571429e+00f, -1.92307692e+00f},
+                                  {2.50000000e-01f, -1.78571429e+00f, 1.92307692e+00f},
+                                  {2.50000000e-01f, -1.78571429e+00f, -1.92307692e+00f}};
+// J_syn = sqrt(1.985*0.362) = 0.848 (ambiguite d'affectation bifilaire), k_force = 1.15 (identifie en vol 06.07)
+static const float F_STAT[4]   = {3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f};
+static const float U_STAT[3]   = {1.53991409e+02f, 0.00000000e+00f, 0.00000000e+00f};
+
+static const float LQI_Q[3]       = {8.17531348e+04f, 3.84011724e+03f, 3.84011724e+03f};
+static const float LQI_QD[3]      = {2.22448377e+03f, 1.04488694e+02f, 1.04488694e+02f};
+static const float LQI_EPS[3]     = {8.01010531e+05f, 3.76251552e+04f, 3.76251552e+04f};
+static const float LQI_EPS_INV[3] = {1.24842304e-06f, 2.65779635e-05f, 2.65779635e-05f};
+static const float AW_TOL[3]      = {3.07982817e+00f, 4.31175944e-01f, 4.00377663e-01f};
+
+static const float OBS_AD12[3] = {4.00000000e-05f, 4.00000000e-05f, 4.00000000e-05f};
+static const float OBS_AD23[3] = {-2.53906413e-06f, -5.40547220e-05f, -5.40547220e-05f};
+static const float OBS_AD33[3] = {9.92842731e-01f, 9.92842731e-01f, 9.92842731e-01f};
+static const float OBS_BD3[3]  = {7.15726889e-03f, 7.15726889e-03f, 7.15726889e-03f};
+static const float OBS_L1[3]   = {8.26648412e-02f, 8.26648447e-02f, 8.26648447e-02f};
+static const float OBS_L2[3]   = {5.21595706e+01f, 5.21595753e+01f, 5.21595753e+01f};
+static const float OBS_L3[3]   = {-1.15644149e+05f, -5.43205012e+03f, -5.43205012e+03f};
+
+#define REF_SMOOTH 1.333333e-04f
+
 // --- MIMO : torseur d'etat, references, observateurs modaux, integrateurs ---
 bool MimoFlag = false;
 float frameCnt = 0;

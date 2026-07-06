@@ -70,16 +70,11 @@
 #define ANTIWINDUP_EN   1
 #define ANTIWINDUP_DIS  0
 
-#define K_CAL1  0.535f
-#define K_CAL2  0.756f
-#define K_CAL3  0.663f
-#define K_CAL4  0.586f
-
 // --- Inverse transform method ---
-#define K_FC1            ((float)(2.0/(L_N1*DELTA_N*K_CAL1)))
-#define K_FC2            ((float)(2.0/(L_N2*DELTA_N*K_CAL2)))
-#define K_FC3            ((float)(2.0/(L_N3*DELTA_N*K_CAL3)))
-#define K_FC4            ((float)(2.0/(L_N4*DELTA_N*K_CAL4)))
+#define K_FC1            ((float)(2.0/(L_N1*DELTA_N)))
+#define K_FC2            ((float)(2.0/(L_N2*DELTA_N)))
+#define K_FC3            ((float)(2.0/(L_N3*DELTA_N)))
+#define K_FC4            ((float)(2.0/(L_N4*DELTA_N)))
 
 #define FP              M*G
 
@@ -103,10 +98,10 @@
 #define I_STORE_2E_DECOLLAGE            15000
 
 #define IMAX            12.0f
-#define FMAX1           ((float)(0.5*L_N1*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0) * K_CAL1))
-#define FMAX2           ((float)(0.5*L_N2*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0) * K_CAL2))
-#define FMAX3           ((float)(0.5*L_N3*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0) * K_CAL3))
-#define FMAX4           ((float)(0.5*L_N4*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0) * K_CAL4))
+#define FMAX1           ((float)(0.5*L_N1*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
+#define FMAX2           ((float)(0.5*L_N2*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
+#define FMAX3           ((float)(0.5*L_N3*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
+#define FMAX4           ((float)(0.5*L_N4*DELTA_N*(IMAX/DELTA_0)*(IMAX/DELTA_0)))
 #define K_ANTIWINDUP    ((float)(1.0/KW))
 
 /* ========================================================================= *
