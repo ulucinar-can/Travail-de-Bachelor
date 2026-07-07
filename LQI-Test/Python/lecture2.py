@@ -92,6 +92,12 @@ finally:
     if len(temps) > 0:
         cols = list(zip(*donnees_globales))  # cols[i] correspond à telemetry[i]
 
+        noms_modaux = {
+            0: "Z — Pilonnement (hauteur moyenne)",
+            1: "T — Tangage (ind. 1+2 vs 3+4)",
+            2: "R — Roulis (ind. 1+3 vs 2+4)",
+        }
+
         def tracer_modal(k):
             qm_ref = cols[2 + k]
             qm     = cols[5 + k]
@@ -131,7 +137,7 @@ finally:
             axs[3].legend(loc="upper right")
             axs[3].grid(True, linestyle='--', alpha=0.7)
 
-            plt.suptitle(f"Vue modale - AXE {k}")
+            plt.suptitle(f"Vue modale — {noms_modaux[k]}")
             plt.tight_layout()
             plt.show()
 
