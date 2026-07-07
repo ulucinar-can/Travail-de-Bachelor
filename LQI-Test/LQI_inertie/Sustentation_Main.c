@@ -525,13 +525,13 @@ __interrupt void adcA1ISR(void)
 
                    state = STATE_3;
                }
-               else if(ic1 < 7.82f)
+               else if(ic1 < 9.5f)
                {
                    ic1 += TAKEOFF_CURRENT_STEP1;
                }
                else
                {
-                   ic1 = 7.82f;
+                   ic1 = 9.5f;
                }
 
                ic2 = ic1;
@@ -651,13 +651,13 @@ __interrupt void adcA1ISR(void)
 
                    state = STATE_6;
                }
-               else if(ic3 < 7.82f)
+               else if(ic3 < 9.5f)
                {
                    ic3 += TAKEOFF_CURRENT_STEP1;
                }
                else
                {
-                   ic3 = 7.82f;
+                   ic3 = 9.5f;
                }
 
                ic4 = ic3;

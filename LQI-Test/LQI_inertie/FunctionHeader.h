@@ -17,7 +17,7 @@
 /* ========================================================================= *
  * PHYSICAL & SYSTEM PARAMETERS
  * ========================================================================= */
-#define DELTA_N         ((float)2e-3)           // Position nominal de l'entrefer
+#define DELTA_N         ((float)2.5e-3)           // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
 #define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise à 120 Hz)
 #define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
@@ -63,7 +63,7 @@
 #define I_SP            3.0f
 #define I_SP105         3.15f
 #define I_SP095         2.85f
-#define KP_I            1.88f // Avec Kui ï¿½ -45ï¿½ : Kpi = 90.964f et sans kui : Kpi = 1.88
+#define KP_I            2.0f // Avec Kui ï¿½ -45ï¿½ : Kpi = 90.964f et sans kui : Kpi = 1.88
 #define TI_I            ((float)3.245633840657308e-4)
 #define GI_I            (1.0/TI_I)
 #define UMAX            VDC_BUS
