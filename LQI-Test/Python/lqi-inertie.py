@@ -54,10 +54,13 @@ Y_I = np.array([+0.130, -0.130, +0.130, -0.130])
 PLACEHOLDER = False
 
 H          = 1.0/25e3        # periode ISR [s]
-NOTCH_LAG  = 4.0e-3          # retard equivalent du coupe-bande 75 Hz [s]
+NOTCH_LAG  = 3.98e-3          # retard equivalent du coupe-bande 75 Hz [s]
 TAU_IBF    = np.mean([0.001276750704319, 0.001361865236756
 , 0.001276750704319, 0.001276750704319])
-TAU_ACT    = TAU_IBF + NOTCH_LAG
+TAU_RC = 4.3e3 * 33e-3
+FMES = 1100
+TAU_MES = 1/(2*np.pi*FMES)
+TAU_ACT    = TAU_IBF + NOTCH_LAG + TAU_RC + TAU_MES
 G_ACC      = 9.81
 
 # Poles ralentis par loop-shaping sur la plante MESUREE du vol 2 (q/u_sat) :
