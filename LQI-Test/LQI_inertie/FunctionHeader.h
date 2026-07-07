@@ -17,7 +17,7 @@
 /* ========================================================================= *
  * PHYSICAL & SYSTEM PARAMETERS
  * ========================================================================= */
-#define DELTA_N         ((float)2.5e-3)           // Position nominal de l'entrefer
+#define DELTA_N         ((float)2.0e-3)           // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
 #define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise à 120 Hz)
 #define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
@@ -172,67 +172,35 @@ extern const float POS_COR_3[6];
 extern const float POS_COR_4[6];
 
 // ================= INDUCTEUR 1 =================
-#define LQI1_Q    66641.0f
-#define LQI1_QD   1146.37f
-#define LQI1_EPS  1451174.1f
+#define LQI1_Q    15517.2f
+#define LQI1_QD   266.93f
+#define LQI1_EPS  337903.8f
 
 #define AD11_1  1.000000f
 #define AD12_1  0.000040f
 #define AD22_1  1.000000f
 #define AD23_1  -0.000009f
-#define AD33_1  0.992818f
-#define BD3_1   0.007182f
-#define L1_1    0.0826f
-#define L2_1    52.11f
-#define L3_1    -33139.86f
+#define AD33_1  0.969156f
+#define BD3_1   0.030844f
+#define L1_1    0.0590f
+#define L2_1    21.62f
+#define L3_1    -12.07f
 
 
 // ================= INDUCTEUR 2 =================
-#define LQI2_Q    67559.8f
-#define LQI2_QD   1162.18f
-#define LQI2_EPS  1471180.7f
+#define LQI2_Q    16535.6f
+#define LQI2_QD   284.45f
+#define LQI2_EPS  360079.4f
 
 #define AD11_2  1.000000f
 #define AD12_2  0.000040f
 #define AD22_2  1.000000f
 #define AD23_2  -0.000009f
-#define AD33_2  0.992916f
-#define BD3_2   0.007084f
-#define L1_2    0.0827f
-#define L2_2    52.30f
-#define L3_2    -33568.16f
-
-
-// ================= INDUCTEUR 3 =================
-#define LQI3_Q    66641.0f
-#define LQI3_QD   1146.37f
-#define LQI3_EPS  1451174.1f
-
-#define AD11_3  1.000000f
-#define AD12_3  0.000040f
-#define AD22_3  1.000000f
-#define AD23_3  -0.000009f
-#define AD33_3  0.992818f
-#define BD3_3   0.007182f
-#define L1_3    0.0826f
-#define L2_3    52.11f
-#define L3_3    -33139.86f
-
-
-// ================= INDUCTEUR 4 =================
-#define LQI4_Q    66641.0f
-#define LQI4_QD   1146.37f
-#define LQI4_EPS  1451174.1f
-
-#define AD11_4  1.000000f
-#define AD12_4  0.000040f
-#define AD22_4  1.000000f
-#define AD23_4  -0.000009f
-#define AD33_4  0.992818f
-#define BD3_4   0.007182f
-#define L1_4    0.0826f
-#define L2_4    52.11f
-#define L3_4    -33139.86f
+#define AD33_2  0.971056f
+#define BD3_2   0.028944f
+#define L1_2    0.0609f
+#define L2_2    23.05f
+#define L3_2    12.84f
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES

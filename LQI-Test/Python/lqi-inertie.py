@@ -26,12 +26,12 @@ g = 9.81
 
 DX = 0.385
 BX = DX/2
-TX = 5.833 - 2
+TX = 2.267
 JX = (M_TOT*g*BX**2 *TX**2)/(4*np.pi**2*L)
 
 DY = 0.278
 BY = DY/2
-TY = 2.267
+TY = 5.833 - 2
 JY    = (M_TOT*g*BY**2 *TY**2)/(4*np.pi**2*L)
 
 # --- Parametrage du vol 2 (la meilleure config volee), conserve tel quel ---

@@ -11,10 +11,11 @@ from scipy.signal import place_poles
 # =============================== PARAMETRES ==================================
 M_CORNER  = 4.513            # masse portee par un inducteur [kg]
 H         = 1.0/25e3         # periode ISR [s] (40 us)
-NOTCH_LAG = 4.0e-3           # CORRECTION : Le filtre coupe-bande est désactivé
+NOTCH_LAG = 0.0 #4.0e-3           # CORRECTION : Le filtre coupe-bande est désactivé
 
 # tau de boucle fermee de courant mesures (Kpi=2), par inducteur [s]
-TAU_IBF = {1: 1.5495e-3, 2: 1.6263e-3, 3: 1.5495e-3, 4: 1.5495e-3}
+TAU_IBF = {1: 0.001276750704319, 2: 0.001361865236756
+, 3: 0.001276750704319, 4: 0.001276750704319}
 # =============================================================================
 
 def c2d(A, B, h):
