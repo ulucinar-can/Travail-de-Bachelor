@@ -172,37 +172,37 @@ extern const float POS_COR_3[6];
 extern const float POS_COR_4[6];
 
 // ================= INDUCTEUR 1 =================
-#define LQI1_Q    1697941041.3f
-#define LQI1_QD   29208379.00f
-#define LQI1_EPS  36974310236.4f
+#define LQI1_Q    63377.6f
+#define LQI1_QD   1090.23f
+#define LQI1_EPS  1380109.7f
 
 #define AD11_1  1.000000f
 #define AD12_1  0.000040f
 #define AD22_1  1.000000f
 #define AD23_1  -0.000009f
-#define AD33_1  1.000000f
-#define BD3_1   0.000000f
-#define L1_1    0.0898f
-#define L2_1    66.76f
-#define L3_1    -75246.29f
+#define AD33_1  0.992448f
+#define BD3_1   0.007552f
+#define L1_1    0.0823f
+#define L2_1    51.43f
+#define L3_1    -31551.06f
 
 
 // ================= INDUCTEUR 2 =================
-#define LQI2_Q    1697942059.7f
-#define LQI2_QD   29208396.52f
-#define LQI2_EPS  36974332413.5f
+#define LQI2_Q    64395.9f
+#define LQI2_QD   1107.75f
+#define LQI2_EPS  1402283.1f
 
 #define AD11_2  1.000000f
 #define AD12_2  0.000040f
 #define AD22_2  1.000000f
 #define AD23_2  -0.000009f
-#define AD33_2  1.000000f
-#define BD3_2   0.000000f
-#define L1_2    0.0898f
-#define L2_2    66.76f
-#define L3_2    -75246.30f
+#define AD33_2  0.992568f
+#define BD3_2   0.007432f
+#define L1_2    0.0824f
+#define L2_2    51.65f
+#define L3_2    -32058.53f
 
-// ======== MIMO — modes [Z, T, R] ========
+// ======== MIMO genere par lqi-inertie.py — modes [Z, T, R] ========
 static const float T_MAT[3][4] = {{2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f},
                                   {1.78571429e+00f, 1.78571429e+00f, -1.78571429e+00f, -1.78571429e+00f},
                                   {1.92307692e+00f, -1.92307692e+00f, 1.92307692e+00f, -1.92307692e+00f}};
@@ -216,19 +216,19 @@ static const float W_MAT[4][3] = {{2.50000000e-01f, 1.78571429e+00f, 1.92307692e
 static const float F_STAT[4]   = {3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f};
 static const float U_STAT[3]   = {1.53991409e+02f, 0.00000000e+00f, 0.00000000e+00f};
 
-static const float LQI_Q[3]       = {2.07582597e+09f, 9.75059193e+07f, 9.75059193e+07f};
-static const float LQI_QD[3]      = {5.64827768e+07f, 2.65311501e+06f, 2.65311501e+06f};
-static const float LQI_EPS[3]     = {2.03387686e+10f, 9.55354812e+08f, 9.55354812e+08f};
-static const float LQI_EPS_INV[3] = {4.91671852e-11f, 1.04673153e-09f, 1.04673153e-09f};
+static const float LQI_Q[3]       = {8.16934029e+04f, 3.83731081e+03f, 3.83731081e+03f};
+static const float LQI_QD[3]      = {2.22285836e+03f, 1.04412331e+02f, 1.04412331e+02f};
+static const float LQI_EPS[3]     = {8.00425301e+05f, 3.75976580e+04f, 3.75976580e+04f};
+static const float LQI_EPS_INV[3] = {1.24933582e-06f, 2.65974013e-05f, 2.65974013e-05f};
 static const float AW_TOL[3]      = {3.07982817e+00f, 4.31175944e-01f, 4.00377663e-01f};
 
 static const float OBS_AD12[3] = {4.00000000e-05f, 4.00000000e-05f, 4.00000000e-05f};
-static const float OBS_AD23[3] = {-2.54819375e-06f, -5.42490844e-05f, -5.42490844e-05f};
-static const float OBS_AD33[3] = {9.99999718e-01f, 9.99999718e-01f, 9.99999718e-01f};
-static const float OBS_BD3[3]  = {2.81877842e-07f, 2.81877842e-07f, 2.81877842e-07f};
-static const float OBS_L1[3]   = {8.98218255e-02f, 8.98218329e-02f, 8.98218329e-02f};
-static const float OBS_L2[3]   = {6.67638219e+01f, 6.67638322e+01f, 6.67638322e+01f};
-static const float OBS_L3[3]   = {-2.61726223e+05f, -1.22938346e+04f, -1.22938346e+04f};
+static const float OBS_AD23[3] = {-2.53905745e-06f, -5.40545797e-05f, -5.40545797e-05f};
+static const float OBS_AD33[3] = {9.92837497e-01f, 9.92837497e-01f, 9.92837497e-01f};
+static const float OBS_BD3[3]  = {7.16250336e-03f, 7.16250336e-03f, 7.16250336e-03f};
+static const float OBS_L1[3]   = {8.26596051e-02f, 8.26596100e-02f, 8.26596100e-02f};
+static const float OBS_L2[3]   = {5.21497898e+01f, 5.21497962e+01f, 5.21497962e+01f};
+static const float OBS_L3[3]   = {-1.15564501e+05f, -5.42830916e+03f, -5.42830916e+03f};
 
 #define REF_SMOOTH 1.333333e-04f
 

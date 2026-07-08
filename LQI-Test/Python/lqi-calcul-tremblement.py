@@ -12,7 +12,7 @@ from scipy.signal import place_poles
 M_CORNER  = 4.513            # masse portee par un inducteur [kg]
 H         = 1.0/25e3         # periode ISR [s] (40 us)
 NOTCH_LAG = 4.0e-3       
-TAU_RC = 4.3e3 * 33e-3
+TAU_RC = 4.3e3 * 33e-9
 FMES = 1100
 TAU_MES = 1/(2*np.pi*FMES)
 
@@ -78,7 +78,7 @@ def main():
     
     for i in (1, 2, 3, 4):
         # CORRECTION : Le tau_act est recalculé DANS la boucle pour s'adapter à chaque inducteur
-        ta = TAU_IBF[i] + NOTCH_LAG + TAU_RC + TAU_MES
+        ta = TAU_IBF[i] + NOTCH_LAG 
         
         K = design_lqi_place(ta)
         Ad_obs, Bd_obs, L = design_observer(ta)

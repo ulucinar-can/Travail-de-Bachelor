@@ -57,7 +57,7 @@ H          = 1.0/25e3        # periode ISR [s]
 NOTCH_LAG  = 3.98e-3          # retard equivalent du coupe-bande 75 Hz [s]
 TAU_IBF    = np.mean([0.001276750704319, 0.001361865236756
 , 0.001276750704319, 0.001276750704319])
-TAU_RC = 4.3e3 * 33e-3
+TAU_RC = 4.3e3 * 33e-9
 FMES = 1100
 TAU_MES = 1/(2*np.pi*FMES)
 TAU_ACT    = TAU_IBF + NOTCH_LAG + TAU_RC + TAU_MES
