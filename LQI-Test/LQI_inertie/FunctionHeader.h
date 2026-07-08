@@ -202,7 +202,7 @@ extern const float POS_COR_4[6];
 #define L2_2    51.65f
 #define L3_2    -32058.53f
 
-// ======== MIMO genere par lqi-inertie.py — modes [Z, T, R] ========
+// ======== MIMO — modes [Z, T, R] ========
 static const float T_MAT[3][4] = {{2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f},
                                   {1.78571429e+00f, 1.78571429e+00f, -1.78571429e+00f, -1.78571429e+00f},
                                   {1.92307692e+00f, -1.92307692e+00f, 1.92307692e+00f, -1.92307692e+00f}};
