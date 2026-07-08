@@ -35,15 +35,16 @@ TY = 5.833 - 2
 JY    = (M_TOT*g*BY**2 *TY**2)/(4*np.pi**2*L)
 
 # --- Parametrage du vol 2 (la meilleure config volee), conserve tel quel ---
-# On garde J_MID / K_FORCE = 1.15 : c'est la base experimentale validee.
+# On garde J_MID / K_SYN = 1.15 : c'est la base experimentale validee.
 # La correction se fait UNIQUEMENT par les poles (voir POLES_LQI ci-dessous).
 # Pour memoire, identifie sur le vol 2 : k reel = 0.639 (Sfc = 277 N pour
 # porter 177 N, integrateur Z a -135 N), J_eff = 28.2 / 0.57 / 3.1 (Z/T/R).
-K_FORCE = 1.15
+K_FF = 0.639
+K_SYN = 1.15
 J_MID   = np.sqrt(JX * JY)
-JX_SYN  = J_MID / K_FORCE
-JY_SYN  = J_MID / K_FORCE
-M_SYN   = M_TOT / K_FORCE
+JX_SYN  = J_MID / K_SYN
+JY_SYN  = J_MID / K_SYN
+M_SYN   = M_TOT / K_SYN
 
 # Positions des inducteurs PAR RAPPORT AU CG [m]
 # 1<->3 = 28 cm (longitudinal, X) ; 1<->2 = 26 cm (lateral, Y)
@@ -218,7 +219,7 @@ def main():
     W = G @ np.linalg.inv(G.T @ G)                       # forces = W @ efforts
     assert np.allclose(E @ W, np.eye(3), atol=1e-12)
 
-    U_STAT = np.array([M_TOT * G_ACC / K_FORCE, 0.0, 0.0])
+    U_STAT = np.array([M_TOT * G_ACC / K_FF, 0.0, 0.0])
     F_STAT = W @ U_STAT
 
     modes = [("Z (pompage)", M_SYN),

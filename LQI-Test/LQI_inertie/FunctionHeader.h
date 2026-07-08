@@ -213,14 +213,14 @@ static const float W_MAT[4][3] = {{2.50000000e-01f, 1.78571429e+00f, 1.92307692e
                                   {2.50000000e-01f, 1.78571429e+00f, -1.92307692e+00f},
                                   {2.50000000e-01f, -1.78571429e+00f, 1.92307692e+00f},
                                   {2.50000000e-01f, -1.78571429e+00f, -1.92307692e+00f}};
-static const float F_STAT[4]   = {3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f};
-static const float U_STAT[3]   = {1.53991409e+02f, 0.00000000e+00f, 0.00000000e+00f};
+static const float F_STAT[4]   = {6.92840845e+01f, 6.92840845e+01f, 6.92840845e+01f, 6.92840845e+01f};
+static const float U_STAT[3]   = {2.77136338e+02f, 0.00000000e+00f, 0.00000000e+00f};
 
 static const float LQI_Q[3]       = {8.16934029e+04f, 3.83731081e+03f, 3.83731081e+03f};
 static const float LQI_QD[3]      = {2.22285836e+03f, 1.04412331e+02f, 1.04412331e+02f};
 static const float LQI_EPS[3]     = {8.00425301e+05f, 3.75976580e+04f, 3.75976580e+04f};
 static const float LQI_EPS_INV[3] = {1.24933582e-06f, 2.65974013e-05f, 2.65974013e-05f};
-static const float AW_TOL[3]      = {3.07982817e+00f, 4.31175944e-01f, 4.00377663e-01f};
+static const float AW_TOL[3]      = {5.54272676e+00f, 7.75981746e-01f, 7.20554479e-01f};
 
 static const float OBS_AD12[3] = {4.00000000e-05f, 4.00000000e-05f, 4.00000000e-05f};
 static const float OBS_AD23[3] = {-2.53905745e-06f, -5.40545797e-05f, -5.40545797e-05f};
