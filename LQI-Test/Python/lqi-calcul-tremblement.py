@@ -11,7 +11,10 @@ from scipy.signal import place_poles
 # =============================== PARAMETRES ==================================
 M_CORNER  = 4.513            # masse portee par un inducteur [kg]
 H         = 1.0/25e3         # periode ISR [s] (40 us)
-NOTCH_LAG = 0.0 #4.0e-3           # CORRECTION : Le filtre coupe-bande est désactivé
+NOTCH_LAG = 4.0e-3       
+TAU_RC = 4.3e3 * 33e-3
+FMES = 1100
+TAU_MES = 1/(2*np.pi*FMES)
 
 # tau de boucle fermee de courant mesures (Kpi=2), par inducteur [s]
 TAU_IBF = {1: 0.001276750704319, 2: 0.001361865236756
@@ -75,7 +78,7 @@ def main():
     
     for i in (1, 2, 3, 4):
         # CORRECTION : Le tau_act est recalculé DANS la boucle pour s'adapter à chaque inducteur
-        ta = TAU_IBF[i] + NOTCH_LAG 
+        ta = TAU_IBF[i] + NOTCH_LAG + TAU_RC + TAU_MES
         
         K = design_lqi_place(ta)
         Ad_obs, Bd_obs, L = design_observer(ta)
