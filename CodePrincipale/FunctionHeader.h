@@ -17,7 +17,7 @@
 /* ========================================================================= *
  * PHYSICAL & SYSTEM PARAMETERS
  * ========================================================================= */
-#define DELTA_N         ((float)2.0e-3)           // Position nominal de l'entrefer
+#define DELTA_N         ((float)2.0e-3)         // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
 #define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise à 120 Hz)
 #define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
@@ -77,22 +77,6 @@
 #define K_FC4            ((float)(2.0/(L_N4*DELTA_N)))
 
 #define FP              M*G
-
-// --- State method regulation for inductor ---
-//#define KW_SANS_INT      ((float)-3.6386e4)
-//#define KDDOT_SANS_INT   -701.9f
-//#define KD_SANS_INT      ((float)-3.6386e4)
-//#define KR_SANS_INT      0.0f
-//
-//#define KW               ((float)-1.4862e4)
-//#define KDDOT            -603.41f
-//#define KD               ((float)-3.8998e4)
-//#define KR               -35.63f
-//
-//#define KW_CHANGE        ((float)-8.8418e3)
-//#define KDDOT_CHANGE     -663.35f
-//#define KD_CHANGE        ((float)-3.9798e4)
-//#define KR_CHANGE        -24.72f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000
@@ -186,21 +170,6 @@ extern const float POS_COR_4[6];
 #define L2_1    51.43f
 #define L3_1    -31551.06f
 
-// ================= INDUCTEUR 1 =================
-#define LQI1_Q    63377.6f
-#define LQI1_QD   1090.23f
-#define LQI1_EPS  1380109.7f
-
-#define AD11_1  1.000000f
-#define AD12_1  0.000040f
-#define AD22_1  1.000000f
-#define AD23_1  -0.000009f
-#define AD33_1  0.992448f
-#define BD3_1   0.007552f
-#define L1_1    0.0823f
-#define L2_1    51.43f
-#define L3_1    -31551.06f
-
 
 // ================= INDUCTEUR 2 =================
 #define LQI2_Q    64395.9f
@@ -257,6 +226,4 @@ void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5,
 float savitzky_Filter(float *Buffer);
 float IIR_Filter(float *entree, float *sortie);
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc);
-float apply_poly5(float x, const float* coeffs);
-void Send32FloatsAsCSV(float v[32]);
 #endif /* FUNCTIONHEADER_H_ */

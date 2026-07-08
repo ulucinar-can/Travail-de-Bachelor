@@ -58,19 +58,6 @@
 #define SKIP_BACK                   0
 #define SKIP_FRONT                  0
 
-#define GAIN_COR_1                  8.6659e-7f
-#define OFFSET_COR_1                2.0069e-4f
-
-#define GAIN_COR_2                  8.5282e-7f
-#define OFFSET_COR_2                2.5155e-4f
-
-#define GAIN_COR_3                  8.1712e-7f
-#define OFFSET_COR_3                4.2764e-4f
-
-#define GAIN_COR_4                  8.3439e-7f
-#define OFFSET_COR_4                3.9979e-4f
-
-
 /* ========================================================================= *
  * GLOBAL VARIABLES
  * ========================================================================= */
@@ -248,11 +235,7 @@ void main(void)
 
 
     // Infinite loop
-    while(1)
-    {
-        status = SFO();
-        if (status == SFO_ERROR) error();
-    }
+    while(1);
 }
 
 void error (void)
@@ -263,9 +246,7 @@ void error (void)
 /* ========================================================================= *
  * INTERRUPT SERVICE ROUTINES (ISRs)
  * ========================================================================= */
-
 #pragma CODE_SECTION(adcA1ISR, ".TI.ramfunc")
-
 __interrupt void adcA1ISR(void)
 {
     /* --------------------------------------------------------------------- *
@@ -371,17 +352,16 @@ __interrupt void adcA1ISR(void)
     {
         UartCounter = 0;
 
-        // Envoie de la position et du courant filtré pour l'affichage sur l'interface web
-        SendFloatAsText(Pos1_filt, Pos2_filt, Pos3_filt, Pos4_filt, Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
+        SendFloatAsText(Pos1_filt*1000, Pos2_filt*1000, Pos3_filt*1000, Pos4_filt*1000, Cur1_filt, Cur2_filt, Cur3_filt, Cur4_filt);
     }
 
     /* --------------------------------------------------------------------- *
      * 5. MACHINE D'ETAT
      * --------------------------------------------------------------------- */
 
-    if (!SystemOn && (state != STATE_0) && (state != STATE_5))
+    if (!SystemOn && (state != STATE_0) && (state != STATE_6))
     {
-        state = STATE_7;
+        state = STATE_6;
     }
 
     switch(state)
@@ -598,23 +578,8 @@ __interrupt void adcA1ISR(void)
                break;
 
            // State 6 :
-           // Vol MIMO, convergence des references modales vers [2mm, 0, 0]
-           case STATE_6:
-
-               i_store++;
-
-               if(i_store == I_STORE_2E_DECOLLAGE)
-               {
-                   i_store = 0;
-
-                   state = STATE_7;
-               }
-
-               break;
-
-           // State 7 :
            // Attend que le bouton soit presse a nouveau pour eteindre la maquette
-           case STATE_7:
+           case STATE_6:
 
                if(!SystemOn)
                {
@@ -654,6 +619,9 @@ __interrupt void adcA1ISR(void)
                        qm_est[j] = qm[j];
                        qm_ref[j] = qm_target[j];
                    }
+
+                   status = SFO();
+                   if (status == SFO_ERROR) error();
 
                    state = STATE_0;
                }

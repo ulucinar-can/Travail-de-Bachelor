@@ -67,8 +67,7 @@ const float POS_COR_4[6] = {
 /* ========================================================================= *
  * CONTROL & REGULATION
  * ========================================================================= */
-
-#pragma CODE_SECTION(PI_current_regulator, ".TI.ramfunc") // Pour que le régulateur soit chargé dans la ram
+#pragma CODE_SECTION(PI_current_regulator, ".TI.ramfunc")
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc)
 {
     float ie = (ic - current) * KP_I;
@@ -102,7 +101,7 @@ void PI_current_regulator(float ic, float current, float *integral, float *ue, f
 //    return v;
 //}
 
-#pragma CODE_SECTION(IIR_Filter, ".TI.ramfunc") // Pour que le filtre soit charger dans la ram
+#pragma CODE_SECTION(IIR_Filter, ".TI.ramfunc")
 float IIR_Filter(float *entree, float *sortie)
 {
     float somme = 0.0;
