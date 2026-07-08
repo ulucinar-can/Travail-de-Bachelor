@@ -39,8 +39,8 @@ JY    = (M_TOT*g*BY**2 *TY**2)/(4*np.pi**2*L)
 # La correction se fait UNIQUEMENT par les poles (voir POLES_LQI ci-dessous).
 # Pour memoire, identifie sur le vol 2 : k reel = 0.639 (Sfc = 277 N pour
 # porter 177 N, integrateur Z a -135 N), J_eff = 28.2 / 0.57 / 3.1 (Z/T/R).
-K_FF = 0.639
 K_SYN = 1.15
+K_FF = 1.15
 J_MID   = np.sqrt(JX * JY)
 JX_SYN  = J_MID / K_SYN
 JY_SYN  = J_MID / K_SYN
@@ -68,7 +68,7 @@ G_ACC      = 9.81
 # avec [-80,-85,-90,-15], la boucle etait au point critique |R|=1.0-1.15 a
 # 14.8 Hz (Z), 3.3 Hz (R) et ~30 Hz (Z/T) -> croissance lente observee en vol.
 # [-50,-55,-60,-11] ramene tous ces points a |R| = 0.34-0.49 (6-9 dB de marge).
-POLES_LQI  = [-80.0, -85.0, -90.0, -15.0]
+POLES_LQI  = [-80.0, -85.0, -90.0, -30.0]
 POLES_OBS  = [-700.0, -760.0, -820.0]
 
 TAU_REF    = 0.3             # lissage des references modales [s]
