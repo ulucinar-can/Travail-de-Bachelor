@@ -61,9 +61,18 @@ def analyse(a1b1, a2, b0b2, titre=""):
     # retard equivalent tau(f) = -phase/omega (equivalent 1er ordre basse freq)
     tau_eq = -ph / (2*np.pi*f)             # [s]
 
-    # NOTCH_LAG recommande : moyenne de tau_eq sur la bande de regulation
+    # methode en-bande : moyenne de tau_eq sur la bande de regulation
     mreg = (f >= BANDE_REG[0]) & (f <= BANDE_REG[1])
     lag = float(np.mean(tau_eq[mreg]))
+
+    # methode -45 deg : premiere frequence ou la phase atteint -45 deg,
+    # puis tau45 = 1/(2*pi*f45) comme pour un 1er ordre. Plus conservatrice
+    # (tau plus grand -> gains plus doux) : elle absorbe une partie des
+    # retards non modelises de la plante.
+    deg = np.degrees(ph)
+    i45 = np.where(deg <= -45.0)[0]
+    f45 = float(f[i45[0]]) if len(i45) else float('nan')
+    tau45 = 1.0/(2*np.pi*f45) if np.isfinite(f45) else float('nan')
 
     # attenuation et retard au marqueur F_RES
     kres = int(np.argmin(np.abs(f - F_RES)))
@@ -71,9 +80,10 @@ def analyse(a1b1, a2, b0b2, titre=""):
 
     print(f"=== {titre} ===")
     print(f"attenuation a {F_RES:.1f} Hz : {mag[kres]:6.1f} dB")
-    print(f"phase a 15 Hz : {np.degrees(ph[k15]):+6.2f} deg  ->  tau_eq = {tau_eq[k15]*1e3:.2f} ms")
-    print(f"NOTCH_LAG recommande (moyenne {BANDE_REG[0]:.0f}-{BANDE_REG[1]:.0f} Hz) : "
-          f"{lag*1e3:.2f} ms   ->   NOTCH_LAG = {lag:.2e}")
+    print(f"NOTCH_LAG (methode -45 deg) : phase = -45 deg a f = {f45:.1f} Hz")
+    print(f"   ->   NOTCH_LAG = {tau45:.2e}   ({tau45*1e3:.2f} ms)")
+    print(f"(reference, retard exact en bande {BANDE_REG[0]:.0f}-{BANDE_REG[1]:.0f} Hz : "
+          f"{lag*1e3:.2f} ms ; l'ecart -45deg/en-bande = marge de robustesse)")
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
     ax1.plot(f, mag)
@@ -86,20 +96,27 @@ def analyse(a1b1, a2, b0b2, titre=""):
     ax1.set_title(f"Notch {titre}   (zone verte = bande de regulation)")
 
     ax2.plot(f, np.degrees(ph))
+    if np.isfinite(f45):
+        ax2.axhline(-45.0, color='m', ls=':', alpha=0.6)
+        ax2.plot(f45, -45.0, 'ms')
+        ax2.annotate(f"-45 deg @ {f45:.1f} Hz\n-> NOTCH_LAG = {tau45*1e3:.2f} ms",
+                     (f45, -45.0), textcoords="offset points",
+                     xytext=(10, 8), color='m')
     ax2.plot(15.0, np.degrees(ph[k15]), 'go')
-    ax2.annotate(f"{np.degrees(ph[k15]):+.1f} deg @ 15 Hz\n-> NOTCH_LAG = {lag*1e3:.2f} ms",
+    ax2.annotate(f"{np.degrees(ph[k15]):+.1f} deg @ 15 Hz (retard exact {lag*1e3:.2f} ms)",
                  (15.0, np.degrees(ph[k15])), textcoords="offset points",
                  xytext=(10, -30), color='g')
     ax2.axvspan(*BANDE_REG, color='g', alpha=0.10)
     ax2.set_xlabel("Frequence [Hz]"); ax2.set_ylabel("Phase [deg]")
     ax2.grid(True, alpha=0.4)
     plt.tight_layout()
-    return lag, mag[kres]
+    return tau45, lag, mag[kres]
 
 
 def tableau_comparatif():
-    print(f"\n{'jeu':5s} | {'description':26s} | {'att@'+format(F_RES,'.1f')+'Hz':>11s} | {'NOTCH_LAG':>10s}")
-    print("-" * 63)
+    print(f"\n{'jeu':5s} | {'description':26s} | {'att@'+format(F_RES,'.1f')+'Hz':>11s} | "
+          f"{'lag -45deg':>10s} | {'lag exact':>9s}")
+    print("-" * 78)
     f = np.linspace(0.5, 200.0, 8000)
     for nom, (a1b1, a2, b0b2, desc) in JEUX.items():
         w, Hc = freqz([b0b2, a1b1, b0b2], [1.0, a1b1, a2], worN=2*np.pi*f/FS)
@@ -108,7 +125,10 @@ def tableau_comparatif():
         tau = -ph/(2*np.pi*f)
         mreg = (f >= BANDE_REG[0]) & (f <= BANDE_REG[1])
         kres = int(np.argmin(np.abs(f - F_RES)))
-        print(f"{nom:5s} | {desc:26s} | {mag[kres]:8.1f} dB | {np.mean(tau[mreg])*1e3:7.2f} ms")
+        i45 = np.where(np.degrees(ph) <= -45.0)[0]
+        t45 = 1.0/(2*np.pi*f[i45[0]])*1e3 if len(i45) else float('nan')
+        print(f"{nom:5s} | {desc:26s} | {mag[kres]:8.1f} dB | {t45:7.2f} ms | "
+              f"{np.mean(tau[mreg])*1e3:6.2f} ms")
 
 
 if __name__ == "__main__":

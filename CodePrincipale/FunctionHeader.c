@@ -1,5 +1,5 @@
 /*
- * FunctionHeader.h
+ * FunctionHeader.c
  *
  * Created by : Uluçinar (2026)
  * Modified by: Uluçinar (2026)
@@ -67,6 +67,9 @@ const float POS_COR_4[6] = {
 /* ========================================================================= *
  * CONTROL & REGULATION
  * ========================================================================= */
+
+#pragma CODE_SECTION(PI_current_regulator, ".TI.ramfunc") // Pour que le régulateur soit chargé dans la ram
+
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc)
 {
     float ie = (ic - current) * KP_I;
@@ -84,21 +87,23 @@ void PI_current_regulator(float ic, float current, float *integral, float *ue, f
     *ue = (uc_prim - *uc) * ANTIWINDUP_EN;
 }
 
-float savitzky_Filter(float *Buffer)
-{
-    float v = 0.0f;
-    uint16_t m = 0;
+//float savitzky_Filter(float *Buffer)
+//{
+//    float v = 0.0f;
+//    uint16_t m = 0;
+//
+//    // savitzky algorithm
+//    for(m = 0; m < FILTWINDOW; m++)
+//        v += F_PWM*Buffer[m]*SAVITZKY[m];
+//
+//    // update buffer for next position
+//    for(m = 0; m < FILTWINDOW-1; m++)
+//       Buffer[m] = Buffer[(m+1)];
+//
+//    return v;
+//}
 
-    // savitzky algorithm
-    for(m = 0; m < FILTWINDOW; m++)
-        v += F_PWM*Buffer[m]*SAVITZKY[m];
-
-    // update buffer for next position
-    for(m = 0; m < FILTWINDOW-1; m++)
-       Buffer[m] = Buffer[(m+1)];
-
-    return v;
-}
+#pragma CODE_SECTION(IIR_Filter, ".TI.ramfunc") // Pour que le filtre soit charger dans la ram
 
 float IIR_Filter(float *entree, float *sortie)
 {
@@ -205,15 +210,3 @@ void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5,
     SCI_enableInterrupt(SCIA_BASE, SCI_INT_TXFF);
 }
 
-float apply_poly5(float x, const float* coeffs)
-{
-    // Calcul hyper rapide (1 cycle par multiplication/addition)
-    float result = ((((coeffs[5] * x + coeffs[4]) * x + coeffs[3]) * x + coeffs[2]) * x + coeffs[1]) * x + coeffs[0];
-
-    // Sécurité : empêche l'entrefer de devenir mathématiquement négatif
-    if (result < 0.0f) {
-        result = 0.0f;
-    }
-
-    return result;
-}
