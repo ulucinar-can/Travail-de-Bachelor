@@ -128,7 +128,7 @@ SECTIONS
    /* stocke en flash (SEC15, exclusif), copie en RAMLS0 au boot par device.c,
       execute depuis la RAM -> mettre les #pragma CODE_SECTION(..., ".TI.ramfunc") */
    .TI.ramfunc      : LOAD = FLASH_BANK0_SEC15,
-                      RUN = RAMLS0,
+                      RUN = RAMLS0 | RAMLS1,
                       LOAD_START(RamfuncsLoadStart),
                       LOAD_SIZE(RamfuncsLoadSize),
                       LOAD_END(RamfuncsLoadEnd),

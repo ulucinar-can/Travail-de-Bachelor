@@ -248,7 +248,11 @@ void main(void)
 
 
     // Infinite loop
-    while(1);
+    while(1)
+    {
+        status = SFO();
+        if (status == SFO_ERROR) error();
+    }
 }
 
 void error (void)
@@ -260,7 +264,7 @@ void error (void)
  * INTERRUPT SERVICE ROUTINES (ISRs)
  * ========================================================================= */
 
-
+#pragma CODE_SECTION(adcA1ISR, ".TI.ramfunc")
 
 __interrupt void adcA1ISR(void)
 {
@@ -650,9 +654,6 @@ __interrupt void adcA1ISR(void)
                        qm_est[j] = qm[j];
                        qm_ref[j] = qm_target[j];
                    }
-
-                   status = SFO();
-                   if (status == SFO_ERROR) error();
 
                    state = STATE_0;
                }
