@@ -90,10 +90,7 @@ MEMORY
 SECTIONS
 {
    codestart        : > BEGIN, ALIGN(8)
-
-   /* On donne 4 secteurs exclusifs au code principal */
-   .text            : >> FLASH_BANK0_SEC2 | FLASH_BANK0_SEC3 | FLASH_BANK0_SEC4 | FLASH_BANK0_SEC5,   ALIGN(8)
-
+   .text            : >> FLASH_BANK0_SEC2 | FLASH_BANK0_SEC3 | FLASH_BANK0_SEC4,   ALIGN(8)
    .cinit           : > FLASH_BANK0_SEC1,  ALIGN(8)
    .switch          : > FLASH_BANK0_SEC1,  ALIGN(8)
    .reset           : > RESET,                  TYPE = DSECT /* not used, */
@@ -107,24 +104,21 @@ SECTIONS
    .bss:cio         : > RAMLS0
    .data            : > RAMLS5
    .sysmem          : > RAMLS5
-   /* Décalé sur SEC6 pour éviter le conflit avec .text */
-   .const           : > FLASH_BANK0_SEC6,  ALIGN(8)
+   .const           : > FLASH_BANK0_SEC4,  ALIGN(8)
 #else
    .pinit           : > FLASH_BANK0_SEC1,  ALIGN(8)
    .ebss            : > RAMLS5
    .esysmem         : > RAMLS5
    .cio             : > RAMLS0
-   /* Décalé sur SEC6 pour éviter le conflit avec .text */
-   .econst          : > FLASH_BANK0_SEC6,  ALIGN(8)
+   .econst          : > FLASH_BANK0_SEC4,  ALIGN(8)
 #endif
 
     ramgs0 : > RAMGS0
     ramgs1 : > RAMGS0
 
-    /* Allocate IQ math areas: */
+    /*  Allocate IQ math areas: */
    IQmath           : > FLASH_BANK0_SEC1, ALIGN(8)
-   /* Décalé sur SEC7 pour éviter le conflit avec .text */
-   IQmathTables     : > FLASH_BANK0_SEC7, ALIGN(8)
+   IQmathTables     : > FLASH_BANK0_SEC2, ALIGN(8)
 
    .TI.ramfunc      : LOAD = FLASH_BANK0_SEC1,
                       RUN = RAMLS0,
@@ -135,4 +129,5 @@ SECTIONS
                       RUN_SIZE(RamfuncsRunSize),
                       RUN_END(RamfuncsRunEnd),
                       ALIGN(8)
+
 }

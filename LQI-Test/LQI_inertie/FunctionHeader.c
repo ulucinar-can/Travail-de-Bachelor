@@ -1,5 +1,5 @@
 /*
- * FunctionHeader.h
+ * FunctionHeader.c
  *
  * Created by : Uluçinar (2026)
  * Modified by: Uluçinar (2026)

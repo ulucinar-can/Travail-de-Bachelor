@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import freqz
 
 # ============================== A MODIFIER ===================================
-CHOIX     = "_6"       # "_0".."_10" (jeux du FunctionHeader.h) ou "custom"
+CHOIX     = "_9"       # "_0".."_10" (jeux du FunctionHeader.h) ou "custom"
 F0_CUSTOM = 85.3       # [Hz] centre du notch custom (si CHOIX = "custom")
 BW_CUSTOM = 40.0       # [Hz] largeur de bande coupee du notch custom
 F_RES     = 85.3       # [Hz] frequence de la resonance a attenuer (marqueur)

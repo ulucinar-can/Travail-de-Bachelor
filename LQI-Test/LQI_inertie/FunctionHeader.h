@@ -79,20 +79,20 @@
 #define FP              M*G
 
 // --- State method regulation for inductor ---
-#define KW_SANS_INT      ((float)-3.6386e4)
-#define KDDOT_SANS_INT   -701.9f
-#define KD_SANS_INT      ((float)-3.6386e4)
-#define KR_SANS_INT      0.0f
-
-#define KW               ((float)-1.4862e4)
-#define KDDOT            -603.41f
-#define KD               ((float)-3.8998e4)
-#define KR               -35.63f
-
-#define KW_CHANGE        ((float)-8.8418e3)
-#define KDDOT_CHANGE     -663.35f
-#define KD_CHANGE        ((float)-3.9798e4)
-#define KR_CHANGE        -24.72f
+//#define KW_SANS_INT      ((float)-3.6386e4)
+//#define KDDOT_SANS_INT   -701.9f
+//#define KD_SANS_INT      ((float)-3.6386e4)
+//#define KR_SANS_INT      0.0f
+//
+//#define KW               ((float)-1.4862e4)
+//#define KDDOT            -603.41f
+//#define KD               ((float)-3.8998e4)
+//#define KR               -35.63f
+//
+//#define KW_CHANGE        ((float)-8.8418e3)
+//#define KDDOT_CHANGE     -663.35f
+//#define KD_CHANGE        ((float)-3.9798e4)
+//#define KR_CHANGE        -24.72f
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000
