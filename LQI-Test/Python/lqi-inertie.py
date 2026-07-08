@@ -68,7 +68,7 @@ G_ACC      = 9.81
 # avec [-80,-85,-90,-15], la boucle etait au point critique |R|=1.0-1.15 a
 # 14.8 Hz (Z), 3.3 Hz (R) et ~30 Hz (Z/T) -> croissance lente observee en vol.
 # [-50,-55,-60,-11] ramene tous ces points a |R| = 0.34-0.49 (6-9 dB de marge).
-POLES_LQI  = [-80.0, -85.0, -90.0, -30.0]
+POLES_LQI  = [-80.0, -85.0, -90.0, -20.0]
 POLES_OBS  = [-700.0, -760.0, -820.0]
 
 TAU_REF    = 0.3             # lissage des references modales [s]

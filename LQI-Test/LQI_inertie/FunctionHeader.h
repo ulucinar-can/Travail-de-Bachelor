@@ -186,6 +186,21 @@ extern const float POS_COR_4[6];
 #define L2_1    51.43f
 #define L3_1    -31551.06f
 
+// ================= INDUCTEUR 1 =================
+#define LQI1_Q    63377.6f
+#define LQI1_QD   1090.23f
+#define LQI1_EPS  1380109.7f
+
+#define AD11_1  1.000000f
+#define AD12_1  0.000040f
+#define AD22_1  1.000000f
+#define AD23_1  -0.000009f
+#define AD33_1  0.992448f
+#define BD3_1   0.007552f
+#define L1_1    0.0823f
+#define L2_1    51.43f
+#define L3_1    -31551.06f
+
 
 // ================= INDUCTEUR 2 =================
 #define LQI2_Q    64395.9f
@@ -202,7 +217,7 @@ extern const float POS_COR_4[6];
 #define L2_2    51.65f
 #define L3_2    -32058.53f
 
-// ======== MIMO — modes [Z, T, R] ========
+// ======== MIMO genere par lqi-inertie.py — modes [Z, T, R] ========
 static const float T_MAT[3][4] = {{2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f},
                                   {1.78571429e+00f, 1.78571429e+00f, -1.78571429e+00f, -1.78571429e+00f},
                                   {1.92307692e+00f, -1.92307692e+00f, 1.92307692e+00f, -1.92307692e+00f}};
@@ -216,10 +231,10 @@ static const float W_MAT[4][3] = {{2.50000000e-01f, 1.78571429e+00f, 1.92307692e
 static const float F_STAT[4]   = {3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f};
 static const float U_STAT[3]   = {1.53991409e+02f, 0.00000000e+00f, 0.00000000e+00f};
 
-static const float LQI_Q[3]       = {1.09992139e+05f, 5.16656124e+03f, 5.16656124e+03f};
-static const float LQI_QD[3]      = {2.55616924e+03f, 1.20068634e+02f, 1.20068634e+02f};
-static const float LQI_EPS[3]     = {1.60037075e+06f, 7.51727636e+04f, 7.51727636e+04f};
-static const float LQI_EPS_INV[3] = {6.24855211e-07f, 1.33026904e-05f, 1.33026904e-05f};
+static const float LQI_Q[3]       = {9.11282003e+04f, 4.28048291e+03f, 4.28048291e+03f};
+static const float LQI_QD[3]      = {2.33398419e+03f, 1.09632143e+02f, 1.09632143e+02f};
+static const float LQI_EPS[3]     = {1.06712708e+06f, 5.01251984e+04f, 5.01251984e+04f};
+static const float LQI_EPS_INV[3] = {9.37095517e-07f, 1.99500457e-05f, 1.99500457e-05f};
 static const float AW_TOL[3]      = {3.07982817e+00f, 4.31175944e-01f, 4.00377663e-01f};
 
 static const float OBS_AD12[3] = {4.00000000e-05f, 4.00000000e-05f, 4.00000000e-05f};

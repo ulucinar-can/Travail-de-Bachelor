@@ -11,7 +11,7 @@ from scipy.signal import place_poles
 # =============================== PARAMETRES ==================================
 M_CORNER  = 4.513            # masse portee par un inducteur [kg]
 H         = 1.0/25e3         # periode ISR [s] (40 us)
-NOTCH_LAG = 4.0e-3       
+NOTCH_LAG = 3.98e-3       
 TAU_RC = 4.3e3 * 33e-9
 FMES = 1100
 TAU_MES = 1/(2*np.pi*FMES)
