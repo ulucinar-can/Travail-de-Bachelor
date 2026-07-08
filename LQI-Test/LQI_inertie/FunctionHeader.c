@@ -67,6 +67,7 @@ const float POS_COR_4[6] = {
 /* ========================================================================= *
  * CONTROL & REGULATION
  * ========================================================================= */
+#pragma CODE_SECTION(PI_current_regulator, ".TI.ramfunc")
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc)
 {
     float ie = (ic - current) * KP_I;
@@ -84,22 +85,23 @@ void PI_current_regulator(float ic, float current, float *integral, float *ue, f
     *ue = (uc_prim - *uc) * ANTIWINDUP_EN;
 }
 
-float savitzky_Filter(float *Buffer)
-{
-    float v = 0.0f;
-    uint16_t m = 0;
+//float savitzky_Filter(float *Buffer)
+//{
+//    float v = 0.0f;
+//    uint16_t m = 0;
+//
+//    // savitzky algorithm
+//    for(m = 0; m < FILTWINDOW; m++)
+//        v += F_PWM*Buffer[m]*SAVITZKY[m];
+//
+//    // update buffer for next position
+//    for(m = 0; m < FILTWINDOW-1; m++)
+//       Buffer[m] = Buffer[(m+1)];
+//
+//    return v;
+//}
 
-    // savitzky algorithm
-    for(m = 0; m < FILTWINDOW; m++)
-        v += F_PWM*Buffer[m]*SAVITZKY[m];
-
-    // update buffer for next position
-    for(m = 0; m < FILTWINDOW-1; m++)
-       Buffer[m] = Buffer[(m+1)];
-
-    return v;
-}
-
+#pragma CODE_SECTION(IIR_Filter, ".TI.ramfunc")
 float IIR_Filter(float *entree, float *sortie)
 {
     float somme = 0.0;
