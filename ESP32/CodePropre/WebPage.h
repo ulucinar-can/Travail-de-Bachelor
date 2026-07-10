@@ -209,9 +209,11 @@ window.onload = function() {
       mixBut.classList.add("stop-btn");
       updateEtatText("1");
 
-      // Reset graphique
-      histP1 = []; histP2 = []; histC1 = []; histC2 = []; timeData = [];
+      // Reset graphique : les 4 historiques ET timeData doivent être vidés
+      // ensemble pour rester synchronisés (même longueur, mêmes indices)
+      histP1 = []; histP2 = []; histP3 = []; histP4 = []; timeData = [];
       startTime = Date.now();
+      renderGraph(); // Redessine la grille vide immédiatement
 
       // Requête Asynchrone (Non bloquante)
       fetch('/BUTTON_START', { method: 'PUT' }).catch(err => console.error(err));
@@ -271,7 +273,7 @@ window.onload = function() {
       document.getElementById("curInd3").innerHTML = v_c3.toFixed(3);
       document.getElementById("curInd4").innerHTML = v_c4.toFixed(3);
 
-      // Mise à jour du graphique (On trace Pos1, Pos2, Cur1, Cur2)
+      // Mise à jour du graphique (les 4 positions)
       var currentGraphTime = (Date.now() - startTime) / 1000.0;
       timeData.push(currentGraphTime);
       histP1.push(v_p1);
