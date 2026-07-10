@@ -94,8 +94,8 @@ const char PAGE_MAIN[] PROGMEM = R"=====(
         <div class="legend">
            <div class="legend-item"><div class="legend-color" style="background-color: #ff4d4d;"></div>Position 1</div>
            <div class="legend-item"><div class="legend-color" style="background-color: #00e5ff;"></div>Position 2</div>
-           <div class="legend-item"><div class="legend-color" style="background-color: #ff9100;"></div>Courant 1</div>
-           <div class="legend-item"><div class="legend-color" style="background-color: #b2ff59;"></div>Courant 2</div>
+           <div class="legend-item"><div class="legend-color" style="background-color: #ff9100;"></div>Position 3</div>
+           <div class="legend-item"><div class="legend-color" style="background-color: #b2ff59;"></div>Position 4</div>
         </div>
       </div>
 
@@ -130,7 +130,7 @@ window.onload = function() {
     var etatSpan = document.getElementById("etatBouton");
 
     // Variables pour le graphique
-    var histP1 = [], histP2 = [], histC1 = [], histC2 = [], timeData = [];
+    var histP1 = [], histP2 = [], histP3 = [], histP4 = [], timeData = [];
     var startTime = Date.now();
     var windowSize = 10.0; // Affiche les 10 dernières secondes
 
@@ -190,8 +190,8 @@ window.onload = function() {
 
         traceCurve(histP1, "#ff4d4d"); // Rouge : Pos 1
         traceCurve(histP2, "#00e5ff"); // Bleu : Pos 2
-        traceCurve(histC1, "#ff9100"); // Orange : Cur 1
-        traceCurve(histC2, "#b2ff59"); // Vert : Cur 2
+        traceCurve(histP3, "#ff9100"); // Orange : Pos 3
+        traceCurve(histP4, "#b2ff59"); // Vert : Pos 4
         ctx.restore(); 
     }
 
@@ -276,16 +276,16 @@ window.onload = function() {
       timeData.push(currentGraphTime);
       histP1.push(v_p1);
       histP2.push(v_p2);
-      histC1.push(v_c1);
-      histC2.push(v_c2);
+      histP3.push(v_p3);
+      histP4.push(v_p4);
 
       // Maintient la "fenêtre glissante" de 10 secondes max
       while(timeData.length > 0 && (currentGraphTime - timeData[0] > windowSize)) {
           timeData.shift(); 
           histP1.shift(); 
           histP2.shift(); 
-          histC1.shift(); 
-          histC2.shift();
+          histP3.shift(); 
+          histP4.shift();
       }
       renderGraph();
     }
