@@ -19,10 +19,10 @@
  * ========================================================================= */
 #define DELTA_N         ((float)2.0e-3)         // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
-#define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise à 120 Hz)
-#define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
-#define L_N3            ((float)7.699e-3)       // Inductance nominal au point nominal pour l'inducteur 3 (prise à 120 Hz)
-#define L_N4            ((float)7.750e-3)       // Inductance nominal au point nominal pour l'inducteur 4 (prise à 120 Hz)
+#define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise ï¿½ 120 Hz)
+#define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise ï¿½ 120 Hz)
+#define L_N3            ((float)7.699e-3)       // Inductance nominal au point nominal pour l'inducteur 3 (prise ï¿½ 120 Hz)
+#define L_N4            ((float)7.750e-3)       // Inductance nominal au point nominal pour l'inducteur 4 (prise ï¿½ 120 Hz)
 #define I_N             4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
 #define M               4.513f                  // Masse pour un seul inducteur
 #define G               9.81f                   // Gravity
@@ -77,6 +77,13 @@
 #define K_FC4            ((float)(2.0/(L_N4*DELTA_N)))
 
 #define FP              M*G
+
+// --- Retour d'etat SISO avant (inducteurs 1 & 2) ---
+// Loi : fc = KW*consigne - KD*position - KDDOT*vitesse + KR*integrale + m*g
+#define KW               ((float)-1.4862e4)   // gain sur la consigne de position
+#define KDDOT            -603.41f             // gain sur la vitesse (Savitzky)
+#define KD               ((float)-3.8998e4)   // gain sur la position mesuree
+#define KR               -35.63f              // gain de l'action integrale
 
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000
@@ -145,7 +152,7 @@
 /* ========================================================================= *
  * SHARED GLOBALS & COMMUNICATION
  * ========================================================================= */
-#define TX_BUF_LEN 512
+#define TX_BUF_LEN 128
 extern volatile char txBuffer[TX_BUF_LEN];
 extern volatile uint16_t txIndex;
 extern volatile uint16_t txLength;
@@ -155,38 +162,10 @@ extern const float POS_COR_2[6];
 extern const float POS_COR_3[6];
 extern const float POS_COR_4[6];
 
-// ================= INDUCTEUR 1 =================
-#define LQI1_Q    63377.6f
-#define LQI1_QD   1090.23f
-#define LQI1_EPS  1380109.7f
+// (Anciens gains observateur/LQI SISO par inducteur retires : l'avant utilise
+//  desormais KW/KD/KDDOT/KR + Savitzky ; le mode complet, le bloc MIMO ci-dessous.)
 
-#define AD11_1  1.000000f
-#define AD12_1  0.000040f
-#define AD22_1  1.000000f
-#define AD23_1  -0.000009f
-#define AD33_1  0.992448f
-#define BD3_1   0.007552f
-#define L1_1    0.0823f
-#define L2_1    51.43f
-#define L3_1    -31551.06f
-
-
-// ================= INDUCTEUR 2 =================
-#define LQI2_Q    64395.9f
-#define LQI2_QD   1107.75f
-#define LQI2_EPS  1402283.1f
-
-#define AD11_2  1.000000f
-#define AD12_2  0.000040f
-#define AD22_2  1.000000f
-#define AD23_2  -0.000009f
-#define AD33_2  0.992568f
-#define BD3_2   0.007432f
-#define L1_2    0.0824f
-#define L2_2    51.65f
-#define L3_2    -32058.53f
-
-// ======== MIMO genere par lqi-inertie.py — modes [Z, T, R] ========
+// ======== MIMO genere par lqi-inertie.py ï¿½ modes [Z, T, R] ========
 static const float T_MAT[3][4] = {{2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f},
                                   {1.78571429e+00f, 1.78571429e+00f, -1.78571429e+00f, -1.78571429e+00f},
                                   {1.92307692e+00f, -1.92307692e+00f, 1.92307692e+00f, -1.92307692e+00f}};
@@ -200,19 +179,19 @@ static const float W_MAT[4][3] = {{2.50000000e-01f, 1.78571429e+00f, 1.92307692e
 static const float F_STAT[4]   = {3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f, 3.84978522e+01f};
 static const float U_STAT[3]   = {1.53991409e+02f, 0.00000000e+00f, 0.00000000e+00f};
 
-static const float LQI_Q[3]       = {9.11282003e+04f, 4.28048291e+03f, 4.28048291e+03f};
-static const float LQI_QD[3]      = {2.33398419e+03f, 1.09632143e+02f, 1.09632143e+02f};
-static const float LQI_EPS[3]     = {1.06712708e+06f, 5.01251984e+04f, 5.01251984e+04f};
-static const float LQI_EPS_INV[3] = {9.37095517e-07f, 1.99500457e-05f, 1.99500457e-05f};
+static const float LQI_Q[3]       = {9.11282003e+04f, 4.31127777e+03f, 4.31127777e+03f};
+static const float LQI_QD[3]      = {2.33398419e+03f, 1.10420863e+02f, 1.10420863e+02f};
+static const float LQI_EPS[3]     = {1.06712708e+06f, 5.04858116e+04f, 5.04858116e+04f};
+static const float LQI_EPS_INV[3] = {9.37095517e-07f, 1.98075453e-05f, 1.98075453e-05f};
 static const float AW_TOL[3]      = {3.07982817e+00f, 4.31175944e-01f, 4.00377663e-01f};
 
 static const float OBS_AD12[3] = {4.00000000e-05f, 4.00000000e-05f, 4.00000000e-05f};
-static const float OBS_AD23[3] = {-2.53905745e-06f, -5.40545797e-05f, -5.40545797e-05f};
+static const float OBS_AD23[3] = {-2.53905745e-06f, -5.36684755e-05f, -5.36684755e-05f};
 static const float OBS_AD33[3] = {9.92837497e-01f, 9.92837497e-01f, 9.92837497e-01f};
 static const float OBS_BD3[3]  = {7.16250336e-03f, 7.16250336e-03f, 7.16250336e-03f};
-static const float OBS_L1[3]   = {8.26596051e-02f, 8.26596100e-02f, 8.26596100e-02f};
-static const float OBS_L2[3]   = {5.21497898e+01f, 5.21497962e+01f, 5.21497962e+01f};
-static const float OBS_L3[3]   = {-1.15564501e+05f, -5.42830916e+03f, -5.42830916e+03f};
+static const float OBS_L1[3]   = {8.26596051e-02f, 8.26596104e-02f, 8.26596104e-02f};
+static const float OBS_L2[3]   = {5.21497898e+01f, 5.21497966e+01f, 5.21497966e+01f};
+static const float OBS_L3[3]   = {-1.15564501e+05f, -5.46736182e+03f, -5.46736182e+03f};
 
 #define REF_SMOOTH 1.333333e-04f
 
@@ -220,7 +199,7 @@ static const float OBS_L3[3]   = {-1.15564501e+05f, -5.42830916e+03f, -5.4283091
  * FUNCTION PROTOTYPES
  * ========================================================================= */
 void reverse(char* str, int len);
-int ConvertIntToStr(int x, char str[], int p);
+int ConvertIntToStr(int32_t x, char str[], int p);
 int ftoa(float n, char* res, int afterpoint);
 void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7);
 float savitzky_Filter(float *Buffer);

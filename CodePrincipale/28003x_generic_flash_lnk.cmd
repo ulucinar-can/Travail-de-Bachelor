@@ -7,11 +7,12 @@ MEMORY
    RAMM1            : origin = 0x00000400, length = 0x000003F8
    // RAMM1_RSVD       : origin = 0x000007F8, length = 0x00000008 /* Reserve and do not use for code as per the errata advisory "Memory: Prefetching Beyond Valid Memory" */
 
-   /* LS0+LS1+LS2 fusionnees en UNE region contigue (6K mots) : une section
-      ne peut pas etre decoupee entre plusieurs regions, il faut UNE case
-      assez grande pour .TI.ramfunc (ISR + filtres en RAM) */
-   RAMLS0_2         : origin = 0x00008000, length = 0x00001800
-   RAMLS3           : origin = 0x00009800, length = 0x00000800
+   /* LS0..LS3 fusionnees en UNE region contigue (8K mots) : accueille en RAM
+      le groupe .TI.ramfunc (ISR + filtres + telemetrie) ET le .text de la
+      bibliotheque SFO, copies depuis la flash au boot par device.c.
+      Une section ne pouvant pas etre decoupee entre regions, il faut UNE
+      seule case assez grande pour tout le groupe. */
+   RAMLS0_3         : origin = 0x00008000, length = 0x00002000
    RAMLS4           : origin = 0x0000A000, length = 0x00000800
    RAMLS5           : origin = 0x0000A800, length = 0x00000800
    RAMLS6           : origin = 0x0000B000, length = 0x00000800
@@ -103,8 +104,8 @@ SECTIONS
 #if defined(__TI_EABI__)
    .init_array      : > FLASH_BANK0_SEC1,  ALIGN(8)
    .bss             : > RAMLS5
-   .bss:output      : > RAMLS3
-   .bss:cio         : > RAMLS0_2
+   .bss:output      : > RAMLS4
+   .bss:cio         : > RAMLS4
    .data            : > RAMLS5
    .sysmem          : > RAMLS5
    .const           : >> FLASH_BANK0_SEC8 | FLASH_BANK0_SEC9,  ALIGN(8)
@@ -112,7 +113,7 @@ SECTIONS
    .pinit           : > FLASH_BANK0_SEC1,  ALIGN(8)
    .ebss            : > RAMLS5
    .esysmem         : > RAMLS5
-   .cio             : > RAMLS0_2
+   .cio             : > RAMLS4
    .econst          : >> FLASH_BANK0_SEC8 | FLASH_BANK0_SEC9,  ALIGN(8)
 #endif
 
@@ -123,10 +124,21 @@ SECTIONS
    IQmath           : > FLASH_BANK0_SEC1, ALIGN(8)
    IQmathTables     : > FLASH_BANK0_SEC10, ALIGN(8)
 
-   /* stocke en flash (SEC14+15), copie en RAM (LS0-LS2) au boot par device.c,
-      execute depuis la RAM via les #pragma CODE_SECTION(..., ".TI.ramfunc") */
-   .TI.ramfunc      : LOAD = FLASH_B0_SEC14_15,
-                      RUN = RAMLS0_2,
+   /* Groupe stocke en flash (SEC14+15), copie en RAM (LS0-LS3) au boot par
+      device.c (memcpy RamfuncsLoadStart -> RamfuncsRunStart, taille LoadSize).
+      Contient :
+        - .TI.ramfunc : les fonctions #pragma CODE_SECTION(..., ".TI.ramfunc")
+        - le .text de la bibliotheque SFO : SFO() est appelee a chaque ISR ;
+          la mettre en RAM supprime les wait-states flash de ce chemin critique.
+      (sqrtf est deja en ligne via la TMU, donc deja execute en RAM dans l'ISR.) */
+   GROUP
+   {
+      .TI.ramfunc
+      /* chemin complet requis : le dossier de la lib SFO n'est pas sur le
+         search-path du linker (-i). Doit correspondre a l'install C2000Ware. */
+      sfo_ramfunc : { "C:/ti/c2000/C2000Ware_5_02_00_00/libraries/calibration/hrpwm/f28003x/lib/SFO_v8_fpu_lib_build_c28_driverlib.lib"(.text) }
+   }                  LOAD = FLASH_B0_SEC14_15,
+                      RUN = RAMLS0_3,
                       LOAD_START(RamfuncsLoadStart),
                       LOAD_SIZE(RamfuncsLoadSize),
                       LOAD_END(RamfuncsLoadEnd),

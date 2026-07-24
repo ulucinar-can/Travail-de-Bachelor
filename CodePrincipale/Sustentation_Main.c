@@ -2,7 +2,17 @@
 //
 // FILE:    Sustentation_Main.c
 //
-// TITLE:   Power command and regulation for magnetic sustenance (MIMO)
+// TITLE:   Commande et regulation d'une sustentation magnetique 4 inducteurs
+//
+// ARCHITECTURE :
+//   - Machine d'etat (STATE_0..6) : decollage avant (ind. 1&2) puis arriere (3&4).
+//   - AVANT : retour d'etat SISO par inducteur (position + vitesse Savitzky-Golay)
+//     + action integrale + anti-windup.
+//   - COMPLET : bascule bumpless vers un controle modal MIMO (Z / tangage / roulis).
+//   - Chaque force -> filtre coupe-bande IIR -> transformee inverse force/courant
+//     -> boucle de courant PI -> HRPWM.
+//   - Chemin temps reel dans l'ISR ADC a 25 kHz. En build FLASH, les fonctions
+//     critiques sont executees en RAM (voir les gardes #ifndef RAM).
 //
 // AUTHOR :
 //          - Can Ulu inar   - 2026
@@ -80,18 +90,21 @@ unsigned int dt_mean = 0;
 
 // --- Shared Control Variables ---
 float I = 1; // Conserv e en variable pour pouvoir couper l'int grateur en direct via debugger
+float Kw = KW, Kd = KD, Kddot = KDDOT, Kr = KR;
 uint32_t i_store = 0;
 
-// --- Inductor 1 Control (SISO avant, actif jusqu'a la bascule MIMO) ---
+// --- Inductor 1 Control ---
 float ic1 = 0.0, ue1 = 0.0, integral_i1 = 0;
 float fc1 = 0;
-float ep1 = 0, xr1 = 0, fc1_prim = 0;
+float pos1Buff[FILTWINDOW] = {[0 ... 8] = 0};
+float v1 = 0, ep1 = 0, xr1 = 0, fce1 = 0, sum_vp1 = 0, fc1_prim = 0;
 float Position_c1 = DELTA_0, Position_c1_dec = 2.85e-3f;
 
-// --- Inductor 2 Control (SISO avant, actif jusqu'a la bascule MIMO) ---
+// --- Inductor 2 Control ---
 float ic2 = 0, ue2 = 0, integral_i2 = 0;
 float fc2 = 0;
-float ep2 = 0, xr2 = 0, fc2_prim = 0;
+float pos2Buff[FILTWINDOW] = {[0 ... 8] = 0};
+float v2 = 0, ep2 = 0, xr2 = 0, fce2 = 0, sum_vp2 = 0, fc2_prim = 0;
 float Position_c2 = DELTA_0, Position_c2_dec = 2.85e-3f;
 
 // --- Inductor 3 ---
@@ -161,10 +174,6 @@ float Cur1_filt = 0;
 float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
-
-// --- Variables Observateurs SISO avant (inducteurs 1 & 2) ---
-float pos_est1 = DELTA_0, vit_est1 = 0.0f, for_est1 = 0.0f, err_obs1 = 0.0f;
-float pos_est2 = DELTA_0, vit_est2 = 0.0f, for_est2 = 0.0f, err_obs2 = 0.0f;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -246,7 +255,14 @@ void error (void)
 /* ========================================================================= *
  * INTERRUPT SERVICE ROUTINES (ISRs)
  * ========================================================================= */
+
+/* ISR ADC principale, cadencee a 25 kHz (F_PWM) : contient toute la chaine
+ * temps reel (lecture ADC -> etat -> regulation -> HRPWM).
+ * En build FLASH elle est copiee/executee en RAM (.TI.ramfunc) pour eviter les
+ * wait-states flash ; en build RAM la garde est neutralisee (deja en RAM). */
+#ifndef RAM
 #pragma CODE_SECTION(adcA1ISR, ".TI.ramfunc")
+#endif
 __interrupt void adcA1ISR(void)
 {
     /* --------------------------------------------------------------------- *
@@ -289,11 +305,6 @@ __interrupt void adcA1ISR(void)
     Position3 = ((float)(ADC_pos_3) * CONV_POS2);
     Position4 = ((float)(ADC_pos_4) * CONV_POS2);
 
-//    Position1 = apply_poly5((float)(ADC_pos_1), POS_COR_1);
-//    Position2 = apply_poly5((float)(ADC_pos_2), POS_COR_2);
-//    Position3 = apply_poly5((float)(ADC_pos_3), POS_COR_3);
-//    Position4 = apply_poly5((float)(ADC_pos_4), POS_COR_4);
-
     qm[0] = T_MAT[0][0]*Position1 + T_MAT[0][1]*Position2 + T_MAT[0][2]*Position3 + T_MAT[0][3]*Position4;
     qm[1] = T_MAT[1][0]*Position1 + T_MAT[1][1]*Position2 + T_MAT[1][2]*Position3 + T_MAT[1][3]*Position4;
     qm[2] = T_MAT[2][0]*Position1 + T_MAT[2][1]*Position2 + T_MAT[2][2]*Position3 + T_MAT[2][3]*Position4;
@@ -301,32 +312,36 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 3. OBSERVATEURS
      * --------------------------------------------------------------------- */
+    // AVANT (SISO) : estimation de la vitesse par derivateur Savitzky-Golay.
     if(PosRegFlag1 && !MimoFlag)
     {
-        err_obs1 = Position1 - pos_est1;
-        float pos_est1_new = AD11_1 * pos_est1 + AD12_1 * vit_est1                     + L1_1 * err_obs1;
-        float vit_est1_new =                     AD22_1 * vit_est1 + AD23_1 * for_est1 + L2_1 * err_obs1;
-        float for_est1_new =                                         AD33_1 * for_est1 + BD3_1 * (fc1f - FP) + L3_1 * err_obs1;
-        pos_est1 = pos_est1_new; vit_est1 = vit_est1_new; for_est1 = for_est1_new;
+        pos1Buff[FILTWINDOW-1] = Position1;
+        v1 = savitzky_Filter(pos1Buff);
 
-        err_obs2 = Position2 - pos_est2;
-        float pos_est2_new = AD11_2 * pos_est2 + AD12_2 * vit_est2                     + L1_2 * err_obs2;
-        float vit_est2_new =                     AD22_2 * vit_est2 + AD23_2 * for_est2 + L2_2 * err_obs2;
-        float for_est2_new =                                         AD33_2 * for_est2 + BD3_2 * (fc2f - FP) + L3_2 * err_obs2;
-        pos_est2 = pos_est2_new; vit_est2 = vit_est2_new; for_est2 = for_est2_new;
+        pos2Buff[FILTWINDOW-1] = Position2;
+        v2 = savitzky_Filter(pos2Buff);
     }
 
+    // MIMO : observateur de Luenberger modal (position/vitesse/force par mode Z,T,R).
     if(MimoFlag)
     {
-        uint16_t j;
-        for(j = 0; j < 3; j++)
-        {
-            float e_obs = qm[j] - qm_est[j];
-            float q_new = qm_est[j] + OBS_AD12[j] * vm_est[j] + OBS_L1[j] * e_obs;
-            float v_new = vm_est[j] + OBS_AD23[j] * um_est[j] + OBS_L2[j] * e_obs;
-            float u_new = OBS_AD33[j] * um_est[j] + OBS_BD3[j] * u_ach[j] + OBS_L3[j] * e_obs;
-            qm_est[j] = q_new; vm_est[j] = v_new; um_est[j] = u_new;
-        }
+        float e_obs0 = qm[0] - qm_est[0];
+        qm_est[0] = qm_est[0] + OBS_AD12[0] * vm_est[0] + OBS_L1[0] * e_obs0;
+        float v_new0 = vm_est[0] + OBS_AD23[0] * um_est[0] + OBS_L2[0] * e_obs0;
+        um_est[0] = OBS_AD33[0] * um_est[0] + OBS_BD3[0] * u_ach[0] + OBS_L3[0] * e_obs0;
+        vm_est[0] = v_new0;
+
+        float e_obs1 = qm[1] - qm_est[1];
+        qm_est[1] = qm_est[1] + OBS_AD12[1] * vm_est[1] + OBS_L1[1] * e_obs1;
+        float v_new1 = vm_est[1] + OBS_AD23[1] * um_est[1] + OBS_L2[1] * e_obs1;
+        um_est[1] = OBS_AD33[1] * um_est[1] + OBS_BD3[1] * u_ach[1] + OBS_L3[1] * e_obs1;
+        vm_est[1] = v_new1;
+
+        float e_obs2 = qm[2] - qm_est[2];
+        qm_est[2] = qm_est[2] + OBS_AD12[2] * vm_est[2] + OBS_L1[2] * e_obs2;
+        float v_new2 = vm_est[2] + OBS_AD23[2] * um_est[2] + OBS_L2[2] * e_obs2;
+        um_est[2] = OBS_AD33[2] * um_est[2] + OBS_BD3[2] * u_ach[2] + OBS_L3[2] * e_obs2;
+        vm_est[2] = v_new2;
     }
 
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
@@ -347,7 +362,7 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 4. COMMUNICATION (TELEMETRIE)
      * --------------------------------------------------------------------- */
-    // Envoie de donnée toute les 1s (40e-6 * 25000 = 1s)
+    // Envoie de donnï¿½e toute les 1s (40e-6 * 25000 = 1s)
     UartCounter++;
     if (UartCounter >= 25000)
     {
@@ -428,13 +443,19 @@ __interrupt void adcA1ISR(void)
 
                if(Position1 <= Position_c1_dec && Position2 <= Position_c2_dec)
                {
+                   uint16_t m;
+
                    Position_c1 = Position1;
                    Position_c2 = Position2;
 
                    xr1 = 0.0f;
                    xr2 = 0.0f;
-                   pos_est1 = Position1; vit_est1 = 0.0f; for_est1 = 0.0f;
-                   pos_est2 = Position2; vit_est2 = 0.0f; for_est2 = 0.0f;
+
+                   for(m = 0; m < FILTWINDOW; m++)
+                   {
+                       pos1Buff[m] = Position1;
+                       pos2Buff[m] = Position2;
+                   }
 
                    state = STATE_3;
                }
@@ -644,47 +665,72 @@ __interrupt void adcA1ISR(void)
         // ================================================================= //
         if(PosRegFlag1 && !MimoFlag)
         {
-            ep1 = Position_c1 - Position1;
-            fc1_prim = FP + LQI1_Q*(Position1 - Position_c1) + LQI1_QD*vit_est1 - LQI1_EPS*xr1*I;
+           // Loi de retour d'etat par inducteur :
+           //   fc = Kw*consigne - Kd*position - Kddot*vitesse + Kr*integrale + m*g
+           //   (Kw,Kd,Kddot,Kr < 0). Anti-windup par back-calculation (fce),
+           //   puis coupe-bande IIR et transformee inverse force->courant.
 
-            fc1 = fc1_prim;
-            bool sat1 = false;
-            if (fc1_prim <= 0)      { fc1 = 0;     sat1 = true; }
-            else if (fc1_prim >= FMAX1) { fc1 = FMAX1; sat1 = true; }
-            if (!sat1) xr1 += ep1 * H;
+           // --- Inducteur 1 ---
+           // Calcul de la force de consigne 1
+           ep1 = Position_c1 - Position1;
+           xr1 += (ep1 - fce1);
+           sum_vp1 = v1 * Kddot + Position1 * Kd;
+           fc1_prim = Kw * Position_c1 + Kr * xr1 * I - sum_vp1 + FP;
 
-            IN1[0] = fc1;
-            fc1f = IIR_Filter(IN1, OUT1);
-            if (fc1f < 0) fc1f = 0; else if (fc1f > FMAX1) fc1f = FMAX1;
-            ic1 = sqrtf(K_FC1 * fc1f) * Position1;
+           // Antiwindup
+           fc1 = fc1_prim;
+           if (fc1_prim <= 0)   fc1 = 0;
+           if (fc1_prim >= FMAX1) fc1 = FMAX1;
+           fce1 = (fc1_prim - fc1) * K_ANTIWINDUP * ANTIWINDUP_EN;
 
-            ep2 = Position_c2 - Position2;
-            fc2_prim = FP + LQI2_Q*(Position2 - Position_c2) + LQI2_QD*vit_est2 - LQI2_EPS*xr2*I;
+           // Filtre coupe bande
+           IN1[0] = fc1;
+           fc1f = IIR_Filter(IN1, OUT1);
+           if (fc1f <= 0)   fc1f = 0;
+           if (fc1f >= FMAX1) fc1f = FMAX1;
 
-            fc2 = fc2_prim;
-            bool sat2 = false;
-            if (fc2_prim <= 0)      { fc2 = 0;     sat2 = true; }
-            else if (fc2_prim >= FMAX2) { fc2 = FMAX2; sat2 = true; }
-            if (!sat2) xr2 += ep2 * H;
+           // Calcul du courant de consigne 1
+           ic1 = (sqrtf(K_FC1 * fc1f)) * Position1;
 
-            IN2[0] = fc2;
-            fc2f = IIR_Filter(IN2, OUT2);
-            if (fc2f < 0) fc2f = 0; else if (fc2f > FMAX2) fc2f = FMAX2;
-            ic2 = sqrtf(K_FC2 * fc2f) * Position2;
+           // --- Inducteur 2 ---
+           // Inductor 2 : Filtre Bandstop + State Regulation
+           // Calcul de la force de consigne 2
+           ep2 = Position_c2 - Position2;
+           xr2 += (ep2 - fce2);
+           sum_vp2 = v2 * Kddot + Position2 * Kd;
+           fc2_prim = Kw * Position_c2 + Kr * xr2 * I - sum_vp2 + FP;
+
+           // Antiwindup
+           fc2 = fc2_prim;
+           if (fc2_prim <= 0)   fc2 = 0;
+           if (fc2_prim >= FMAX2) fc2 = FMAX2;
+           fce2 = (fc2_prim - fc2) * K_ANTIWINDUP * ANTIWINDUP_EN;
+
+           // Filtre coupe bande
+           IN2[0] = fc2;
+           fc2f = IIR_Filter(IN2, OUT2);
+           if (fc2f <= 0)   fc2f = 0;
+           if (fc2f >= FMAX2) fc2f = FMAX2;
+
+           // Transform e inverse pour calculer le courant   partir de la force
+           ic2 = (sqrtf(K_FC2 * fc2f)) * Position2;
         }
 
         // ================================================================= //
         // B2. REGULATION MIMO (torseur LQI + allocation)
+        //   u_cmd (par mode) = LQI_Q*(q-ref) + LQI_QD*vitesse - LQI_EPS*integrale
+        //   forces = F_STAT + W_MAT * u_cmd   (allocation min-norme sur 4 inducteurs)
+        //   eps_m  : integrateurs modaux, geles en saturation (tolerance AW_TOL)
+        //   u_ach  : effort reellement atteint (forces filtrees) -> observateur
         // ================================================================= //
         if(MimoFlag)
         {
-            uint16_t j;
-
-            for(j = 0; j < 3; j++)
-            {
-                qm_ref[j] += (qm_target[j] - qm_ref[j]) * REF_SMOOTH;
-                u_cmd[j] = LQI_Q[j]*(qm[j] - qm_ref[j]) + LQI_QD[j]*vm_est[j] - LQI_EPS[j]*eps_m[j]*I;
-            }
+            qm_ref[0] += (qm_target[0] - qm_ref[0]) * REF_SMOOTH;
+            u_cmd[0] = LQI_Q[0]*(qm[0] - qm_ref[0]) + LQI_QD[0]*vm_est[0] - LQI_EPS[0]*eps_m[0]*I;
+            qm_ref[1] += (qm_target[1] - qm_ref[1]) * REF_SMOOTH;
+            u_cmd[1] = LQI_Q[1]*(qm[1] - qm_ref[1]) + LQI_QD[1]*vm_est[1] - LQI_EPS[1]*eps_m[1]*I;
+            qm_ref[2] += (qm_target[2] - qm_ref[2]) * REF_SMOOTH;
+            u_cmd[2] = LQI_Q[2]*(qm[2] - qm_ref[2]) + LQI_QD[2]*vm_est[2] - LQI_EPS[2]*eps_m[2]*I;
 
             fc1 = F_STAT[0] + W_MAT[0][0]*u_cmd[0] + W_MAT[0][1]*u_cmd[1] + W_MAT[0][2]*u_cmd[2];
             fc2 = F_STAT[1] + W_MAT[1][0]*u_cmd[0] + W_MAT[1][1]*u_cmd[1] + W_MAT[1][2]*u_cmd[2];
@@ -696,17 +742,17 @@ __interrupt void adcA1ISR(void)
             if (fc3 < 0) fc3 = 0; else if (fc3 > FMAX3) fc3 = FMAX3;
             if (fc4 < 0) fc4 = 0; else if (fc4 > FMAX4) fc4 = FMAX4;
 
-            for(j = 0; j < 3; j++)
-            {
-                u_sat[j] = E_MAT[j][0]*fc1 + E_MAT[j][1]*fc2
-                         + E_MAT[j][2]*fc3 + E_MAT[j][3]*fc4 - U_STAT[j];
+            u_sat[0] = E_MAT[0][0]*fc1 + E_MAT[0][1]*fc2 + E_MAT[0][2]*fc3 + E_MAT[0][3]*fc4 - U_STAT[0];
+            float def0 = u_cmd[0] - u_sat[0];
+            if (def0 > -AW_TOL[0] && def0 < AW_TOL[0]) eps_m[0] += (qm_ref[0] - qm[0]) * H;
 
-                float def = u_cmd[j] - u_sat[j];
-                if (def > -AW_TOL[j] && def < AW_TOL[j])
-                {
-                    eps_m[j] += (qm_ref[j] - qm[j]) * H;
-                }
-            }
+            u_sat[1] = E_MAT[1][0]*fc1 + E_MAT[1][1]*fc2 + E_MAT[1][2]*fc3 + E_MAT[1][3]*fc4 - U_STAT[1];
+            float def1 = u_cmd[1] - u_sat[1];
+            if (def1 > -AW_TOL[1] && def1 < AW_TOL[1]) eps_m[1] += (qm_ref[1] - qm[1]) * H;
+
+            u_sat[2] = E_MAT[2][0]*fc1 + E_MAT[2][1]*fc2 + E_MAT[2][2]*fc3 + E_MAT[2][3]*fc4 - U_STAT[2];
+            float def2 = u_cmd[2] - u_sat[2];
+            if (def2 > -AW_TOL[2] && def2 < AW_TOL[2]) eps_m[2] += (qm_ref[2] - qm[2]) * H;
 
             IN1[0] = fc1;
             fc1f = IIR_Filter(IN1, OUT1);
@@ -728,11 +774,9 @@ __interrupt void adcA1ISR(void)
             if (fc4f < 0) fc4f = 0; else if (fc4f > FMAX4) fc4f = FMAX4;
             ic4 = sqrtf(K_FC4 * fc4f) * Position4;
 
-            for(j = 0; j < 3; j++)
-            {
-                u_ach[j] = E_MAT[j][0]*fc1f + E_MAT[j][1]*fc2f
-                         + E_MAT[j][2]*fc3f + E_MAT[j][3]*fc4f - U_STAT[j];
-            }
+            u_ach[0] = E_MAT[0][0]*fc1f + E_MAT[0][1]*fc2f + E_MAT[0][2]*fc3f + E_MAT[0][3]*fc4f - U_STAT[0];
+            u_ach[1] = E_MAT[1][0]*fc1f + E_MAT[1][1]*fc2f + E_MAT[1][2]*fc3f + E_MAT[1][3]*fc4f - U_STAT[1];
+            u_ach[2] = E_MAT[2][0]*fc1f + E_MAT[2][1]*fc2f + E_MAT[2][2]*fc3f + E_MAT[2][3]*fc4f - U_STAT[2];
         }
 
         // ================================================================= //
@@ -821,6 +865,9 @@ __interrupt void INT_Push_Button_Start_XINT_ISR(void)
 }
 
 // --- UART Receive (RX) ---
+#ifndef RAM
+#pragma CODE_SECTION(INT_mySCI0_RX_ISR, ".TI.ramfunc")
+#endif
 __interrupt void INT_mySCI0_RX_ISR(void)
 {
     uint16_t c;
@@ -854,6 +901,9 @@ __interrupt void INT_mySCI0_RX_ISR(void)
 }
 
 // --- UART Transmit (TX) ---
+#ifndef RAM
+#pragma CODE_SECTION(INT_mySCI0_TX_ISR, ".TI.ramfunc")
+#endif
 __interrupt void INT_mySCI0_TX_ISR(void)
 {
     while (SCI_getTxFIFOStatus(SCIA_BASE) < SCI_FIFO_TX16 && txIndex < txLength)
