@@ -318,15 +318,23 @@ __interrupt void adcA1ISR(void)
 
     if(MimoFlag)
     {
-        uint16_t j;
-        for(j = 0; j < 3; j++)
-        {
-            float e_obs = qm[j] - qm_est[j];
-            float q_new = qm_est[j] + OBS_AD12[j] * vm_est[j] + OBS_L1[j] * e_obs;
-            float v_new = vm_est[j] + OBS_AD23[j] * um_est[j] + OBS_L2[j] * e_obs;
-            float u_new = OBS_AD33[j] * um_est[j] + OBS_BD3[j] * u_ach[j] + OBS_L3[j] * e_obs;
-            qm_est[j] = q_new; vm_est[j] = v_new; um_est[j] = u_new;
-        }
+        float e_obs0 = qm[0] - qm_est[0];
+        qm_est[0] = qm_est[0] + OBS_AD12[0] * vm_est[0] + OBS_L1[0] * e_obs0;
+        float v_new0 = vm_est[0] + OBS_AD23[0] * um_est[0] + OBS_L2[0] * e_obs0;
+        um_est[0] = OBS_AD33[0] * um_est[0] + OBS_BD3[0] * u_ach[0] + OBS_L3[0] * e_obs0;
+        vm_est[0] = v_new0;
+
+        float e_obs1 = qm[1] - qm_est[1];
+        qm_est[1] = qm_est[1] + OBS_AD12[1] * vm_est[1] + OBS_L1[1] * e_obs1;
+        float v_new1 = vm_est[1] + OBS_AD23[1] * um_est[1] + OBS_L2[1] * e_obs1;
+        um_est[1] = OBS_AD33[1] * um_est[1] + OBS_BD3[1] * u_ach[1] + OBS_L3[1] * e_obs1;
+        vm_est[1] = v_new1;
+
+        float e_obs2 = qm[2] - qm_est[2];
+        qm_est[2] = qm_est[2] + OBS_AD12[2] * vm_est[2] + OBS_L1[2] * e_obs2;
+        float v_new2 = vm_est[2] + OBS_AD23[2] * um_est[2] + OBS_L2[2] * e_obs2;
+        um_est[2] = OBS_AD33[2] * um_est[2] + OBS_BD3[2] * u_ach[2] + OBS_L3[2] * e_obs2;
+        vm_est[2] = v_new2;
     }
 
     Pos1_filt = (ALPHA * Position1) + (ALPHA_INV * Pos1_filt);
@@ -347,7 +355,7 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 4. COMMUNICATION (TELEMETRIE)
      * --------------------------------------------------------------------- */
-    // Envoie de donnée toute les 1s (40e-6 * 25000 = 1s)
+    // Envoie de donnï¿½e toute les 1s (40e-6 * 25000 = 1s)
     UartCounter++;
     if (UartCounter >= 25000)
     {
@@ -678,13 +686,12 @@ __interrupt void adcA1ISR(void)
         // ================================================================= //
         if(MimoFlag)
         {
-            uint16_t j;
-
-            for(j = 0; j < 3; j++)
-            {
-                qm_ref[j] += (qm_target[j] - qm_ref[j]) * REF_SMOOTH;
-                u_cmd[j] = LQI_Q[j]*(qm[j] - qm_ref[j]) + LQI_QD[j]*vm_est[j] - LQI_EPS[j]*eps_m[j]*I;
-            }
+            qm_ref[0] += (qm_target[0] - qm_ref[0]) * REF_SMOOTH;
+            u_cmd[0] = LQI_Q[0]*(qm[0] - qm_ref[0]) + LQI_QD[0]*vm_est[0] - LQI_EPS[0]*eps_m[0]*I;
+            qm_ref[1] += (qm_target[1] - qm_ref[1]) * REF_SMOOTH;
+            u_cmd[1] = LQI_Q[1]*(qm[1] - qm_ref[1]) + LQI_QD[1]*vm_est[1] - LQI_EPS[1]*eps_m[1]*I;
+            qm_ref[2] += (qm_target[2] - qm_ref[2]) * REF_SMOOTH;
+            u_cmd[2] = LQI_Q[2]*(qm[2] - qm_ref[2]) + LQI_QD[2]*vm_est[2] - LQI_EPS[2]*eps_m[2]*I;
 
             fc1 = F_STAT[0] + W_MAT[0][0]*u_cmd[0] + W_MAT[0][1]*u_cmd[1] + W_MAT[0][2]*u_cmd[2];
             fc2 = F_STAT[1] + W_MAT[1][0]*u_cmd[0] + W_MAT[1][1]*u_cmd[1] + W_MAT[1][2]*u_cmd[2];
@@ -696,17 +703,17 @@ __interrupt void adcA1ISR(void)
             if (fc3 < 0) fc3 = 0; else if (fc3 > FMAX3) fc3 = FMAX3;
             if (fc4 < 0) fc4 = 0; else if (fc4 > FMAX4) fc4 = FMAX4;
 
-            for(j = 0; j < 3; j++)
-            {
-                u_sat[j] = E_MAT[j][0]*fc1 + E_MAT[j][1]*fc2
-                         + E_MAT[j][2]*fc3 + E_MAT[j][3]*fc4 - U_STAT[j];
+            u_sat[0] = E_MAT[0][0]*fc1 + E_MAT[0][1]*fc2 + E_MAT[0][2]*fc3 + E_MAT[0][3]*fc4 - U_STAT[0];
+            float def0 = u_cmd[0] - u_sat[0];
+            if (def0 > -AW_TOL[0] && def0 < AW_TOL[0]) eps_m[0] += (qm_ref[0] - qm[0]) * H;
 
-                float def = u_cmd[j] - u_sat[j];
-                if (def > -AW_TOL[j] && def < AW_TOL[j])
-                {
-                    eps_m[j] += (qm_ref[j] - qm[j]) * H;
-                }
-            }
+            u_sat[1] = E_MAT[1][0]*fc1 + E_MAT[1][1]*fc2 + E_MAT[1][2]*fc3 + E_MAT[1][3]*fc4 - U_STAT[1];
+            float def1 = u_cmd[1] - u_sat[1];
+            if (def1 > -AW_TOL[1] && def1 < AW_TOL[1]) eps_m[1] += (qm_ref[1] - qm[1]) * H;
+
+            u_sat[2] = E_MAT[2][0]*fc1 + E_MAT[2][1]*fc2 + E_MAT[2][2]*fc3 + E_MAT[2][3]*fc4 - U_STAT[2];
+            float def2 = u_cmd[2] - u_sat[2];
+            if (def2 > -AW_TOL[2] && def2 < AW_TOL[2]) eps_m[2] += (qm_ref[2] - qm[2]) * H;
 
             IN1[0] = fc1;
             fc1f = IIR_Filter(IN1, OUT1);
@@ -728,11 +735,9 @@ __interrupt void adcA1ISR(void)
             if (fc4f < 0) fc4f = 0; else if (fc4f > FMAX4) fc4f = FMAX4;
             ic4 = sqrtf(K_FC4 * fc4f) * Position4;
 
-            for(j = 0; j < 3; j++)
-            {
-                u_ach[j] = E_MAT[j][0]*fc1f + E_MAT[j][1]*fc2f
-                         + E_MAT[j][2]*fc3f + E_MAT[j][3]*fc4f - U_STAT[j];
-            }
+            u_ach[0] = E_MAT[0][0]*fc1f + E_MAT[0][1]*fc2f + E_MAT[0][2]*fc3f + E_MAT[0][3]*fc4f - U_STAT[0];
+            u_ach[1] = E_MAT[1][0]*fc1f + E_MAT[1][1]*fc2f + E_MAT[1][2]*fc3f + E_MAT[1][3]*fc4f - U_STAT[1];
+            u_ach[2] = E_MAT[2][0]*fc1f + E_MAT[2][1]*fc2f + E_MAT[2][2]*fc3f + E_MAT[2][3]*fc4f - U_STAT[2];
         }
 
         // ================================================================= //
@@ -821,6 +826,7 @@ __interrupt void INT_Push_Button_Start_XINT_ISR(void)
 }
 
 // --- UART Receive (RX) ---
+#pragma CODE_SECTION(INT_mySCI0_RX_ISR, ".TI.ramfunc")
 __interrupt void INT_mySCI0_RX_ISR(void)
 {
     uint16_t c;
@@ -854,6 +860,7 @@ __interrupt void INT_mySCI0_RX_ISR(void)
 }
 
 // --- UART Transmit (TX) ---
+#pragma CODE_SECTION(INT_mySCI0_TX_ISR, ".TI.ramfunc")
 __interrupt void INT_mySCI0_TX_ISR(void)
 {
     while (SCI_getTxFIFOStatus(SCIA_BASE) < SCI_FIFO_TX16 && txIndex < txLength)

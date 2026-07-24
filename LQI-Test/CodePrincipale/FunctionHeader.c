@@ -1,8 +1,8 @@
 /*
  * FunctionHeader.c
  *
- * Created by : Uluçinar (2026)
- * Modified by: Uluçinar (2026)
+ * Created by : Uluï¿½inar (2026)
+ * Modified by: Uluï¿½inar (2026)
  *
  * Description: Description: Implementation of control, filtering, and utility functions
  */
@@ -128,6 +128,7 @@ float IIR_Filter(float *entree, float *sortie)
 /* ========================================================================= *
  * COMMUNICATION & STRING UTILS
  * ========================================================================= */
+#pragma CODE_SECTION(reverse, ".TI.ramfunc")
 void reverse(char* str, int len)
 {
     int i = 0, j = len - 1, temp;
@@ -140,7 +141,8 @@ void reverse(char* str, int len)
     }
 }
 
-int ConvertIntToStr(int x, char str[], int p)
+#pragma CODE_SECTION(ConvertIntToStr, ".TI.ramfunc")
+int ConvertIntToStr(int32_t x, char str[], int p)
 {
     int i = 0;
     if (x == 0) str[i++] = '0';
@@ -156,6 +158,9 @@ int ConvertIntToStr(int x, char str[], int p)
     return i;
 }
 
+static const float POW10[8] = {1.0f, 10.0f, 100.0f, 1000.0f, 10000.0f, 100000.0f, 1000000.0f, 10000000.0f};
+
+#pragma CODE_SECTION(ftoa, ".TI.ramfunc")
 int ftoa(float n, char* res, int afterpoint)
 {
     int i = 0;
@@ -165,21 +170,29 @@ int ftoa(float n, char* res, int afterpoint)
         n = -n;
     }
 
-    int ipart = (int)n;
+    int32_t ipart = (int32_t)n;
     float fpart = n - (float)ipart;
 
-    i += ConvertIntToStr(ipart, res + i, 0);
-
     if (afterpoint > 0) {
+        if (afterpoint > 7) afterpoint = 7;
+        float scale = POW10[afterpoint];
+        int32_t fint = (int32_t)(fpart * scale + 0.5f);
+        if (fint >= (int32_t)scale) {
+            fint = 0;
+            ipart++;
+        }
+        i += ConvertIntToStr(ipart, res + i, 0);
         res[i++] = '.';
-        fpart *= powf(10.0f, (float)afterpoint);
-        i += ConvertIntToStr((int)(fpart + 0.5f), res + i, afterpoint);
+        i += ConvertIntToStr(fint, res + i, afterpoint);
+    } else {
+        i += ConvertIntToStr(ipart, res + i, 0);
     }
 
     res[i] = '\0';
     return i;
 }
 
+#pragma CODE_SECTION(SendFloatAsText, ".TI.ramfunc")
 void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7)
 {
     char str[TX_BUF_LEN];

@@ -19,10 +19,10 @@
  * ========================================================================= */
 #define DELTA_N         ((float)2.0e-3)         // Position nominal de l'entrefer
 #define DELTA_0         ((float)3.0e-3)         // Position max de l'entrefer
-#define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise à 120 Hz)
-#define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise à 120 Hz)
-#define L_N3            ((float)7.699e-3)       // Inductance nominal au point nominal pour l'inducteur 3 (prise à 120 Hz)
-#define L_N4            ((float)7.750e-3)       // Inductance nominal au point nominal pour l'inducteur 4 (prise à 120 Hz)
+#define L_N1            ((float)7.742e-3)       // Inductance nominal au point nominal pour l'inducteur 1 (prise ï¿½ 120 Hz)
+#define L_N2            ((float)8.647e-3)       // Inductance nominal au point nominal pour l'inducteur 2 (prise ï¿½ 120 Hz)
+#define L_N3            ((float)7.699e-3)       // Inductance nominal au point nominal pour l'inducteur 3 (prise ï¿½ 120 Hz)
+#define L_N4            ((float)7.750e-3)       // Inductance nominal au point nominal pour l'inducteur 4 (prise ï¿½ 120 Hz)
 #define I_N             4.48f                   // Courant nominal par mï¿½thode inverse au point nominal
 #define M               4.513f                  // Masse pour un seul inducteur
 #define G               9.81f                   // Gravity
@@ -186,7 +186,7 @@ extern const float POS_COR_4[6];
 #define L2_2    51.65f
 #define L3_2    -32058.53f
 
-// ======== MIMO genere par lqi-inertie.py — modes [Z, T, R] ========
+// ======== MIMO genere par lqi-inertie.py ï¿½ modes [Z, T, R] ========
 static const float T_MAT[3][4] = {{2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f, 2.50000000e-01f},
                                   {1.78571429e+00f, 1.78571429e+00f, -1.78571429e+00f, -1.78571429e+00f},
                                   {1.92307692e+00f, -1.92307692e+00f, 1.92307692e+00f, -1.92307692e+00f}};
@@ -220,7 +220,7 @@ static const float OBS_L3[3]   = {-1.15564501e+05f, -5.46736182e+03f, -5.4673618
  * FUNCTION PROTOTYPES
  * ========================================================================= */
 void reverse(char* str, int len);
-int ConvertIntToStr(int x, char str[], int p);
+int ConvertIntToStr(int32_t x, char str[], int p);
 int ftoa(float n, char* res, int afterpoint);
 void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7);
 float savitzky_Filter(float *Buffer);
