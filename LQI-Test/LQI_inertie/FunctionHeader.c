@@ -1,8 +1,8 @@
 /*
  * FunctionHeader.c
  *
- * Created by : Uluçinar (2026)
- * Modified by: Uluçinar (2026)
+ * Created by : Uluï¿½inar (2026)
+ * Modified by: Uluï¿½inar (2026)
  *
  * Description: Description: Implementation of control, filtering, and utility functions
  */
@@ -104,25 +104,15 @@ void PI_current_regulator(float ic, float current, float *integral, float *ue, f
 #pragma CODE_SECTION(IIR_Filter, ".TI.ramfunc")
 float IIR_Filter(float *entree, float *sortie)
 {
-    float somme = 0.0;
-    float somme2 = 0.0;
-    uint16_t k = 0;
+    float y = (b[0]*entree[0] + b[1]*entree[1] + b[2]*entree[2])
+            - (a[0]*sortie[0] + a[1]*sortie[1]);
 
-    // difference equation
-    for(k = 0; k < Nb; k++) // Num.
-        somme += b[k]*entree[k];
-    for(k = 0; k < Na; k++) // Den.
-        somme2 += a[k]*sortie[k];
+    sortie[1] = sortie[0];
+    sortie[0] = y;
+    entree[2] = entree[1];
+    entree[1] = entree[0];
 
-    // update buffers
-    for(k = (Na-1); k > 0; k--)
-        sortie[k] = sortie[(k-1)];
-    sortie[0] = (somme-somme2);
-
-    for(k = (Nb-1); k > 0; k--)
-        entree[k] = entree[(k-1)];
-
-    return (somme-somme2);
+    return y;
 }
 
 /* ========================================================================= *
@@ -140,7 +130,9 @@ void reverse(char* str, int len)
     }
 }
 
-int ConvertIntToStr(int x, char str[], int p)
+static const float POW10[8] = {1.0f, 10.0f, 100.0f, 1000.0f, 10000.0f, 100000.0f, 1000000.0f, 10000000.0f};
+
+int ConvertIntToStr(int32_t x, char str[], int p)
 {
     int i = 0;
     if (x == 0) str[i++] = '0';
@@ -165,15 +157,22 @@ int ftoa(float n, char* res, int afterpoint)
         n = -n;
     }
 
-    int ipart = (int)n;
+    int32_t ipart = (int32_t)n;
     float fpart = n - (float)ipart;
 
-    i += ConvertIntToStr(ipart, res + i, 0);
-
     if (afterpoint > 0) {
+        if (afterpoint > 7) afterpoint = 7;
+        float scale = POW10[afterpoint];
+        int32_t fint = (int32_t)(fpart * scale + 0.5f);
+        if (fint >= (int32_t)scale) {
+            fint = 0;
+            ipart++;
+        }
+        i += ConvertIntToStr(ipart, res + i, 0);
         res[i++] = '.';
-        fpart *= powf(10.0f, (float)afterpoint);
-        i += ConvertIntToStr((int)(fpart + 0.5f), res + i, afterpoint);
+        i += ConvertIntToStr(fint, res + i, afterpoint);
+    } else {
+        i += ConvertIntToStr(ipart, res + i, 0);
     }
 
     res[i] = '\0';
@@ -212,7 +211,7 @@ float apply_poly5(float x, const float* coeffs)
     // Calcul hyper rapide (1 cycle par multiplication/addition)
     float result = ((((coeffs[5] * x + coeffs[4]) * x + coeffs[3]) * x + coeffs[2]) * x + coeffs[1]) * x + coeffs[0];
 
-    // Sécurité : empêche l'entrefer de devenir mathématiquement négatif
+    // Sï¿½curitï¿½ : empï¿½che l'entrefer de devenir mathï¿½matiquement nï¿½gatif
     if (result < 0.0f) {
         result = 0.0f;
     }
@@ -236,6 +235,7 @@ void Send32FloatsAsCSV(float v[32])
     str[i++] = '\n';
 
     // Copie dans le buffer UART
+    SCI_disableInterrupt(SCIA_BASE, SCI_INT_TXFF);
     for (j = 0; j < i && j < TX_BUF_LEN; j++) {
         txBuffer[j] = (uint8_t)str[j];
     }

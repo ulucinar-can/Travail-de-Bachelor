@@ -160,6 +160,9 @@ volatile char rxBuffer[RX_BUF_LEN];
 volatile uint16_t rxIndex = 0;
 static uint16_t dataIndex = 0;
 
+volatile bool TelemetryReady = false;
+float TelemetrySnap[32];
+
 // --- State machine variable ---
 uint8_t state = STATE_0;
 bool PosRegFlag1 = false;
@@ -248,7 +251,14 @@ void main(void)
 
 
     // Infinite loop
-    while(1);
+    while(1)
+    {
+        if(TelemetryReady)
+        {
+            Send32FloatsAsCSV(TelemetrySnap);
+            TelemetryReady = false;
+        }
+    }
 }
 
 void error (void)
@@ -365,51 +375,53 @@ __interrupt void adcA1ISR(void)
     {
         UartCounter = 0;
 
-        float telemetry[32];
+        if(!TelemetryReady)
+        {
+            TelemetrySnap[0]  = frameCnt;
+            TelemetrySnap[1]  = (float)state;
 
-        telemetry[0]  = frameCnt;
-        telemetry[1]  = (float)state;
+            TelemetrySnap[2]  = qm_ref[0] * 1000.0f;
+            TelemetrySnap[3]  = qm_ref[1] * 1000.0f;
+            TelemetrySnap[4]  = qm_ref[2] * 1000.0f;
 
-        telemetry[2]  = qm_ref[0] * 1000.0f;
-        telemetry[3]  = qm_ref[1] * 1000.0f;
-        telemetry[4]  = qm_ref[2] * 1000.0f;
+            TelemetrySnap[5]  = qm[0] * 1000.0f;
+            TelemetrySnap[6]  = qm[1] * 1000.0f;
+            TelemetrySnap[7]  = qm[2] * 1000.0f;
 
-        telemetry[5]  = qm[0] * 1000.0f;
-        telemetry[6]  = qm[1] * 1000.0f;
-        telemetry[7]  = qm[2] * 1000.0f;
+            TelemetrySnap[8]  = vm_est[0] * 1000.0f;
+            TelemetrySnap[9]  = vm_est[1] * 1000.0f;
+            TelemetrySnap[10] = vm_est[2] * 1000.0f;
 
-        telemetry[8]  = vm_est[0] * 1000.0f;
-        telemetry[9]  = vm_est[1] * 1000.0f;
-        telemetry[10] = vm_est[2] * 1000.0f;
+            TelemetrySnap[11] = u_cmd[0];
+            TelemetrySnap[12] = u_cmd[1];
+            TelemetrySnap[13] = u_cmd[2];
 
-        telemetry[11] = u_cmd[0];
-        telemetry[12] = u_cmd[1];
-        telemetry[13] = u_cmd[2];
+            TelemetrySnap[14] = u_sat[0];
+            TelemetrySnap[15] = u_sat[1];
+            TelemetrySnap[16] = u_sat[2];
 
-        telemetry[14] = u_sat[0];
-        telemetry[15] = u_sat[1];
-        telemetry[16] = u_sat[2];
+            TelemetrySnap[17] = LQI_EPS[0] * eps_m[0];
+            TelemetrySnap[18] = LQI_EPS[1] * eps_m[1];
+            TelemetrySnap[19] = LQI_EPS[2] * eps_m[2];
 
-        telemetry[17] = LQI_EPS[0] * eps_m[0];
-        telemetry[18] = LQI_EPS[1] * eps_m[1];
-        telemetry[19] = LQI_EPS[2] * eps_m[2];
+            TelemetrySnap[20] = Position1 * 1000.0f;
+            TelemetrySnap[21] = Position2 * 1000.0f;
+            TelemetrySnap[22] = Position3 * 1000.0f;
+            TelemetrySnap[23] = Position4 * 1000.0f;
 
-        telemetry[20] = Position1 * 1000.0f;
-        telemetry[21] = Position2 * 1000.0f;
-        telemetry[22] = Position3 * 1000.0f;
-        telemetry[23] = Position4 * 1000.0f;
+            TelemetrySnap[24] = fc1;
+            TelemetrySnap[25] = fc2;
+            TelemetrySnap[26] = fc3;
+            TelemetrySnap[27] = fc4;
 
-        telemetry[24] = fc1;
-        telemetry[25] = fc2;
-        telemetry[26] = fc3;
-        telemetry[27] = fc4;
+            TelemetrySnap[28] = Current1;
+            TelemetrySnap[29] = Current2;
+            TelemetrySnap[30] = Current3;
+            TelemetrySnap[31] = Current4;
 
-        telemetry[28] = Current1;
-        telemetry[29] = Current2;
-        telemetry[30] = Current3;
-        telemetry[31] = Current4;
+            TelemetryReady = true;
+        }
 
-        Send32FloatsAsCSV(telemetry);
         frameCnt += 1.0f;
     }
 
@@ -660,12 +672,12 @@ __interrupt void adcA1ISR(void)
 
                    GPIO_writePin(LED_D2, 1);
 
-                   for(i = 0; i < NUM_OF_PWM_CHANNEL; i++)
+                   for(j = 0; j < NUM_OF_PWM_CHANNEL; j++)
                    {
-                       dutyFine = ((float)(duty_cycle_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
+                       dutyFine = ((float)(duty_cycle_table[j] * TIME_BASE_PERIOD) * INV_FACTOR);
                        compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-                       HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
-                       HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+                       HRPWM_setCounterCompareValue(ePWM[j], HRPWM_COUNTER_COMPARE_A, compCount);
+                       HRPWM_setCounterCompareValue(ePWM[j], HRPWM_COUNTER_COMPARE_B, compCount);
                    }
 
                    PosRegFlag1 = false;
@@ -829,19 +841,20 @@ __interrupt void adcA1ISR(void)
         duty_table[2] = dutyCycle3 * 100;
         duty_table[3] = dutyCycle4 * 100;
 
-        for (i = 0; i < NUM_OF_PWM_CHANNEL; i++)
+        uint16_t n;
+        for (n = 0; n < NUM_OF_PWM_CHANNEL; n++)
         {
-            if (duty_table[i] >= LIMITE_MAX_DUTY_FINE) {
-                duty_table[i] = LIMITE_MAX_DUTY_FINE;
+            if (duty_table[n] >= LIMITE_MAX_DUTY_FINE) {
+                duty_table[n] = LIMITE_MAX_DUTY_FINE;
             }
-            else if (duty_table[i] <= LIMITE_MIN_DUTY_FINE) {
-                duty_table[i] = LIMITE_MIN_DUTY_FINE;
+            else if (duty_table[n] <= LIMITE_MIN_DUTY_FINE) {
+                duty_table[n] = LIMITE_MIN_DUTY_FINE;
             }
 
-            dutyFine = ((float)(duty_table[i] * TIME_BASE_PERIOD) * INV_FACTOR);
+            dutyFine = ((float)(duty_table[n] * TIME_BASE_PERIOD) * INV_FACTOR);
             compCount = (dutyFine * (float32_t)(EPWM_TIMER_TBPRD << 8)) * INV_FACTOR;
-            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_A, compCount);
-            HRPWM_setCounterCompareValue(ePWM[i], HRPWM_COUNTER_COMPARE_B, compCount);
+            HRPWM_setCounterCompareValue(ePWM[n], HRPWM_COUNTER_COMPARE_A, compCount);
+            HRPWM_setCounterCompareValue(ePWM[n], HRPWM_COUNTER_COMPARE_B, compCount);
         }
 
         status = SFO();
@@ -893,6 +906,7 @@ __interrupt void INT_Push_Button_Start_XINT_ISR(void)
 }
 
 // --- UART Receive (RX) ---
+#pragma CODE_SECTION(INT_mySCI0_RX_ISR, ".TI.ramfunc")
 __interrupt void INT_mySCI0_RX_ISR(void)
 {
     uint16_t c;
@@ -926,6 +940,7 @@ __interrupt void INT_mySCI0_RX_ISR(void)
 }
 
 // --- UART Transmit (TX) ---
+#pragma CODE_SECTION(INT_mySCI0_TX_ISR, ".TI.ramfunc")
 __interrupt void INT_mySCI0_TX_ISR(void)
 {
     while (SCI_getTxFIFOStatus(SCIA_BASE) < SCI_FIFO_TX16 && txIndex < txLength)

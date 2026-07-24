@@ -347,8 +347,9 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 4. COMMUNICATION (TELEMETRIE)
      * --------------------------------------------------------------------- */
+    // Envoie de donnée toute les 1s (40e-6 * 25000 = 1s)
     UartCounter++;
-    if (UartCounter >= 250)
+    if (UartCounter >= 25000)
     {
         UartCounter = 0;
 
