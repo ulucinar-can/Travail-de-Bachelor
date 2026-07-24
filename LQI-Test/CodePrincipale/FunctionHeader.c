@@ -67,7 +67,9 @@ const float POS_COR_4[6] = {
 /* ========================================================================= *
  * CONTROL & REGULATION
  * ========================================================================= */
+#ifndef RAM
 #pragma CODE_SECTION(PI_current_regulator, ".TI.ramfunc")
+#endif
 void PI_current_regulator(float ic, float current, float *integral, float *ue, float *uc)
 {
     float ie = (ic - current) * KP_I;
@@ -85,23 +87,25 @@ void PI_current_regulator(float ic, float current, float *integral, float *ue, f
     *ue = (uc_prim - *uc) * ANTIWINDUP_EN;
 }
 
-//float savitzky_Filter(float *Buffer)
-//{
-//    float v = 0.0f;
-//    uint16_t m = 0;
-//
-//    // savitzky algorithm
-//    for(m = 0; m < FILTWINDOW; m++)
-//        v += F_PWM*Buffer[m]*SAVITZKY[m];
-//
-//    // update buffer for next position
-//    for(m = 0; m < FILTWINDOW-1; m++)
-//       Buffer[m] = Buffer[(m+1)];
-//
-//    return v;
-//}
+float savitzky_Filter(float *Buffer)
+{
+    float v = 0.0f;
+    uint16_t m = 0;
 
+    // savitzky algorithm
+    for(m = 0; m < FILTWINDOW; m++)
+        v += F_PWM*Buffer[m]*SAVITZKY[m];
+
+    // update buffer for next position
+    for(m = 0; m < FILTWINDOW-1; m++)
+       Buffer[m] = Buffer[(m+1)];
+
+    return v;
+}
+
+#ifndef RAM
 #pragma CODE_SECTION(IIR_Filter, ".TI.ramfunc")
+#endif
 float IIR_Filter(float *entree, float *sortie)
 {
     float somme = 0.0;
@@ -128,7 +132,9 @@ float IIR_Filter(float *entree, float *sortie)
 /* ========================================================================= *
  * COMMUNICATION & STRING UTILS
  * ========================================================================= */
+#ifndef RAM
 #pragma CODE_SECTION(reverse, ".TI.ramfunc")
+#endif
 void reverse(char* str, int len)
 {
     int i = 0, j = len - 1, temp;
@@ -141,7 +147,9 @@ void reverse(char* str, int len)
     }
 }
 
+#ifndef RAM
 #pragma CODE_SECTION(ConvertIntToStr, ".TI.ramfunc")
+#endif
 int ConvertIntToStr(int32_t x, char str[], int p)
 {
     int i = 0;
@@ -160,7 +168,9 @@ int ConvertIntToStr(int32_t x, char str[], int p)
 
 static const float POW10[8] = {1.0f, 10.0f, 100.0f, 1000.0f, 10000.0f, 100000.0f, 1000000.0f, 10000000.0f};
 
+#ifndef RAM
 #pragma CODE_SECTION(ftoa, ".TI.ramfunc")
+#endif
 int ftoa(float n, char* res, int afterpoint)
 {
     int i = 0;
@@ -192,7 +202,9 @@ int ftoa(float n, char* res, int afterpoint)
     return i;
 }
 
+#ifndef RAM
 #pragma CODE_SECTION(SendFloatAsText, ".TI.ramfunc")
+#endif
 void SendFloatAsText(float f0, float f1, float f2, float f3, float f4, float f5, float f6, float f7)
 {
     char str[TX_BUF_LEN];

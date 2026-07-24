@@ -78,6 +78,12 @@
 
 #define FP              M*G
 
+// --- State method regulation for inductor ---
+#define KW               ((float)-1.4862e4)
+#define KDDOT            -603.41f
+#define KD               ((float)-3.8998e4)
+#define KR               -35.63f
+
 #define I_STORE_CHANGE_POLES_PLACEMENT  10000
 #define I_STORE_2E_DECOLLAGE            15000
 
