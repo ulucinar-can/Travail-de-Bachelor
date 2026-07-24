@@ -21,12 +21,15 @@
 // savitzky filter coefficients, order = 2, window = 9
 const float SAVITZKY[FILTWINDOW] = {-0.0667, -0.05, -0.0333, -0.0167, 0.0, 0.0167, 0.0333, 0.05, 0.0667};
 
-// bandstop Filter (initialise to the 75Hz large bandstop filter design)
+// Filtre coupe-bande actif : denominateur a[], numerateur b[].
+// Jeu courant = set _6 (75 Hz, bande coupee ~40-130 Hz). Les 11 jeux
+// disponibles (_0.._10) sont definis dans FunctionHeader.h.
 float a[Na] = {A1_B1_6, A2_6};
 float b[Nb] = {B0_B2_6, A1_B1_6, B0_B2_6};
 
 /* ========================================================================= *
- * FILTER COEFFICIENTS
+ * POLYNOMES DE CORRECTION DE POSITION (apply_poly5 - actuellement desactive)
+ *   Linearisation ADC->entrefer : coeffs a0..a5 par inducteur.
  * ========================================================================= */
 const float POS_COR_1[6] = {
     -1.6985e-4f,    // a0
@@ -67,6 +70,9 @@ const float POS_COR_4[6] = {
 /* ========================================================================= *
  * CONTROL & REGULATION
  * ========================================================================= */
+/* Boucle de courant PI avec anti-windup par back-calculation.
+ *   ic          : courant de consigne      current : courant mesure
+ *   integral,ue : etats persistants        uc      : tension commandee [0..UMAX] */
 #ifndef RAM
 #pragma CODE_SECTION(PI_current_regulator, ".TI.ramfunc")
 #endif
@@ -87,22 +93,31 @@ void PI_current_regulator(float ic, float current, float *integral, float *ue, f
     *ue = (uc_prim - *uc) * ANTIWINDUP_EN;
 }
 
+/* Derivateur Savitzky-Golay (ordre 2, fenetre 9) : estime la vitesse a partir
+ * de l'historique de position. Le plus recent echantillon est en Buffer[FILTWINDOW-1].
+ * v = pente (par echantillon) * F_PWM  ->  vitesse en m/s. La somme des coeffs
+ * SAVITZKY etant nulle, une position constante donne v = 0 (utile a l'amorcage). */
+#ifndef RAM
+#pragma CODE_SECTION(savitzky_Filter, ".TI.ramfunc")
+#endif
 float savitzky_Filter(float *Buffer)
 {
     float v = 0.0f;
     uint16_t m = 0;
 
-    // savitzky algorithm
+    // Convolution avec les coefficients de derivee SG
     for(m = 0; m < FILTWINDOW; m++)
         v += F_PWM*Buffer[m]*SAVITZKY[m];
 
-    // update buffer for next position
+    // Decalage de la fenetre glissante (anciens echantillons vers la gauche)
     for(m = 0; m < FILTWINDOW-1; m++)
        Buffer[m] = Buffer[(m+1)];
 
     return v;
 }
 
+/* Filtre IIR biquad (coupe-bande) en forme directe I, coeffs a[]/b[] globaux.
+ * entree/sortie : buffers d'historique (entree[0] = echantillon courant). */
 #ifndef RAM
 #pragma CODE_SECTION(IIR_Filter, ".TI.ramfunc")
 #endif
@@ -131,6 +146,8 @@ float IIR_Filter(float *entree, float *sortie)
 
 /* ========================================================================= *
  * COMMUNICATION & STRING UTILS
+ *   Conversion float->ASCII "maison" (sans printf) pour la telemetrie UART.
+ *   Place en RAM en build FLASH pour ne pas ralentir l'ISR.
  * ========================================================================= */
 #ifndef RAM
 #pragma CODE_SECTION(reverse, ".TI.ramfunc")
@@ -166,8 +183,11 @@ int ConvertIntToStr(int32_t x, char str[], int p)
     return i;
 }
 
+// Table de puissances de 10 (evite un appel a powf dans ftoa)
 static const float POW10[8] = {1.0f, 10.0f, 100.0f, 1000.0f, 10000.0f, 100000.0f, 1000000.0f, 10000000.0f};
 
+/* float -> chaine ASCII avec 'afterpoint' decimales. Gere la retenue d'arrondi
+ * (ex : 1.9997 a 3 decimales donne "2.000" et non "1.1000"). */
 #ifndef RAM
 #pragma CODE_SECTION(ftoa, ".TI.ramfunc")
 #endif

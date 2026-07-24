@@ -2,7 +2,17 @@
 //
 // FILE:    Sustentation_Main.c
 //
-// TITLE:   Power command and regulation for magnetic sustenance (MIMO)
+// TITLE:   Commande et regulation d'une sustentation magnetique 4 inducteurs
+//
+// ARCHITECTURE :
+//   - Machine d'etat (STATE_0..6) : decollage avant (ind. 1&2) puis arriere (3&4).
+//   - AVANT : retour d'etat SISO par inducteur (position + vitesse Savitzky-Golay)
+//     + action integrale + anti-windup.
+//   - COMPLET : bascule bumpless vers un controle modal MIMO (Z / tangage / roulis).
+//   - Chaque force -> filtre coupe-bande IIR -> transformee inverse force/courant
+//     -> boucle de courant PI -> HRPWM.
+//   - Chemin temps reel dans l'ISR ADC a 25 kHz. En build FLASH, les fonctions
+//     critiques sont executees en RAM (voir les gardes #ifndef RAM).
 //
 // AUTHOR :
 //          - Can Ulu inar   - 2026
@@ -88,26 +98,14 @@ float ic1 = 0.0, ue1 = 0.0, integral_i1 = 0;
 float fc1 = 0;
 float pos1Buff[FILTWINDOW] = {[0 ... 8] = 0};
 float v1 = 0, ep1 = 0, xr1 = 0, fce1 = 0, sum_vp1 = 0, fc1_prim = 0;
-float Position_c1 = DELTA_0, Position_c1_dec = 0;
+float Position_c1 = DELTA_0, Position_c1_dec = 2.85e-3f;
 
 // --- Inductor 2 Control ---
 float ic2 = 0, ue2 = 0, integral_i2 = 0;
 float fc2 = 0;
 float pos2Buff[FILTWINDOW] = {[0 ... 8] = 0};
 float v2 = 0, ep2 = 0, xr2 = 0, fce2 = 0, sum_vp2 = 0, fc2_prim = 0;
-float Position_c2 = DELTA_0, Position_c2_dec = 0;
-
-//// --- Inductor 1 Control (SISO avant, actif jusqu'a la bascule MIMO) ---
-//float ic1 = 0.0, ue1 = 0.0, integral_i1 = 0;
-//float fc1 = 0;
-//float ep1 = 0, xr1 = 0, fc1_prim = 0;
-//float Position_c1 = DELTA_0, Position_c1_dec = 2.85e-3f;
-//
-//// --- Inductor 2 Control (SISO avant, actif jusqu'a la bascule MIMO) ---
-//float ic2 = 0, ue2 = 0, integral_i2 = 0;
-//float fc2 = 0;
-//float ep2 = 0, xr2 = 0, fc2_prim = 0;
-//float Position_c2 = DELTA_0, Position_c2_dec = 2.85e-3f;
+float Position_c2 = DELTA_0, Position_c2_dec = 2.85e-3f;
 
 // --- Inductor 3 ---
 float ic3 = 0, ue3 = 0, integral_i3 = 0;
@@ -176,10 +174,6 @@ float Cur1_filt = 0;
 float Cur2_filt = 0;
 float Cur3_filt = 0;
 float Cur4_filt = 0;
-
-// --- Variables Observateurs SISO avant (inducteurs 1 & 2) ---
-float pos_est1 = DELTA_0, vit_est1 = 0.0f, for_est1 = 0.0f, err_obs1 = 0.0f;
-float pos_est2 = DELTA_0, vit_est2 = 0.0f, for_est2 = 0.0f, err_obs2 = 0.0f;
 
 /* ========================================================================= *
  * FUNCTION PROTOTYPES (Local)
@@ -261,6 +255,11 @@ void error (void)
 /* ========================================================================= *
  * INTERRUPT SERVICE ROUTINES (ISRs)
  * ========================================================================= */
+
+/* ISR ADC principale, cadencee a 25 kHz (F_PWM) : contient toute la chaine
+ * temps reel (lecture ADC -> etat -> regulation -> HRPWM).
+ * En build FLASH elle est copiee/executee en RAM (.TI.ramfunc) pour eviter les
+ * wait-states flash ; en build RAM la garde est neutralisee (deja en RAM). */
 #ifndef RAM
 #pragma CODE_SECTION(adcA1ISR, ".TI.ramfunc")
 #endif
@@ -306,11 +305,6 @@ __interrupt void adcA1ISR(void)
     Position3 = ((float)(ADC_pos_3) * CONV_POS2);
     Position4 = ((float)(ADC_pos_4) * CONV_POS2);
 
-//    Position1 = apply_poly5((float)(ADC_pos_1), POS_COR_1);
-//    Position2 = apply_poly5((float)(ADC_pos_2), POS_COR_2);
-//    Position3 = apply_poly5((float)(ADC_pos_3), POS_COR_3);
-//    Position4 = apply_poly5((float)(ADC_pos_4), POS_COR_4);
-
     qm[0] = T_MAT[0][0]*Position1 + T_MAT[0][1]*Position2 + T_MAT[0][2]*Position3 + T_MAT[0][3]*Position4;
     qm[1] = T_MAT[1][0]*Position1 + T_MAT[1][1]*Position2 + T_MAT[1][2]*Position3 + T_MAT[1][3]*Position4;
     qm[2] = T_MAT[2][0]*Position1 + T_MAT[2][1]*Position2 + T_MAT[2][2]*Position3 + T_MAT[2][3]*Position4;
@@ -318,9 +312,9 @@ __interrupt void adcA1ISR(void)
     /* --------------------------------------------------------------------- *
      * 3. OBSERVATEURS
      * --------------------------------------------------------------------- */
+    // AVANT (SISO) : estimation de la vitesse par derivateur Savitzky-Golay.
     if(PosRegFlag1 && !MimoFlag)
     {
-        // --- Filtres de vitesse Savitzky-Golay ---
         pos1Buff[FILTWINDOW-1] = Position1;
         v1 = savitzky_Filter(pos1Buff);
 
@@ -328,6 +322,7 @@ __interrupt void adcA1ISR(void)
         v2 = savitzky_Filter(pos2Buff);
     }
 
+    // MIMO : observateur de Luenberger modal (position/vitesse/force par mode Z,T,R).
     if(MimoFlag)
     {
         float e_obs0 = qm[0] - qm_est[0];
@@ -448,13 +443,19 @@ __interrupt void adcA1ISR(void)
 
                if(Position1 <= Position_c1_dec && Position2 <= Position_c2_dec)
                {
+                   uint16_t m;
+
                    Position_c1 = Position1;
                    Position_c2 = Position2;
 
                    xr1 = 0.0f;
                    xr2 = 0.0f;
-                   pos_est1 = Position1; vit_est1 = 0.0f; for_est1 = 0.0f;
-                   pos_est2 = Position2; vit_est2 = 0.0f; for_est2 = 0.0f;
+
+                   for(m = 0; m < FILTWINDOW; m++)
+                   {
+                       pos1Buff[m] = Position1;
+                       pos2Buff[m] = Position2;
+                   }
 
                    state = STATE_3;
                }
@@ -664,6 +665,11 @@ __interrupt void adcA1ISR(void)
         // ================================================================= //
         if(PosRegFlag1 && !MimoFlag)
         {
+           // Loi de retour d'etat par inducteur :
+           //   fc = Kw*consigne - Kd*position - Kddot*vitesse + Kr*integrale + m*g
+           //   (Kw,Kd,Kddot,Kr < 0). Anti-windup par back-calculation (fce),
+           //   puis coupe-bande IIR et transformee inverse force->courant.
+
            // --- Inducteur 1 ---
            // Calcul de la force de consigne 1
            ep1 = Position_c1 - Position1;
@@ -712,6 +718,10 @@ __interrupt void adcA1ISR(void)
 
         // ================================================================= //
         // B2. REGULATION MIMO (torseur LQI + allocation)
+        //   u_cmd (par mode) = LQI_Q*(q-ref) + LQI_QD*vitesse - LQI_EPS*integrale
+        //   forces = F_STAT + W_MAT * u_cmd   (allocation min-norme sur 4 inducteurs)
+        //   eps_m  : integrateurs modaux, geles en saturation (tolerance AW_TOL)
+        //   u_ach  : effort reellement atteint (forces filtrees) -> observateur
         // ================================================================= //
         if(MimoFlag)
         {
