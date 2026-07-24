@@ -29,7 +29,7 @@ BX = DX/2
 TX = 2.267
 JX = (M_TOT*g*BX**2 *TX**2)/(4*np.pi**2*L)
 
-DY = 0.278
+DY = 0.28
 BY = DY/2
 TY = 5.833 - 2
 JY    = (M_TOT*g*BY**2 *TY**2)/(4*np.pi**2*L)
